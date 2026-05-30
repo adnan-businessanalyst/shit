@@ -4017,7 +4017,6 @@ function persist() {
   DB.save('vc', [voucherCounter]);
   DB.save('cc', [confCounter]);
   DB.save('bc', [batchCounter]);
-  if (typeof hotels !== 'undefined') DB.save('hotels', hotels);
 }
 
 /* Seed demo data if empty */
