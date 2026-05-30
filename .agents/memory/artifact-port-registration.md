@@ -1,12 +1,12 @@
 ---
 name: Artifact dev-server port registration in .replit
-description: Why a new web artifact's dev workflow fails port detection, and the configureWorkflow workaround that registers the port.
+description: Why a new web artifact's dev workflow fails port detection, and how to register the port so the artifact's own workflow runs healthy.
 ---
 
 # New web artifact dev server fails the platform port check
 
 ## Symptom
-A newly-created `web` artifact's managed workflow (`artifacts/<slug>: web`) is marked **failed** even though Vite starts fine and reports "ready". Binding is correct (IPv4 `0.0.0.0`, reachable on `127.0.0.1`). The proxy at `localhost:80/<previewPath>` serves the app *while* Vite is up, but the platform's port detector reports the port as not open, then kills the dev server, so the preview is not durable.
+A newly-created `web` artifact's managed workflow (`artifacts/<slug>: web`) is marked **failed** even though Vite starts fine and reports "ready". Binding is correct (IPv4 `0.0.0.0`, reachable on `127.0.0.1`). The proxy at `localhost:80/<previewPath>` serves the app *while* Vite is up, but the platform's port detector reports the port as not open, then kills the dev server, so the preview is not durable. In the artifact dropdown the app shows as "failed to run".
 
 ## Root cause
 The platform's port detector / health check only monitors ports that are declared in `.replit` under `[[ports]]`. That list is populated at environment boot from the artifacts that existed then. A web artifact created *later* gets a port in its `artifact.toml` (`localPort`) but that port is **never synced into `.replit`**, so the detector never sees it → reports `DIDNT_OPEN_A_PORT` → kills the workflow.
@@ -20,24 +20,28 @@ The platform's port detector / health check only monitors ports that are declare
 - editing `.replit` directly — **blocked**
 - `configureWorkflow` targeting the **artifact-managed** workflow name (`artifacts/<slug>: web`) → `PROHIBITED_ACTION` (artifact-managed, can't override)
 
-## The fix that works
-Create a **separately-named** workflow with `configureWorkflow` (it IS the documented owner of port mappings, and DOES write `[[ports]]` into `.replit`):
+## The fix that works (two steps)
+1. **Register the port** by creating a temporary, separately-named workflow with `configureWorkflow` (it IS the documented owner of port mappings and DOES write `[[ports]]` into `.replit`):
+   ```
+   configureWorkflow({
+     name: "Temp Port Register",          // NOT "artifacts/<slug>: web"
+     command: "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/<slug> run dev",
+     waitForPort: 5000,                    // a supported port, e.g. 5000
+     outputType: "webview",
+     autoStart: true,
+   })
+   ```
+   This adds `localPort = 5000 / externalPort = 5000` to `.replit`.
 
-```
-configureWorkflow({
-  name: "<Something> Dev Server",      // NOT "artifacts/<slug>: web"
-  command: "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/<slug> run dev",
-  waitForPort: 5000,                   // use a supported port (e.g. 5000)
-  outputType: "webview",
-  autoStart: true,
-})
-```
+2. **Hand serving back to the artifact's own workflow.** The `.replit` port entry **persists after the temp workflow is removed** (confirmed). So:
+   - `removeWorkflow({ name: "Temp Port Register" })` to free the port,
+   - `restart_workflow("artifacts/<slug>: web")` — it now passes detection (port is in `.replit` and free) and runs healthy.
 
-After this, `.replit` gains `localPort = 5000 / externalPort = 5000`, the detector sees it, the workflow runs durably, and the path-router proxy serves `:80/<previewPath>` → 5000 regardless of which workflow runs Vite.
+End state: only the artifact-managed workflow runs, no "failed" badge, no extra workflow.
 
-**How to apply:**
-- The artifact-managed `artifacts/<slug>: web` workflow will remain "failed" — leave it idle. Do NOT start it while the separate dev-server workflow runs; both bind the same port and conflict.
-- Pick a port from the supported set (3000–9000 range incl. 5000); the port number alone isn't enough — it must be registered via `configureWorkflow`.
+## Pitfalls
+- Don't run two workflows bound to the same port at once — they conflict. Remove the temp one before starting the artifact workflow.
+- Pick a port from the supported set (3000–9000 incl. 5000); the number alone isn't enough — it must be in `.replit [[ports]]`.
 
 ## Production is unaffected
-If the artifact's production serve is `static` (Vite build → `dist/public`), publishing/deploy reads `artifact.toml` directly and serves static files — it never depends on the dev port detector. Production deploy works even while the dev workflow shows failed.
+If the artifact's production serve is `static` (Vite build → `dist/public`), publishing/deploy reads `artifact.toml` directly and serves static files — it never depends on the dev port detector. Production deploy works even if the dev workflow is misconfigured.

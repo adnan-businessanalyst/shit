@@ -4,7 +4,7 @@ A self-contained Arabic (RTL) Umrah / hospitality operations dashboard served as
 
 ## Run & Operate
 
-- **Web app (dev):** workflow `Ofoq Dev Server` runs the Vite dev server on port 5000 — `PORT=5000 BASE_PATH=/ pnpm --filter @workspace/ofoq-al-diafah run dev`
+- **Web app (dev):** workflow `artifacts/ofoq-al-diafah: web` runs the Vite dev server on port 5000 — `PORT=5000 BASE_PATH=/ pnpm --filter @workspace/ofoq-al-diafah run dev`
 - `pnpm --filter @workspace/api-server run dev` — run the API server (scaffold only; the app does not use it)
 - `pnpm run typecheck` — full typecheck across all packages
 - Production build: `PORT=5000 BASE_PATH=/ NODE_ENV=production pnpm --filter @workspace/ofoq-al-diafah run build` → static output in `dist/public/`
@@ -27,7 +27,7 @@ A self-contained Arabic (RTL) Umrah / hospitality operations dashboard served as
 - **Served as-is, not rebuilt in React.** The app is a complete, working self-contained HTML file. It is served verbatim for full fidelity rather than being ported to a framework.
 - **100% client-side persistence.** State is stored in the browser using IndexedDB and localStorage (keys prefixed `oad_`). There is no server-side database for app data.
 - **Only external dependency is the Google Fonts CDN.** All images are inlined as data-URLs.
-- **Dev server runs under the `Ofoq Dev Server` workflow**, not the artifact-managed `artifacts/ofoq-al-diafah: web` workflow — see Gotchas.
+- **Dev server runs under the artifact-managed `artifacts/ofoq-al-diafah: web` workflow** on port 5000 (registered in `.replit`) — see Gotchas.
 
 ## Product
 
@@ -39,7 +39,7 @@ A hospitality operations platform for managing Umrah/pilgrimage guest services: 
 
 ## Gotchas
 
-- **Use the `Ofoq Dev Server` workflow to serve the app, not `artifacts/ofoq-al-diafah: web`.** The artifact-managed web workflow shows "failed" because its auto-assigned port is never registered in `.replit`, so the platform's port detector kills its dev server. The separately-configured `Ofoq Dev Server` workflow registers port 5000 in `.replit` and runs durably. Do **not** start the artifact-managed web workflow while `Ofoq Dev Server` is running — both bind port 5000 and will conflict.
+- **The dev workflow needs its port registered in `.replit`.** A newly-created web artifact's port (here 5000) is not auto-synced into `.replit`, so the platform's port detector marks the workflow "failed" and kills Vite. Once port 5000 is present under `[[ports]]` in `.replit`, the artifact workflow `artifacts/ofoq-al-diafah: web` runs healthy. See `.agents/memory/artifact-port-registration.md` for how the port got registered if it ever drops out.
 - `vite.config.ts` throws without `PORT` and `BASE_PATH` — set both for any build or run outside the workflow.
 
 ## Pointers

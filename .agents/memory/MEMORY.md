@@ -1,1 +1,1 @@
-- [Artifact dev-server port registration](artifact-port-registration.md) — new web artifact's `artifacts/<slug>: web` workflow fails port detection; fix is a separately-named `configureWorkflow` (it writes `.replit [[ports]]`). Don't run both — port conflict.
+- [Artifact dev-server port registration](artifact-port-registration.md) — new web artifact's `artifacts/<slug>: web` workflow fails port detection until its port is in `.replit [[ports]]`; register via a temp `configureWorkflow`, then remove it (port persists) and restart the artifact workflow.
