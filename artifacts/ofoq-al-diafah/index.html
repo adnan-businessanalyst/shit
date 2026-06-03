@@ -8455,7 +8455,7 @@ function renderActivityLog() {
   const typeF   = document.getElementById('log-filter-type')?.value||'';
 
   // Combined log from vouLog + invLog + global
-  const allLogs = [...(voucherLog||[]), ...(inventoryLog||[])].sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  const allLogs = [...(vouLog||[]), ...(invLog||[])].sort((a,b)=>new Date(b.ts)-new Date(a.ts));
 
   document.getElementById('log-subtitle').textContent = `${allLogs.length} entries`;
 
@@ -8480,8 +8480,8 @@ function renderActivityLog() {
 }
 
 function clearActivityLog() {
-  if (voucherLog) { voucherLog.length=0; DB.save('vouLog',[]); }
-  if (inventoryLog) { inventoryLog.length=0; DB.save('invLog',[]); }
+  if (vouLog) { vouLog.length=0; DB.save('vouLog',[]); }
+  if (invLog) { invLog.length=0; DB.save('invLog',[]); }
   renderActivityLog();
   toast('Activity log cleared');
 }
@@ -13741,14 +13741,15 @@ if (_csvZone) {
   });
 }
 
-// Check for existing session
-const _sess = sessionGet();
-if (_sess) {
-  currentUser = _sess;
-  enterApp();
-} else {
-  // Just show auth screen (already visible by default)
-}
+// Check for existing session — deferred until DOM is fully parsed
+// (auth-screen and app elements are defined after this script block)
+document.addEventListener('DOMContentLoaded', function() {
+  const _sess = sessionGet();
+  if (_sess) {
+    currentUser = _sess;
+    enterApp();
+  }
+});
 
 /* ─── Font Size Controls ─────────────────────────── */
 var _fontScale = parseFloat(Prefs.get('font_scale', '1') || '1');
