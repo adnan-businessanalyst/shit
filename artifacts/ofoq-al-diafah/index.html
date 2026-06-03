@@ -4283,26 +4283,22 @@ function renderWidgetContent(w) {
     if (style === 'card-stripe') {
       return `<div class="kpi-card" style="border-left:4px solid ${accent}">
         <div>
-          <div class="kpi-icon">${def.icon}</div>
           <div class="kpi-value" style="color:${accent}">${valDisplay}</div>
           <div class="kpi-label">${def.label}</div>
         </div>
       </div>`;
     } else if (style === 'card-top') {
       return `<div class="kpi-card" style="border-top:4px solid ${accent};padding-top:14px">
-        <div class="kpi-icon">${def.icon}</div>
         <div class="kpi-value" style="color:${accent}">${Number(val).toLocaleString()}</div>
         <div class="kpi-label">${def.label}</div>
       </div>`;
     } else if (style === 'card-filled') {
       return `<div class="kpi-card" style="background:${accent};margin:-20px;padding:20px;border-radius:var(--r)">
-        <div style="font-size:2.0rem;margin-bottom:8px">${def.icon}</div>
         <div style="font-size:2.1429rem;font-weight:700;color:#fff;line-height:1">${Number(val).toLocaleString()}</div>
         <div style="font-size:0.8571rem;color:rgba(255,255,255,0.75);margin-top:6px;font-weight:500">${def.label}</div>
       </div>`;
     } else if (style === 'card-minimal') {
       return `<div style="display:flex;align-items:center;gap:14px">
-        <div style="width:48px;height:48px;border-radius:12px;background:${accent}22;display:flex;align-items:center;justify-content:center;font-size:1.5714rem;flex-shrink:0">${def.icon}</div>
         <div>
           <div style="font-size:1.8571rem;font-weight:700;color:${accent};line-height:1">${Number(val).toLocaleString()}</div>
           <div style="font-size:0.8571rem;color:var(--ink-muted);margin-top:4px">${def.label}</div>
@@ -4310,7 +4306,6 @@ function renderWidgetContent(w) {
       </div>`;
     } else if (style === 'card-large') {
       return `<div style="text-align:center;padding:10px 0">
-        <div style="font-size:2.5714rem;margin-bottom:8px">${def.icon}</div>
         <div style="font-size:3.4286rem;font-weight:700;color:${accent};line-height:1">${Number(val).toLocaleString()}</div>
         <div style="font-size:0.9286rem;color:var(--ink-muted);margin-top:8px">${def.label}</div>
       </div>`;
@@ -8314,7 +8309,6 @@ function renderAR() {
     ['⚠️', overdue.length,                              'Overdue',        'var(--red)'],
   ].map(([icon,val,lbl,col])=>`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;border-top:3px solid ${col}">
-      <div style="font-size:1.5714rem;margin-bottom:5px">${icon}</div>
       <div style="font-size:${typeof val==='number'?'26':'18'}px;font-weight:700;color:${col};font-family:'Alexandria',sans-serif">${val}</div>
       <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:4px">${lbl}</div>
     </div>`).join('');
@@ -9342,7 +9336,6 @@ function renderAllReservations() {
     ['✅', confirmed,     'Confirmed',   'var(--green)'],
   ].map(([icon,val,lbl,col])=>`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;border-top:3px solid ${col}">
-      <div style="font-size:1.5714rem;margin-bottom:4px">${icon}</div>
       <div style="font-size:1.7143rem;font-weight:700;color:${col};font-family:'Alexandria',sans-serif">${val}</div>
       <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:3px">${lbl}</div>
     </div>`).join('');
@@ -12182,7 +12175,6 @@ function renderTickets() {
     ['⚠️', critical,                                             'Critical',    'var(--red)'],
   ].map(([icon,val,lbl,col])=>`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;border-top:3px solid ${col}">
-      <div style="font-size:1.5714rem;margin-bottom:4px">${icon}</div>
       <div style="font-size:1.7143rem;font-weight:700;color:${col};font-family:'Alexandria',sans-serif">${val}</div>
       <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:3px">${lbl}</div>
     </div>`).join('');
