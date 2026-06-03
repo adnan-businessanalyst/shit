@@ -12876,7 +12876,6 @@ function renderReports() {
     ['🏢', tip(agencies,'Unique Agencies','Count of distinct agency names',`From ${filteredVouchers.length} vouchers`), 'Agencies', 'metric-gold'],
   ].map(([icon,val,lbl,cls])=>`
     <div class="metric ${cls}">
-      <div class="metric-icon">${icon}</div>
       <div class="metric-val">${typeof val==='number'?Number(val).toLocaleString():val}</div>
       <div class="metric-label">${lbl}</div>
     </div>`).join('');
@@ -12994,7 +12993,6 @@ function renderOpsReports() {
   // ── Top Ratios strip ──────────────────────────────────────
   const ratioCard = (icon, value, label, sub, color) => `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;text-align:center;border-top:3px solid ${color}">
-      <div style="font-size:1.7143rem;margin-bottom:6px">${icon}</div>
       <div style="font-size:1.8571rem;font-weight:700;color:${color};line-height:1;font-family:'Alexandria',sans-serif">${value}</div>
       <div style="font-size:0.8571rem;font-weight:600;color:var(--ink);margin-top:6px">${label}</div>
       <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:2px">${sub}</div>
@@ -13288,7 +13286,6 @@ function renderFinancial() {
     ['✅', `${currency} ${netProfit.toLocaleString()}`,     'Net Profit',      netProfit>=0?'var(--green)':'var(--red)'],
   ].map(([icon,val,lbl,col])=>`
     <div class="metric" style="border-top:3px solid ${col}">
-      <div class="metric-icon">${icon}</div>
       <div class="metric-val" style="font-size:1.4286rem;color:${col}">${val}</div>
       <div class="metric-label">${lbl}</div>
     </div>`).join('');
