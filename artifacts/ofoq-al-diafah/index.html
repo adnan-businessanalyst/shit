@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ofoq Al Diafah — أفق الضيافة</title>
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>html { font-size: 14px; }
 
 /* ─── Reset & Base ─────────────────────────────────────── */
@@ -3778,169 +3779,84 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   STORAGE ENGINE — IndexedDB with localStorage fallback
-   All data lives in IndexedDB ('ofoq_db').
-   Synchronous in-memory cache mirrors the DB so existing
-   code (DB.load / DB.save) works unchanged.
+   STORAGE ENGINE — Supabase cloud backend
+   All data lives in Supabase PostgreSQL (oad_kv table).
+   In-memory cache mirrors the DB so DB.load/DB.save work synchronously.
 ═══════════════════════════════════════════════════════ */
-const DB_NAME    = 'ofoq_db';
-const DB_VERSION = 1;
-const DB_STORE   = 'keyval';
+const SUPABASE_URL = '%VITE_SUPABASE_URL%';
+const SUPABASE_KEY = '%VITE_SUPABASE_ANON_KEY%';
 
-let _idb = null;          // IDB connection
-let _cache = {};          // in-memory mirror
-let _idbReady = false;    // true once IDB is open and cache populated
-const _idbQueue = [];     // writes queued before IDB is ready
+let _sbClient = null;
+let _cache    = {};
 
-function _idbOpen() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = e => {
-      e.target.result.createObjectStore(DB_STORE);
-    };
-    req.onsuccess = e => { resolve(e.target.result); };
-    req.onerror   = e => { reject(e.target.error); };
-  });
-}
-
-async function _idbGet(idb, key) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(DB_STORE, 'readonly');
-    const req = tx.objectStore(DB_STORE).get(key);
-    req.onsuccess = () => res(req.result);
-    req.onerror   = () => rej(req.error);
-  });
-}
-
-async function _idbPut(idb, key, value) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(DB_STORE, 'readwrite');
-    const req = tx.objectStore(DB_STORE).put(value, key);
-    req.onsuccess = () => res();
-    req.onerror   = () => rej(req.error);
-  });
-}
-
-async function _idbDelete(idb, key) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(DB_STORE, 'readwrite');
-    const req = tx.objectStore(DB_STORE).delete(key);
-    req.onsuccess = () => res();
-    req.onerror   = () => rej(req.error);
-  });
-}
-
-async function _idbGetAll(idb) {
-  return new Promise((res, rej) => {
-    const tx = idb.transaction(DB_STORE, 'readonly');
-    const store = tx.objectStore(DB_STORE);
-    const keys = [], values = [];
-    store.openCursor().onsuccess = e => {
-      const cursor = e.target.result;
-      if (cursor) { keys.push(cursor.key); values.push(cursor.value); cursor.continue(); }
-      else { const out={}; keys.forEach((k,i)=>out[k]=values[i]); res(out); }
-    };
-  });
-}
-
-// All DB keys used by the app
 const DB_KEYS = [
   'rooms','vouchers','confirmations','batches','invLog','vouLog',
   'hotels','busCompanies','mutamers','hotelReservations','busReservations',
   'notifications','clientCompanies','providers','tours','itTickets',
-  'appSettings','authUsers','gc','vc','dashConfig','lookups',
+  'appSettings','authUsers','gc','vc','cc','bc','dashConfig','lookups',
 ];
 
-// Boot: open IDB, load all data into cache, migrate from localStorage
-async function _idbBoot() {
+// Async boot: connect to Supabase and load all data into cache
+const _dbBootPromise = (async () => {
   try {
-    _idb = await _idbOpen();
-    // Load everything from IDB into cache
-    const stored = await _idbGetAll(_idb);
-    Object.assign(_cache, stored);
+    _sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await _sbClient.from('oad_kv').select('key, value');
+    if (error) throw error;
+    (data || []).forEach(row => { _cache[row.key] = row.value; });
 
-    // One-time migration: pull any existing localStorage data into IDB
-    if (!_cache['_migrated_from_ls']) {
-      let migrated = 0;
+    // One-time migration: pull existing localStorage data into Supabase
+    if (!_cache['_migrated_sb']) {
+      const toWrite = [];
       DB_KEYS.forEach(key => {
         const raw = localStorage.getItem('oad_' + key);
         if (raw && !_cache[key]) {
-          try {
-            _cache[key] = JSON.parse(raw);
-            migrated++;
-          } catch {}
+          try { _cache[key] = JSON.parse(raw); toWrite.push({ key, value: _cache[key] }); } catch {}
         }
       });
-      // Also migrate non-array keys
-      ['oad_dark_mode','oad_font_scale','oad_onboarded','oad_inv_cleared_v1',
-       'oad_batch_prefix_migrated','oad_last_backup','oad_dashConfig'].forEach(k => {
-        const short = k.replace('oad_','');
-        const v = localStorage.getItem(k);
-        if (v && !_cache[short]) _cache[short] = v;
-      });
-      _cache['_migrated_from_ls'] = '1';
-      // Save all migrated data to IDB
-      await Promise.all(Object.entries(_cache).map(([k,v]) => _idbPut(_idb, k, v)));
-      if (migrated > 0) console.log(`[OAD] Migrated ${migrated} collections from localStorage to IndexedDB`);
+      _cache['_migrated_sb'] = '1';
+      toWrite.push({ key: '_migrated_sb', value: '1' });
+      await _sbClient.from('oad_kv').upsert(toWrite);
+      if (toWrite.length > 1) console.log(`[OAD] Migrated ${toWrite.length - 1} collections to Supabase`);
     }
-
-    _idbReady = true;
-    // Flush any queued writes
-    while (_idbQueue.length) {
-      const {key, data} = _idbQueue.shift();
-      await _idbPut(_idb, key, data);
-    }
-    console.log('[OAD] IndexedDB ready');
+    console.log('[OAD] Supabase ready');
   } catch(err) {
-    console.warn('[OAD] IndexedDB unavailable, using localStorage fallback:', err);
-    _idbReady = false;
+    console.error('[OAD] Supabase error, falling back to localStorage:', err);
+    DB_KEYS.forEach(key => {
+      try { const r = localStorage.getItem('oad_'+key); if (r) _cache[key] = JSON.parse(r); } catch {}
+    });
   }
-}
+})();
 
-// Synchronous DB interface — reads from cache, writes to cache + IDB async
+// Synchronous DB interface — reads from in-memory cache, writes to cache + Supabase async
 const DB = {
   load(key) {
     if (_cache[key] !== undefined) return Array.isArray(_cache[key]) ? _cache[key] : [_cache[key]];
-    // Fallback to localStorage
     try { return JSON.parse(localStorage.getItem('oad_'+key)) || []; } catch { return []; }
   },
   save(key, data) {
     _cache[key] = data;
-    // Persist to IDB asynchronously (non-blocking)
-    if (_idbReady && _idb) {
-      _idbPut(_idb, key, data).catch(e => {
-        console.warn('[OAD] IDB write failed for', key, e);
-        // Fallback to localStorage
-        try { localStorage.setItem('oad_'+key, JSON.stringify(data)); } catch {}
-      });
-    } else {
-      // Queue write or use localStorage until IDB is ready
-      _idbQueue.push({key, data});
-      try { localStorage.setItem('oad_'+key, JSON.stringify(data)); } catch {}
+    if (_sbClient) {
+      _sbClient.from('oad_kv').upsert({ key, value: data })
+        .then(({error}) => { if (error) console.warn('[OAD] Supabase write failed:', key, error); });
     }
+    try { localStorage.setItem('oad_'+key, JSON.stringify(data)); } catch {}
   },
   remove(key) {
     delete _cache[key];
-    if (_idbReady && _idb) _idbDelete(_idb, key).catch(() => localStorage.removeItem('oad_'+key));
-    else localStorage.removeItem('oad_'+key);
+    if (_sbClient) _sbClient.from('oad_kv').delete().eq('key', key).then(()=>{});
+    try { localStorage.removeItem('oad_'+key); } catch {}
   },
-  // Clear all app data from IDB + cache
   async clearAll() {
-    DB_KEYS.forEach(k => { delete _cache[k]; });
-    if (_idb) {
-      const tx = _idb.transaction(DB_STORE, 'readwrite');
-      tx.objectStore(DB_STORE).clear();
-    }
+    DB_KEYS.forEach(k => delete _cache[k]);
+    if (_sbClient) await _sbClient.from('oad_kv').delete().in('key', DB_KEYS);
     DB_KEYS.forEach(k => { try { localStorage.removeItem('oad_'+k); } catch {} });
     console.log('[OAD] All data cleared');
   },
-  // Export all data as a JSON backup
   exportAll() {
     const out = {};
     DB_KEYS.forEach(k => { if (_cache[k]) out[k] = _cache[k]; });
     return JSON.stringify(out, null, 2);
   },
-  // Import from a JSON backup
   importAll(json) {
     try {
       const data = JSON.parse(json);
@@ -3950,21 +3866,18 @@ const DB = {
   },
 };
 
-// Replace localStorage calls for non-DB keys (UI preferences)
 const Prefs = {
   get(key, def) {
-    if (_cache['pref_'+key] !== undefined) return _cache['pref_'+key];
+    const v = _cache['pref_'+key];
+    if (v !== undefined) return v;
     return localStorage.getItem('oad_'+key) ?? def;
   },
   set(key, val) {
     _cache['pref_'+key] = val;
-    localStorage.setItem('oad_'+key, val); // prefs stay in localStorage
-    if (_idbReady && _idb) _idbPut(_idb, 'pref_'+key, val).catch(()=>{});
+    localStorage.setItem('oad_'+key, val);
+    if (_sbClient) _sbClient.from('oad_kv').upsert({ key: 'pref_'+key, value: val }).then(()=>{});
   },
 };
-
-// Boot IDB immediately (async, non-blocking)
-_idbBoot();
 
 // ── Clear rooms & meals inventory (one-time reset) ──
 if (!Prefs.get('inv_cleared_v1', null)) {
@@ -4019,20 +3932,7 @@ function persist() {
   DB.save('bc', [batchCounter]);
 }
 
-/* Seed demo data if empty */
-if (rooms.length === 0) {
-  rooms = [
-    { id:'rm1', number:'101', type:'Standard', view:'City View', beds:'1 King Bed', occupancy:2, floor:'1', desc:'Comfortable standard room with city view, en-suite bathroom, minibar.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
-    { id:'rm2', number:'102', type:'Standard', view:'City View', beds:'2 Twin Beds', occupancy:2, floor:'1', desc:'Twin beds, city view, ideal for two travelers.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
-    { id:'rm3', number:'201', type:'Deluxe', view:'Garden View', beds:'1 King Bed', occupancy:2, floor:'2', desc:'Spacious deluxe room with garden view, sitting area, upgraded amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:650, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
-    { id:'rm4', number:'202', type:'Deluxe', view:'Pool View', beds:'2 Twin Beds', occupancy:3, floor:'2', desc:'Deluxe twin room overlooking the pool. Includes premium bedding.', from:'2025-05-18', to:'2025-07-31', costPerNight:680, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
-    { id:'rm5', number:'301', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, separate sitting area, walk-in shower.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
-    { id:'rm6', number:'302', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, all amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
-  ];
-  batches = [{ id:'batch-demo', ref:'HTL-2025-001', name:'Makkah Grand — Season 2025', hotel:'Makkah Grand Hotel', source:'direct', from:'2025-05-17', to:'2025-07-31', confirmedBy:'Demo User', createdAt:'2025-05-17' }];
-  DB.save('batches', batches);
-  persist();
-}
+/* Seed demo data — deferred to _reloadEntities() after Supabase boot */
 
 /* ═══════════════════════════════════════════════════════
    NAVIGATION
@@ -13730,9 +13630,60 @@ if (_csvZone) {
   });
 }
 
-// Check for existing session — deferred until DOM is fully parsed
-// (auth-screen and app elements are defined after this script block)
-document.addEventListener('DOMContentLoaded', function() {
+// Re-populate all entity variables from cache after async Supabase boot
+function _reloadEntities() {
+  rooms             = DB.load('rooms');
+  vouchers          = DB.load('vouchers');
+  confirmations     = DB.load('confirmations');
+  batches           = DB.load('batches');
+  invLog            = DB.load('invLog');
+  vouLog            = DB.load('vouLog');
+  guestIdCounter    = DB.load('gc')[0]  || 1;
+  voucherCounter    = DB.load('vc')[0]  || 1;
+  confCounter       = DB.load('cc')[0]  || 1;
+  batchCounter      = DB.load('bc')[0]  || 1;
+  busCompanies      = DB.load('busCompanies');
+  tours             = DB.load('tours');
+  providers         = DB.load('providers');
+  clientCompanies   = DB.load('clientCompanies');
+  hotels            = DB.load('hotels');
+  mutamers          = DB.load('mutamers');
+  hotelReservations = DB.load('hotelReservations');
+  busReservations   = DB.load('busReservations');
+  notifications     = DB.load('notifications');
+  itTickets         = DB.load('itTickets');
+
+  // Seed demo data only on a genuinely empty first install
+  if (rooms.length === 0 && !_cache['_seeded']) {
+    rooms = [
+      { id:'rm1', number:'101', type:'Standard', view:'City View', beds:'1 King Bed', occupancy:2, floor:'1', desc:'Comfortable standard room with city view, en-suite bathroom, minibar.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
+      { id:'rm2', number:'102', type:'Standard', view:'City View', beds:'2 Twin Beds', occupancy:2, floor:'1', desc:'Twin beds, city view, ideal for two travelers.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
+      { id:'rm3', number:'201', type:'Deluxe', view:'Garden View', beds:'1 King Bed', occupancy:2, floor:'2', desc:'Spacious deluxe room with garden view, sitting area, upgraded amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:650, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
+      { id:'rm4', number:'202', type:'Deluxe', view:'Pool View', beds:'2 Twin Beds', occupancy:3, floor:'2', desc:'Deluxe twin room overlooking the pool. Includes premium bedding.', from:'2025-05-18', to:'2025-07-31', costPerNight:680, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
+      { id:'rm5', number:'301', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, separate sitting area, walk-in shower.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
+      { id:'rm6', number:'302', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, all amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
+    ];
+    batches = [{ id:'batch-demo', ref:'HTL-2025-001', name:'Makkah Grand — Season 2025', hotel:'Makkah Grand Hotel', source:'direct', from:'2025-05-17', to:'2025-07-31', confirmedBy:'Demo User', createdAt:'2025-05-17' }];
+    DB.save('batches', batches);
+    DB.save('_seeded', '1');
+    _cache['_seeded'] = '1';
+    persist();
+  }
+}
+
+// Check for existing session — deferred until DOM is fully parsed and Supabase is ready
+document.addEventListener('DOMContentLoaded', async function() {
+  // Wait for Supabase to load all data into cache
+  await _dbBootPromise;
+
+  // Re-populate entity variables with cloud data
+  _reloadEntities();
+
+  // Hide loading overlay
+  const _loadEl = document.getElementById('_sb-loading');
+  if (_loadEl) _loadEl.style.display = 'none';
+
+  // Session check
   const _sess = sessionGet();
   if (_sess) {
     currentUser = _sess;
@@ -13777,6 +13728,12 @@ function toggleDarkMode() {
 </script>
 
 <!-- ════════ AUTH SCREEN ════════ -->
+<div id="_sb-loading" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;font-family:'Alexandria',sans-serif">
+  <div style="color:#BE9C5C;font-size:1.8rem;font-weight:600;margin-bottom:10px">أفق الضيافة</div>
+  <div style="color:rgba(255,255,255,0.75);font-size:0.95rem;margin-bottom:24px">جارٍ الاتصال بقاعدة البيانات…</div>
+  <div style="width:38px;height:38px;border:3px solid #BE9C5C;border-top-color:transparent;border-radius:50%;animation:_sbspin 0.9s linear infinite"></div>
+  <style>@keyframes _sbspin{to{transform:rotate(360deg)}}</style>
+</div>
 <div id="auth-screen">
 
   <!-- Decorative grid lines -->
