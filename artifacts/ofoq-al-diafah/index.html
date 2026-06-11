@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -528,6 +528,15 @@ tbody tr:hover td { background: var(--cream); }
 
   /* Calendar: even smaller on tiny screens */
   #cal-grid > div { font-size: 0.55rem; padding: 2px 1px !important; min-height: 44px !important; }
+
+  /* Touch targets: ensure tappable elements meet 44px minimum */
+  .btn { min-height: 44px; padding: 10px 14px; }
+  .btn-sm { min-height: 38px; padding: 7px 11px; }
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="number"], input[type="date"], input[type="time"],
+  select, textarea { min-height: 44px; font-size: 1rem; }
+  textarea { min-height: 80px; }
+  .action-bar select, .action-bar input { min-height: 44px; }
 }
 
 /* ─── Extras tags ───────────────────────────────────────── */
@@ -1200,7 +1209,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div class="sidebar-footer" style="padding:12px 16px">
   <div style="display:flex;gap:6px;margin-bottom:8px">
     <div title="Toggle dark mode" onclick="toggleDarkMode()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;flex:1;text-align:center" id="dark-mode-btn">🌙 <span data-i18n="sidebar.dark">Dark</span></div>
-    <div title="Switch language" onclick="toggleLang()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;text-align:center;white-space:nowrap" id="lang-toggle-btn">🌐 عربي</div>
+    <div title="Switch language" onclick="toggleLang()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;text-align:center;white-space:nowrap" id="lang-toggle-btn">🌐 EN</div>
   </div>
   <div class="nav-item" style="color:rgba(1,1,1,0.75);margin-bottom:4px" onclick="doLogout()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:17px;height:17px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1474,25 +1483,25 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="tab-panel active" id="inv-panel-rooms">
         <div class="action-bar">
           <select id="inv-filter-type" onchange="renderInventory()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-            <option value="">All Types</option>
-            <option value="Standard">Standard</option>
-            <option value="Deluxe">Deluxe</option>
-            <option value="Suite">Suite</option>
-            <option value="Family">Family</option>
+            <option value="">جميع الأنواع</option>
+            <option value="Standard">غرفة عادية</option>
+            <option value="Deluxe">ديلوكس</option>
+            <option value="Suite">جناح</option>
+            <option value="Family">عائلية</option>
           </select>
           <select id="inv-filter-status" onchange="renderInventory()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-            <option value="">All Status</option>
-            <option value="Available">Available</option>
-            <option value="Reserved">Reserved</option>
+            <option value="">جميع الحالات</option>
+            <option value="Available">متاحة</option>
+            <option value="Reserved">محجوزة</option>
           </select>
           <select id="inv-filter-source" onchange="renderInventory()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-            <option value="">All Sources</option>
-            <option value="direct">Direct Hotel</option>
-            <option value="agent">Middleman Agent</option>
-            <option value="owned">Company Owned</option>
+            <option value="">جميع المصادر</option>
+            <option value="direct">مباشر من الفندق</option>
+            <option value="agent">عبر وسيط</option>
+            <option value="owned">ملكية الشركة</option>
           </select>
           <select id="inv-filter-batch" onchange="renderInventory()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-            <option value="">All Batches</option>
+            <option value="">جميع الدفعات</option>
           </select>
         </div>
         <div class="card">
@@ -1538,11 +1547,11 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="tab-panel active" id="vou-panel-vouchers">
         <div class="action-bar">
           <select id="vou-filter" onchange="renderVouchers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-            <option value="">All Status</option>
-            <option value="Tentative – Pending Reservation">Tentative (Res.)</option>
-            <option value="Tentative – Pending Payment">Tentative (Pay.)</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="">جميع الحالات</option>
+            <option value="Tentative – Pending Reservation">مؤقت (حجز)</option>
+            <option value="Tentative – Pending Payment">مؤقت (دفع)</option>
+            <option value="Confirmed">مؤكد</option>
+            <option value="Cancelled">ملغي</option>
           </select>
         </div>
         <div id="vouchers-list"></div>
@@ -1571,7 +1580,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="topbar">
       <div>
         <div class="topbar-title" id="nvp-title" data-i18n="pages.newVoucher.title">New B2B Voucher</div>
-        <div class="topbar-sub" id="nvp-step-sub">Step 1 of 4</div>
+        <div class="topbar-sub" id="nvp-step-sub">الخطوة 1 من 4</div>
       </div>
       <button class="btn" onclick="navigate(document.querySelector('[data-page=vouchers]'),'vouchers')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1609,30 +1618,30 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div id="nvp-step-1">
         <div class="card">
           <div class="card-header" style="margin-bottom:14px">
-            <div><div class="card-title">👥 Group & Client Information</div><div class="card-sub">Select the client company and enter group details</div></div>
+            <div><div class="card-title">👥 معلومات المجموعة والعميل</div><div class="card-sub">اختر شركة العميل وأدخل تفاصيل المجموعة</div></div>
           </div>
           <div class="form-grid-3">
-            <div class="field" style="grid-column:span 2"><label class="required">Client Company</label>
+            <div class="field" style="grid-column:span 2"><label class="required">شركة العميل</label>
               <select id="v-agency-select" onchange="onVoucherClientSelect()">
-                <option value="">— Select client company —</option>
+                <option value="">— اختر شركة العميل —</option>
               </select>
             </div>
-            <div class="field"><label>Agency Name</label><input id="v-agency" type="text" placeholder="Auto-filled" readonly style="background:var(--cream)"></div>
-            <div class="field"><label class="required">Group Number</label><input id="v-agency-ref" type="text" placeholder="e.g. 901002419"></div>
-            <div class="field"><label class="required">Leader Phone</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
-            <div class="field"><label>Agent Phone</label><input id="v-phone" type="text" placeholder="+966..."></div>
-            <div class="field"><label>Agent Email</label><input id="v-email" type="email" placeholder="agent@agency.com"></div>
-            <div class="field"><label>Internal Notes</label><input id="v-notes" type="text" placeholder="Any notes..."></div>
+            <div class="field"><label>اسم الوكالة</label><input id="v-agency" type="text" placeholder="مُعبأ تلقائياً" readonly style="background:var(--cream)"></div>
+            <div class="field"><label class="required">رقم المجموعة</label><input id="v-agency-ref" type="text" placeholder="مثال: 901002419"></div>
+            <div class="field"><label class="required">هاتف القائد</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
+            <div class="field"><label>هاتف الوكيل</label><input id="v-phone" type="text" placeholder="+966..."></div>
+            <div class="field"><label>بريد الوكيل</label><input id="v-email" type="email" placeholder="agent@agency.com"></div>
+            <div class="field"><label>ملاحظات داخلية</label><input id="v-notes" type="text" placeholder="أي ملاحظات..."></div>
           </div>
         </div>
         <div class="card" style="margin-top:0">
           <div class="card-header" style="margin-bottom:14px">
-            <div><div class="card-title">Mutamers (PAX)</div></div>
+            <div><div class="card-title">المعتمرون (PAX)</div></div>
           </div>
           <div class="form-grid-3">
-            <div class="field"><label class="required">Total PAX</label><input id="v-pax-total" type="number" min="1" placeholder="e.g. 24" oninput="updatePaxCount()"></div>
-            <div class="field"><label class="required">Men</label><input id="v-pax-men" type="number" min="0" placeholder="e.g. 4" oninput="updatePaxCount()"></div>
-            <div class="field"><label class="required">Women</label><input id="v-pax-women" type="number" min="0" placeholder="e.g. 20" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="required">إجمالي المعتمرين</label><input id="v-pax-total" type="number" min="1" placeholder="مثال: 24" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="required">رجال</label><input id="v-pax-men" type="number" min="0" placeholder="مثال: 4" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="required">نساء</label><input id="v-pax-women" type="number" min="0" placeholder="مثال: 20" oninput="updatePaxCount()"></div>
           </div>
           <div id="pax-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:var(--r-sm);padding:8px 12px;font-size:0.8571rem;margin-top:12px"></div>
           <div id="guests-container" style="display:none"></div>
@@ -1643,34 +1652,34 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div id="nvp-step-2" style="display:none">
         <div class="card">
           <div class="card-header" style="margin-bottom:14px">
-            <div><div class="card-title">✈️ Flight Details</div><div class="card-sub">Arrival and departure information</div></div>
+            <div><div class="card-title">✈️ تفاصيل الرحلة الجوية</div><div class="card-sub">معلومات الوصول والمغادرة</div></div>
           </div>
           <div style="margin-bottom:18px">
-            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> Arrival</div>
+            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> الوصول</div>
             <div class="form-grid-4">
-              <div class="field"><label class="required">Arrival Date</label><input id="v-arr-date" type="date"></div>
-              <div class="field"><label class="required">Flight No.</label><input id="v-arr-flight" type="text" placeholder="e.g. JT 86"></div>
-              <div class="field"><label class="required">Airport</label>
+              <div class="field"><label class="required">تاريخ الوصول</label><input id="v-arr-date" type="date"></div>
+              <div class="field"><label class="required">رقم الرحلة</label><input id="v-arr-flight" type="text" placeholder="مثال: JT 86"></div>
+              <div class="field"><label class="required">المطار</label>
                 <select id="v-arr-airport">
-                  <option value="">— Select —</option>
+                  <option value="">— اختر —</option>
                   <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
-              <div class="field"><label class="required">Arrival Time</label><input id="v-arr-time" type="time"></div>
+              <div class="field"><label class="required">وقت الوصول</label><input id="v-arr-time" type="time"></div>
             </div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:18px">
-            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> Departure</div>
+            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> المغادرة</div>
             <div class="form-grid-4">
-              <div class="field"><label class="required">Departure Date</label><input id="v-dep-date" type="date"></div>
-              <div class="field"><label class="required">Flight No.</label><input id="v-dep-flight" type="text" placeholder="e.g. JT 87"></div>
-              <div class="field"><label class="required">Airport</label>
+              <div class="field"><label class="required">تاريخ المغادرة</label><input id="v-dep-date" type="date"></div>
+              <div class="field"><label class="required">رقم الرحلة</label><input id="v-dep-flight" type="text" placeholder="مثال: JT 87"></div>
+              <div class="field"><label class="required">المطار</label>
                 <select id="v-dep-airport">
-                  <option value="">— Select —</option>
+                  <option value="">— اختر —</option>
                   <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
-              <div class="field"><label class="required">Departure Time</label><input id="v-dep-time" type="time"></div>
+              <div class="field"><label class="required">وقت المغادرة</label><input id="v-dep-time" type="time"></div>
             </div>
           </div>
         </div>
@@ -1680,16 +1689,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div id="nvp-step-3" style="display:none">
         <div class="card">
           <div class="card-header" style="margin-bottom:4px">
-            <div><div class="card-title">🏨 Hotel Confirmations</div><div class="card-sub">Add one hotel per city stay</div></div>
-            <button class="btn btn-sm" onclick="addHotelConfRow()">+ Add Hotel</button>
+            <div><div class="card-title">🏨 تأكيدات الفنادق</div><div class="card-sub">أضف فندقاً لكل مدينة إقامة</div></div>
+            <button class="btn btn-sm" onclick="addHotelConfRow()">+ إضافة فندق</button>
           </div>
           <div id="hotel-conf-container"></div>
           <div id="room-assignment-container" style="display:none"></div>
         </div>
         <div class="card" style="margin-top:0">
           <div class="card-header" style="margin-bottom:4px">
-            <div><div class="card-title">🍽️ Meals</div><div class="card-sub">Meal allotments per person for the stay</div></div>
-            <button class="btn btn-sm" onclick="addMealRow()">+ Add Meal</button>
+            <div><div class="card-title">🍽️ الوجبات</div><div class="card-sub">تخصيص الوجبات لكل شخص خلال الإقامة</div></div>
+            <button class="btn btn-sm" onclick="addMealRow()">+ إضافة وجبة</button>
           </div>
           <div id="meals-container"></div>
         </div>
@@ -1699,15 +1708,15 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div id="nvp-step-4" style="display:none">
         <div class="card">
           <div class="card-header" style="margin-bottom:4px">
-            <div><div class="card-title">🚌 Transportation Itinerary</div><div class="card-sub">Day-by-day transport schedule</div></div>
-            <button class="btn btn-sm" onclick="addTransportRow()">+ Add Row</button>
+            <div><div class="card-title">🚌 جدول النقل</div><div class="card-sub">جدول النقل اليومي</div></div>
+            <button class="btn btn-sm" onclick="addTransportRow()">+ إضافة صف</button>
           </div>
           <div id="transport-container"></div>
         </div>
 
         <!-- Summary before saving -->
         <div class="card" id="nvp-summary-card" style="margin-top:0;background:var(--cream)">
-          <div class="card-title" style="margin-bottom:12px">📋 Voucher Summary</div>
+          <div class="card-title" style="margin-bottom:12px">📋 ملخص القسيمة</div>
           <div id="nvp-summary-body" style="font-size:0.9286rem;color:var(--ink-mid)"></div>
         </div>
       </div>
@@ -1750,10 +1759,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="content">
       <div class="action-bar">
         <select id="res-filter-status" onchange="renderReservations()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Completed">Completed</option>
+          <option value="">جميع الحالات</option>
+          <option value="Pending">قيد الانتظار</option>
+          <option value="Confirmed">مؤكد</option>
+          <option value="Completed">مكتمل</option>
         </select>
       </div>
       <div id="reservations-list"></div>
@@ -1771,13 +1780,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="content">
       <div class="action-bar">
         <select id="busres-filter-status" onchange="renderBusReservations()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Completed">Completed</option>
+          <option value="">جميع الحالات</option>
+          <option value="Pending">قيد الانتظار</option>
+          <option value="Confirmed">مؤكد</option>
+          <option value="Completed">مكتمل</option>
         </select>
         <select id="busres-filter-voucher" onchange="renderBusReservations()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Vouchers</option>
+          <option value="">جميع القسائم</option>
         </select>
       </div>
       <div id="bus-reservations-list"></div>
@@ -2375,23 +2384,23 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Filters -->
       <div class="action-bar">
         <input id="allres-search" type="text" oninput="renderAllReservations()"
-          placeholder="Search ref, agency, guest..."
+          placeholder="بحث بالمرجع أو الوكالة أو الضيف..."
           style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink);width:240px">
         <select id="allres-filter-type" onchange="renderAllReservations()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Types</option>
-          <option value="b2b">B2B Vouchers</option>
-          <option value="b2c">Individual (B2C)</option>
-          <option value="bus">Bus Tour</option>
-          <option value="direct">Direct Group</option>
+          <option value="">جميع الأنواع</option>
+          <option value="b2b">قسائم B2B</option>
+          <option value="b2c">حجز فردي (B2C)</option>
+          <option value="bus">جولات الحافلات</option>
+          <option value="direct">مجموعة مباشرة</option>
         </select>
         <select id="allres-filter-status" onchange="renderAllReservations()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Tentative – Pending Reservation">Tentative (Res.)</option>
-          <option value="Tentative – Pending Payment">Tentative (Pay.)</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Cancelled">Cancelled</option>
-          <option value="Completed">Completed</option>
+          <option value="">جميع الحالات</option>
+          <option value="Pending">قيد الانتظار</option>
+          <option value="Tentative – Pending Reservation">مؤقت (حجز)</option>
+          <option value="Tentative – Pending Payment">مؤقت (دفع)</option>
+          <option value="Confirmed">مؤكد</option>
+          <option value="Cancelled">ملغي</option>
+          <option value="Completed">مكتمل</option>
         </select>
         <input id="allres-filter-date" type="date" onchange="renderAllReservations()"
           title="Filter by arrival/check-in date"
@@ -2433,15 +2442,15 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- All Mutamers tab -->
       <div class="tab-panel active" id="mut-panel-all">
         <div class="action-bar">
-          <input id="mut-search" type="text" oninput="renderMutamers()" placeholder="Search name, passport, nationality..."
+          <input id="mut-search" type="text" oninput="renderMutamers()" placeholder="بحث بالاسم أو جواز السفر أو الجنسية..."
             style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);width:240px">
           <select id="mut-filter-voucher" onchange="renderMutamers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-            <option value="">All Vouchers</option>
+            <option value="">جميع القسائم</option>
           </select>
           <select id="mut-filter-sex" onchange="renderMutamers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-            <option value="">All</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="">الكل</option>
+            <option value="Male">ذكر</option>
+            <option value="Female">أنثى</option>
           </select>
         </div>
         <div class="card">
@@ -2453,7 +2462,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="tab-panel" id="mut-panel-voucher">
         <div class="action-bar">
           <select id="mut-voucher-sel" onchange="renderMutamersByVoucher()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);min-width:280px">
-            <option value="">— Select a voucher —</option>
+            <option value="">— اختر قسيمة —</option>
           </select>
         </div>
         <div id="mut-voucher-group"></div>
@@ -2470,44 +2479,44 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </div>
 
           <div class="form-section">
-            <div class="form-section-title">Associate with Voucher</div>
+            <div class="form-section-title">ربط بقسيمة</div>
             <div style="max-width:400px">
               <div class="field">
-                <label class="required">Select Voucher</label>
+                <label class="required">اختر قسيمة</label>
                 <select id="upload-voucher-id" style="font-size:0.9286rem;padding:9px 12px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);font-family:inherit;width:100%">
-                  <option value="">— Select voucher —</option>
+                  <option value="">— اختر قسيمة —</option>
                 </select>
               </div>
             </div>
           </div>
 
           <div class="form-section">
-            <div class="form-section-title">CSV File</div>
+            <div class="form-section-title">ملف CSV</div>
             <div style="background:var(--cream);border:2px dashed var(--border-strong);border-radius:var(--r);padding:28px;text-align:center;margin-bottom:16px" id="csv-drop-zone">
               <div style="font-size:2.0rem;margin-bottom:10px">📄</div>
-              <div style="font-size:1.0rem;font-weight:500;margin-bottom:6px">Drop CSV file here or click to browse</div>
-              <div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:14px">Required columns: first_name, middle_name, last_name, phone, dob, nationality, passport_no, sex<br>Optional: id_number (Saudi citizens)</div>
+              <div style="font-size:1.0rem;font-weight:500;margin-bottom:6px">أسقط ملف CSV هنا أو انقر للتصفح</div>
+              <div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:14px">الأعمدة المطلوبة: first_name, middle_name, last_name, phone, dob, nationality, passport_no, sex<br>اختياري: id_number (للمواطنين السعوديين)</div>
               <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">
-              <button class="btn btn-gold btn-sm" onclick="document.getElementById('csv-file-input').click()">Browse File</button>
+              <button class="btn btn-gold btn-sm" onclick="document.getElementById('csv-file-input').click()">تصفح الملف</button>
             </div>
             <div id="csv-preview" style="display:none">
               <div style="font-size:0.9286rem;font-weight:500;margin-bottom:10px" id="csv-preview-title"></div>
               <div class="table-wrap" id="csv-preview-table"></div>
               <div style="margin-top:14px;display:flex;gap:10px">
-                <button class="btn btn-green" onclick="confirmCSVImport()">✓ Import All</button>
-                <button class="btn" onclick="cancelCSVPreview()">Cancel</button>
+                <button class="btn btn-green" onclick="confirmCSVImport()">✓ استيراد الكل</button>
+                <button class="btn" onclick="cancelCSVPreview()">إلغاء</button>
               </div>
             </div>
           </div>
 
           <div class="form-section" style="margin-bottom:0">
-            <div class="form-section-title">CSV Format Template</div>
+            <div class="form-section-title">نموذج تنسيق CSV</div>
             <div style="background:var(--ink);border-radius:var(--r-sm);padding:14px 16px;font-family:monospace;font-size:0.8571rem;color:var(--gold-light);overflow-x:auto">
               first_name,middle_name,last_name,phone,dob,nationality,passport_no,id_number,sex<br>
               Ahmed,Ali,Al-Rashidi,+966501234567,1985-03-15,Saudi,A12345678,1085031500001,Male<br>
               Fatima,,Hassan,+966509876543,1990-07-22,Egyptian,EG9876543,,Female
             </div>
-            <button class="btn btn-sm" style="margin-top:10px" onclick="downloadCSVTemplate()">⬇ Download Template</button>
+            <button class="btn btn-sm" style="margin-top:10px" onclick="downloadCSVTemplate()">⬇ تحميل النموذج</button>
           </div>
         </div>
       </div>
@@ -2521,52 +2530,52 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-mutamer">
   <div class="modal" style="width:700px;max-width:100%">
     <div class="modal-header">
-      <div class="modal-title" id="mutamer-modal-title">Add Mutamer</div>
+      <div class="modal-title" id="mutamer-modal-title">إضافة معتمر</div>
       <button class="modal-close" onclick="closeModal('modal-mutamer')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="mut-id">
       <div class="form-section">
-        <div class="form-section-title">Personal Information</div>
+        <div class="form-section-title">المعلومات الشخصية</div>
         <div class="form-grid-3">
-          <div class="field"><label class="required">First Name</label><input id="mut-fname" type="text" placeholder="First name"></div>
-          <div class="field"><label>Middle Name</label><input id="mut-mname" type="text" placeholder="Middle name"></div>
-          <div class="field"><label class="required">Last Name</label><input id="mut-lname" type="text" placeholder="Last name"></div>
-          <div class="field"><label class="required">Sex</label>
+          <div class="field"><label class="required">الاسم الأول</label><input id="mut-fname" type="text" placeholder="الاسم الأول"></div>
+          <div class="field"><label>الاسم الأوسط</label><input id="mut-mname" type="text" placeholder="الاسم الأوسط"></div>
+          <div class="field"><label class="required">الاسم الأخير</label><input id="mut-lname" type="text" placeholder="الاسم الأخير"></div>
+          <div class="field"><label class="required">الجنس</label>
             <select id="mut-sex">
-              <option value="">— Select —</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
+              <option value="">— اختر —</option>
+              <option value="Male">ذكر</option>
+              <option value="Female">أنثى</option>
             </select>
           </div>
-          <div class="field"><label class="required">Date of Birth</label><input id="mut-dob" type="date"></div>
-          <div class="field"><label class="required">Nationality</label><input id="mut-nationality" type="text" placeholder="e.g. Saudi, Egyptian, Pakistani"></div>
+          <div class="field"><label class="required">تاريخ الميلاد</label><input id="mut-dob" type="date"></div>
+          <div class="field"><label class="required">الجنسية</label><input id="mut-nationality" type="text" placeholder="مثال: سعودي، مصري، باكستاني"></div>
         </div>
       </div>
       <div class="form-section">
-        <div class="form-section-title">Identity Documents</div>
+        <div class="form-section-title">وثائق الهوية</div>
         <div class="form-grid">
-          <div class="field"><label class="required">Passport Number</label><input id="mut-passport" type="text" placeholder="Passport number"></div>
-          <div class="field"><label>Passport Expiry</label><input id="mut-passport-expiry" type="date"></div>
-          <div class="field"><label>National ID (Saudi citizens)</label><input id="mut-id-number" type="text" placeholder="10-digit national ID"></div>
-          <div class="field"><label>Phone Number</label><input id="mut-phone" type="text" placeholder="+966..."></div>
+          <div class="field"><label class="required">رقم جواز السفر</label><input id="mut-passport" type="text" placeholder="رقم جواز السفر"></div>
+          <div class="field"><label>تاريخ انتهاء جواز السفر</label><input id="mut-passport-expiry" type="date"></div>
+          <div class="field"><label>الهوية الوطنية (للمواطنين السعوديين)</label><input id="mut-id-number" type="text" placeholder="رقم الهوية (10 أرقام)"></div>
+          <div class="field"><label>رقم الهاتف</label><input id="mut-phone" type="text" placeholder="+966..."></div>
         </div>
       </div>
       <div class="form-section" style="margin-bottom:0">
-        <div class="form-section-title">Associate with Voucher</div>
+        <div class="form-section-title">ربط بقسيمة</div>
         <div style="max-width:400px">
           <div class="field">
-            <label>Voucher</label>
+            <label>القسيمة</label>
             <select id="mut-voucher-id" style="font-size:0.9286rem;padding:9px 12px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);font-family:inherit;width:100%">
-              <option value="">— Not assigned —</option>
+              <option value="">— غير مخصصة —</option>
             </select>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-mutamer')">Cancel</button>
-      <button class="btn btn-gold" onclick="saveMutamer()">Save Mutamer</button>
+      <button class="btn" onclick="closeModal('modal-mutamer')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveMutamer()">حفظ المعتمر</button>
     </div>
   </div>
 </div>
@@ -2575,19 +2584,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-tour">
   <div class="modal" style="width:760px;max-width:100%">
     <div class="modal-header">
-      <div class="modal-title" id="tour-modal-title">Add Tour Package</div>
+      <div class="modal-title" id="tour-modal-title">إضافة باقة جولة</div>
       <button class="modal-close" onclick="closeModal('modal-tour')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="tr-id">
 
       <div class="form-section">
-        <div class="form-section-title">Tour Details</div>
+        <div class="form-section-title">تفاصيل الجولة</div>
         <div class="form-grid">
-          <div class="field"><label class="required">Tour Name</label><input id="tr-name" type="text" placeholder="e.g. Makkah Ziyarah Full Day"></div>
-          <div class="field"><label class="required">Tour Type</label>
+          <div class="field"><label class="required">اسم الجولة</label><input id="tr-name" type="text" placeholder="مثال: زيارة مكة المكرمة يوم كامل"></div>
+          <div class="field"><label class="required">نوع الجولة</label>
             <select id="tr-type">
-              <option value="">— Select —</option>
+              <option value="">— اختر —</option>
               <option>Ziyarah – Makkah</option>
               <option>Ziyarah – Madinah</option>
               <option>City Tour</option>
@@ -2598,24 +2607,24 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <option>Custom</option>
             </select>
           </div>
-          <div class="field"><label class="required">City</label>
+          <div class="field"><label class="required">المدينة</label>
             <select id="tr-city">
-              <option value="">— Select —</option>
+              <option value="">— اختر —</option>
               <option>Makkah</option><option>Madinah</option><option>Jeddah</option>
               <option>Taif</option><option>Riyadh</option><option>Other</option>
             </select>
           </div>
-          <div class="field"><label>Duration</label><input id="tr-duration" type="text" placeholder="e.g. Half Day, Full Day, 3 Hours"></div>
-          <div class="field full"><label>Description</label><textarea id="tr-description" placeholder="Sites visited, inclusions, itinerary overview..."></textarea></div>
+          <div class="field"><label>المدة</label><input id="tr-duration" type="text" placeholder="مثال: نصف يوم، يوم كامل، 3 ساعات"></div>
+          <div class="field full"><label>الوصف</label><textarea id="tr-description" placeholder="المواقع المزارة، المشمولات، نظرة عامة على البرنامج..."></textarea></div>
         </div>
       </div>
 
       <div class="form-section">
-        <div class="form-section-title">Bus Company</div>
+        <div class="form-section-title">شركة الحافلات</div>
         <div class="form-grid">
-          <div class="field"><label class="required">Bus Company</label>
+          <div class="field"><label class="required">شركة الحافلات</label>
             <select id="tr-bus-company" onchange="onTourBusCompanySelect()">
-              <option value="">— Select bus company —</option>
+              <option value="">— اختر شركة حافلات —</option>
             </select>
           </div>
           <div id="tr-bus-company-info" style="grid-column:span 2;font-size:0.8571rem;color:var(--ink-muted)"></div>
@@ -2623,32 +2632,32 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       </div>
 
       <div class="form-section">
-        <div class="form-section-title">Pricing (per Bus)</div>
+        <div class="form-section-title">الأسعار (لكل حافلة)</div>
         <div id="tr-pricing-container"></div>
-        <button class="btn btn-sm" onclick="addTourPricingRow()">+ Add Bus Type / Price</button>
+        <button class="btn btn-sm" onclick="addTourPricingRow()">+ إضافة نوع حافلة / سعر</button>
       </div>
 
       <div class="form-section">
-        <div class="form-section-title">Per-Person Pricing (optional)</div>
+        <div class="form-section-title">أسعار لكل شخص (اختياري)</div>
         <div class="form-grid">
-          <div class="field"><label>Cost Price / Person (SAR)</label>
+          <div class="field"><label>سعر التكلفة / شخص (ريال)</label>
             <input id="tr-cost-per-person" type="number" min="0" placeholder="0.00" style="background:var(--red-light);border-color:rgba(192,57,43,0.25)">
           </div>
-          <div class="field"><label>Selling Price / Person (SAR)</label>
+          <div class="field"><label>سعر البيع / شخص (ريال)</label>
             <input id="tr-sell-per-person" type="number" min="0" placeholder="0.00" style="background:var(--green-light);border-color:rgba(26,107,60,0.25)">
           </div>
-          <div class="field"><label>Min PAX</label><input id="tr-min-pax" type="number" min="1" placeholder="e.g. 10"></div>
-          <div class="field"><label>Max PAX</label><input id="tr-max-pax" type="number" min="1" placeholder="e.g. 50"></div>
+          <div class="field"><label>الحد الأدنى للمعتمرين</label><input id="tr-min-pax" type="number" min="1" placeholder="مثال: 10"></div>
+          <div class="field"><label>الحد الأقصى للمعتمرين</label><input id="tr-max-pax" type="number" min="1" placeholder="مثال: 50"></div>
         </div>
       </div>
 
       <div class="form-section">
-        <div class="form-section-title">Agreement / Contract</div>
+        <div class="form-section-title">اتفاقية / عقد</div>
         <div class="form-grid">
-          <div class="field"><label>Contract Reference</label><input id="tr-contract-ref" type="text" placeholder="Contract or agreement number"></div>
-          <div class="field"><label>Contract Start</label><input id="tr-contract-start" type="date"></div>
-          <div class="field"><label>Contract End</label><input id="tr-contract-end" type="date"></div>
-          <div class="field"><label>Upload Agreement (PDF / Image)</label>
+          <div class="field"><label>مرجع العقد</label><input id="tr-contract-ref" type="text" placeholder="رقم العقد أو الاتفاقية"></div>
+          <div class="field"><label>بداية العقد</label><input id="tr-contract-start" type="date"></div>
+          <div class="field"><label>نهاية العقد</label><input id="tr-contract-end" type="date"></div>
+          <div class="field"><label>رفع الاتفاقية (PDF / صورة)</label>
             <input id="tr-agreement-file" type="file" accept="image/*,application/pdf" onchange="handleTourAgreementUpload(event)">
             <div id="tr-agreement-preview" style="font-size:0.7857rem;color:var(--green);margin-top:4px"></div>
           </div>
@@ -2656,13 +2665,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       </div>
 
       <div class="form-section" style="margin-bottom:0">
-        <div class="form-section-title">Notes</div>
-        <div class="field"><textarea id="tr-notes" placeholder="Inclusions, exclusions, terms..."></textarea></div>
+        <div class="form-section-title">ملاحظات</div>
+        <div class="field"><textarea id="tr-notes" placeholder="الشاملات، الاستثناءات، الشروط..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-tour')">Cancel</button>
-      <button class="btn btn-gold" onclick="saveTour()">Save Tour Package</button>
+      <button class="btn" onclick="closeModal('modal-tour')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveTour()">حفظ باقة الجولة</button>
     </div>
   </div>
 </div>
@@ -2671,7 +2680,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-inline-res">
   <div class="modal" style="width:860px;max-width:100%">
     <div class="modal-header">
-      <div class="modal-title" id="ires-title">Build Reservation</div>
+      <div class="modal-title" id="ires-title">بناء حجز</div>
       <button class="modal-close" onclick="closeModal('modal-inline-res')">×</button>
     </div>
     <div class="modal-body">
@@ -2679,58 +2688,58 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
       <!-- ROOMS -->
       <div class="form-section">
-        <div class="form-section-title">🏨 Room Selection</div>
+        <div class="form-section-title">🏨 اختيار الغرف</div>
         <div id="ires-rooms-hint" style="background:var(--cream);border-radius:var(--r-sm);padding:8px 12px;font-size:0.8571rem;color:var(--ink-muted);margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap"></div>
-        <div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:10px">Tick the rooms to include. Adjust Qty, Nights and Sell Price. Cost is fixed from inventory.</div>
+        <div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:10px">حدد الغرف التي تريد تضمينها. اضبط الكمية والليالي وسعر البيع. التكلفة ثابتة من المخزون.</div>
         <div id="ires-rooms-table"></div>
       </div>
 
       <!-- MEALS -->
       <div class="form-section">
-        <div class="form-section-title">🍽️ Meals</div>
+        <div class="form-section-title">🍽️ الوجبات</div>
         <div id="ires-meals-container"></div>
-        <button class="btn btn-sm" onclick="addIresMealRow()">+ Add Meal</button>
+        <button class="btn btn-sm" onclick="addIresMealRow()">+ إضافة وجبة</button>
       </div>
 
       <!-- TOURS -->
       <div class="form-section">
-        <div class="form-section-title">🚌 Tours</div>
+        <div class="form-section-title">🚌 الجولات</div>
         <div id="ires-tours-container"></div>
-        <button class="btn btn-sm" onclick="addIresTourRow()">+ Add Tour</button>
+        <button class="btn btn-sm" onclick="addIresTourRow()">+ إضافة جولة</button>
       </div>
 
       <!-- LIVE TOTALS -->
       <div style="background:var(--ink);border-radius:var(--r);padding:16px 20px;margin-top:14px" id="ires-totals">
-        <div style="color:rgba(255,255,255,0.4);font-size:0.7857rem;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">Reservation Summary</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:0.7857rem;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">ملخص الحجز</div>
         <table style="width:100%;font-size:0.9286rem;color:#fff;border-collapse:collapse">
-          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">Rooms</td>
+          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">الغرف</td>
             <td style="text-align:right;padding:4px 8px;color:#ff9999" id="ires-room-cost">—</td>
             <td style="text-align:right;padding:4px 8px;color:#7be09a" id="ires-room-sell">—</td>
             <td style="text-align:right;padding:4px 8px" id="ires-room-margin">—</td></tr>
-          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">Meals</td>
+          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">الوجبات</td>
             <td style="text-align:right;padding:4px 8px;color:#ff9999" id="ires-meal-cost">—</td>
             <td style="text-align:right;padding:4px 8px;color:#7be09a" id="ires-meal-sell">—</td>
             <td style="text-align:right;padding:4px 8px" id="ires-meal-margin">—</td></tr>
-          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">Tours</td>
+          <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.6)">الجولات</td>
             <td style="text-align:right;padding:4px 8px;color:#ff9999" id="ires-tour-cost">—</td>
             <td style="text-align:right;padding:4px 8px;color:#7be09a" id="ires-tour-sell">—</td>
             <td style="text-align:right;padding:4px 8px" id="ires-tour-margin">—</td></tr>
           <tr style="border-top:1px solid rgba(255,255,255,0.15);font-weight:700">
-            <td style="padding:8px 8px 4px;color:var(--gold-light)">Grand Total</td>
+            <td style="padding:8px 8px 4px;color:var(--gold-light)">الإجمالي الكلي</td>
             <td style="text-align:right;padding:8px 8px 4px;color:#ff9999;font-size:1.0714rem" id="ires-grand-cost">—</td>
             <td style="text-align:right;padding:8px 8px 4px;color:#7be09a;font-size:1.0714rem" id="ires-grand-sell">—</td>
             <td style="text-align:right;padding:8px 8px 4px;font-size:1.0714rem" id="ires-grand-margin">—</td></tr>
         </table>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;font-size:0.7143rem;color:rgba(255,255,255,0.35);text-align:right">
-          <div>COST (wholesale)</div><div>SELL (client price)</div><div>MARGIN</div>
+          <div>التكلفة (الجملة)</div><div>البيع (سعر العميل)</div><div>الهامش</div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="cancelInlineReservation()">← Back to Voucher</button>
+      <button class="btn" onclick="cancelInlineReservation()">← العودة إلى القسيمة</button>
       <button class="btn btn-gold" onclick="saveInlineReservation()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polyline points="20 6 9 17 4 12"/></svg>
-        Save Reservation
+        حفظ الحجز
       </button>
     </div>
   </div>
@@ -2740,20 +2749,20 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-ticket">
   <div class="modal" style="width:680px;max-width:100%">
     <div class="modal-header">
-      <div class="modal-title" id="ticket-modal-title">New IT Ticket</div>
+      <div class="modal-title" id="ticket-modal-title">تذكرة دعم تقني جديدة</div>
       <button class="modal-close" onclick="closeModal('modal-ticket')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="tk-id">
       <div class="form-section">
-        <div class="form-section-title">Ticket Details</div>
+        <div class="form-section-title">تفاصيل التذكرة</div>
         <div class="form-grid">
-          <div class="field full"><label class="required">Title / Issue Summary</label>
-            <input id="tk-title" type="text" placeholder="Brief description of the issue">
+          <div class="field full"><label class="required">عنوان / ملخص المشكلة</label>
+            <input id="tk-title" type="text" placeholder="وصف موجز للمشكلة">
           </div>
-          <div class="field"><label class="required">Category</label>
+          <div class="field"><label class="required">الفئة</label>
             <select id="tk-category">
-              <option value="">— Select —</option>
+              <option value="">— اختر —</option>
               <option>Hardware</option>
               <option>Software</option>
               <option>Network</option>
@@ -2764,17 +2773,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <option>Other</option>
             </select>
           </div>
-          <div class="field"><label class="required">Priority</label>
+          <div class="field"><label class="required">الأولوية</label>
             <select id="tk-priority">
-              <option value="Medium" selected>Medium</option>
-              <option value="Low">Low</option>
-              <option value="High">High</option>
-              <option value="Critical">🔴 Critical</option>
+              <option value="Medium" selected>متوسطة</option>
+              <option value="Low">منخفضة</option>
+              <option value="High">عالية</option>
+              <option value="Critical">🔴 حرجة</option>
             </select>
           </div>
-          <div class="field"><label>Affected Module / Section</label>
+          <div class="field"><label>الوحدة / القسم المتأثر</label>
             <select id="tk-module">
-              <option value="">— Select —</option>
+              <option value="">— اختر —</option>
               <option>B2B Bookings</option>
               <option>Individual Bookings</option>
               <option>Bus Tour Bookings</option>
@@ -2787,19 +2796,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <option>Other</option>
             </select>
           </div>
-          <div class="field"><label>Reported By</label>
-            <input id="tk-reporter" type="text" placeholder="Your name or department">
+          <div class="field"><label>أبلغ عنه</label>
+            <input id="tk-reporter" type="text" placeholder="اسمك أو قسمك">
           </div>
-          <div class="field full"><label class="required">Description</label>
-            <textarea id="tk-description" rows="4" placeholder="Detailed description of the issue. Include steps to reproduce, what you expected to happen, and what actually happened..."></textarea>
+          <div class="field full"><label class="required">الوصف</label>
+            <textarea id="tk-description" rows="4" placeholder="وصف تفصيلي للمشكلة. اذكر خطوات إعادة الإنتاج وما توقعته وما حدث فعلاً..."></textarea>
           </div>
-          <div class="field full"><label>Screenshot / Attachment (optional)</label>
+          <div class="field full"><label>لقطة شاشة / مرفق (اختياري)</label>
             <div id="tk-drop-zone" style="border:2px dashed var(--border-strong);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;background:var(--cream)"
               onclick="document.getElementById('tk-file-input').click()"
               ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
               ondragleave="this.style.borderColor='var(--border-strong)'"
               ondrop="event.preventDefault();this.style.borderColor='var(--border-strong)';handleTicketFileDrop(event)">
-              <div style="font-size:0.8571rem;color:var(--ink-muted)">📎 Drop screenshots here or click to upload</div>
+              <div style="font-size:0.8571rem;color:var(--ink-muted)">📎 أسقط لقطات الشاشة هنا أو انقر للرفع</div>
             </div>
             <input id="tk-file-input" type="file" accept="image/*" multiple style="display:none" onchange="handleTicketFiles(event)">
             <div id="tk-attachments-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
@@ -2808,28 +2817,28 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       </div>
       <!-- Status / Assignment (admin view) -->
       <div class="form-section" id="tk-admin-section" style="display:none;margin-bottom:0">
-        <div class="form-section-title">Assignment & Resolution</div>
+        <div class="form-section-title">التعيين والحل</div>
         <div class="form-grid">
-          <div class="field"><label>Status</label>
+          <div class="field"><label>الحالة</label>
             <select id="tk-status">
-              <option value="Open">Open</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Closed">Closed</option>
+              <option value="Open">مفتوحة</option>
+              <option value="In Progress">قيد المعالجة</option>
+              <option value="Resolved">محلولة</option>
+              <option value="Closed">مغلقة</option>
             </select>
           </div>
-          <div class="field"><label>Assigned To</label>
-            <input id="tk-assigned" type="text" placeholder="IT team member name">
+          <div class="field"><label>مُسند إلى</label>
+            <input id="tk-assigned" type="text" placeholder="اسم فني الدعم التقني">
           </div>
-          <div class="field full"><label>Resolution Notes</label>
-            <textarea id="tk-resolution" placeholder="How was this resolved?"></textarea>
+          <div class="field full"><label>ملاحظات الحل</label>
+            <textarea id="tk-resolution" placeholder="كيف تم حل هذه المشكلة؟"></textarea>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-ticket')">Cancel</button>
-      <button class="btn btn-gold" onclick="saveTicket()">Submit Ticket</button>
+      <button class="btn" onclick="closeModal('modal-ticket')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveTicket()">إرسال التذكرة</button>
     </div>
   </div>
 </div>
@@ -2853,34 +2862,34 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-add-user">
   <div class="modal" style="width:520px">
     <div class="modal-header">
-      <div class="modal-title" id="add-user-modal-title">Add User</div>
+      <div class="modal-title" id="add-user-modal-title">إضافة مستخدم</div>
       <button class="modal-close" onclick="closeModal('modal-add-user')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="au-id">
       <div class="form-grid">
-        <div class="field"><label class="required">First Name</label><input id="au-first" type="text" placeholder="First name"></div>
-        <div class="field"><label class="required">Last Name</label><input id="au-last" type="text" placeholder="Last name"></div>
-        <div class="field full"><label class="required">Email</label><input id="au-email" type="email" placeholder="user@ofoq.com"></div>
-        <div class="field"><label id="au-password-label" class="required">Password</label>
+        <div class="field"><label class="required">الاسم الأول</label><input id="au-first" type="text" placeholder="الاسم الأول"></div>
+        <div class="field"><label class="required">الاسم الأخير</label><input id="au-last" type="text" placeholder="الاسم الأخير"></div>
+        <div class="field full"><label class="required">البريد الإلكتروني</label><input id="au-email" type="email" placeholder="user@ofoq.com"></div>
+        <div class="field"><label id="au-password-label" class="required">كلمة المرور</label>
           <div style="position:relative">
-            <input id="au-password" type="password" placeholder="Min. 8 characters"
+            <input id="au-password" type="password" placeholder="8 أحرف على الأقل"
               style="padding-right:36px">
             <button type="button" onclick="togglePassVis('au-password','au-pass-eye')"
               style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1429rem;color:var(--ink-muted)" id="au-pass-eye">👁</button>
           </div>
         </div>
-        <div class="field"><label id="au-confirm-label">Confirm Password</label>
+        <div class="field"><label id="au-confirm-label">تأكيد كلمة المرور</label>
           <div style="position:relative">
-            <input id="au-confirm" type="password" placeholder="Repeat password"
+            <input id="au-confirm" type="password" placeholder="أعد كتابة كلمة المرور"
               style="padding-right:36px">
             <button type="button" onclick="togglePassVis('au-confirm','au-confirm-eye')"
               style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1429rem;color:var(--ink-muted)" id="au-confirm-eye">👁</button>
           </div>
         </div>
-        <div class="field"><label class="required">Department</label>
+        <div class="field"><label class="required">القسم</label>
           <select id="au-dept">
-            <option value="">— Select —</option>
+            <option value="">— اختر —</option>
             <option value="Transportation">Transportation</option>
             <option value="Sales">Sales</option>
             <option value="Operations">Operations</option>
@@ -2889,29 +2898,29 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             <option value="Admin">Admin</option>
           </select>
         </div>
-        <div class="field"><label>Role / Job Title</label><input id="au-role" type="text" placeholder="e.g. Booking Agent, Accountant"></div>
-        <div class="field"><label>Phone</label><input id="au-phone" type="text" placeholder="+966..."></div>
-        <div class="field"><label class="required">Access Level</label>
+        <div class="field"><label>الدور / المسمى الوظيفي</label><input id="au-role" type="text" placeholder="مثال: موظف حجز، محاسب"></div>
+        <div class="field"><label>الهاتف</label><input id="au-phone" type="text" placeholder="+966..."></div>
+        <div class="field"><label class="required">مستوى الوصول</label>
           <select id="au-access">
-            <option value="viewer">Viewer — Read only</option>
-            <option value="agent" selected>Agent — Create &amp; edit</option>
-            <option value="manager">Manager — Full access to department</option>
-            <option value="admin">Admin — Full system access</option>
-            <option value="field_coordinator">Field Coordinator — Bus tours only</option>
+            <option value="viewer">مشاهد — قراءة فقط</option>
+            <option value="agent" selected>وكيل — إنشاء وتعديل</option>
+            <option value="manager">مدير — وصول كامل للقسم</option>
+            <option value="admin">مسؤول — وصول كامل للنظام</option>
+            <option value="field_coordinator">منسق ميداني — جولات الحافلات فقط</option>
           </select>
         </div>
-        <div class="field"><label>Status</label>
+        <div class="field"><label>الحالة</label>
           <select id="au-status">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="active">نشط</option>
+            <option value="inactive">غير نشط</option>
           </select>
         </div>
-        <div class="field full"><label>Notes</label><textarea id="au-notes" placeholder="Optional notes about this user..."></textarea></div>
+        <div class="field full"><label>ملاحظات</label><textarea id="au-notes" placeholder="ملاحظات اختيارية عن هذا المستخدم..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal('modal-add-user')">Cancel</button>
-      <button class="btn btn-gold" onclick="saveUserFromPage()">Save User</button>
+      <button class="btn" onclick="closeModal('modal-add-user')">إلغاء</button>
+      <button class="btn btn-gold" onclick="saveUserFromPage()">حفظ المستخدم</button>
     </div>
   </div>
 </div>
@@ -2921,8 +2930,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div class="modal" style="width:900px;max-width:100%">
     <div class="modal-header">
       <div>
-        <div class="modal-title">Room Availability Calendar</div>
-        <div class="topbar-sub" id="rac-subtitle">Hover a cell to see room details</div>
+        <div class="modal-title">تقويم توفر الغرف</div>
+        <div class="topbar-sub" id="rac-subtitle">مرر الماوس على الخلية لرؤية تفاصيل الغرفة</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-sm" onclick="racPrev()">‹</button>
@@ -2934,9 +2943,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="modal-body" style="padding:0;overflow-x:auto">
       <div id="rac-grid" style="min-width:600px"></div>
       <div style="display:flex;gap:16px;padding:12px 20px;font-size:0.8571rem;border-top:1px solid var(--border)">
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--green-light);border:1px solid var(--green);border-radius:3px;display:inline-block"></span>Available</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--red-light);border:1px solid var(--red);border-radius:3px;display:inline-block"></span>Reserved</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--cream-dark);border:1px solid var(--border);border-radius:3px;display:inline-block"></span>No Data</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--green-light);border:1px solid var(--green);border-radius:3px;display:inline-block"></span>متاحة</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--red-light);border:1px solid var(--red);border-radius:3px;display:inline-block"></span>محجوزة</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;background:var(--cream-dark);border:1px solid var(--border);border-radius:3px;display:inline-block"></span>لا بيانات</span>
       </div>
     </div>
   </div>
@@ -2946,23 +2955,23 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-bulk-voucher">
   <div class="modal" style="width:560px">
     <div class="modal-header">
-      <div class="modal-title">Bulk Actions</div>
+      <div class="modal-title">إجراءات جماعية</div>
       <button class="modal-close" onclick="closeModal('modal-bulk-voucher')">×</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:0.9286rem;color:var(--ink-muted);margin-bottom:16px">Select an action to apply to multiple vouchers at once.</div>
+      <div style="font-size:0.9286rem;color:var(--ink-muted);margin-bottom:16px">اختر إجراءً لتطبيقه على عدة قسائم دفعة واحدة.</div>
 
       <div style="margin-bottom:18px">
-        <div style="font-size:0.8571rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--ink-muted);margin-bottom:10px">Filter Vouchers</div>
+        <div style="font-size:0.8571rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--ink-muted);margin-bottom:10px">تصفية القسائم</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <select id="bulk-filter-status" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem">
-            <option value="">All Statuses</option>
-            <option value="Tentative – Pending Reservation">Tentative (Res.)</option>
-            <option value="Tentative – Pending Payment">Tentative (Pay.)</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="">جميع الحالات</option>
+            <option value="Tentative – Pending Reservation">مؤقت (حجز)</option>
+            <option value="Tentative – Pending Payment">مؤقت (دفع)</option>
+            <option value="Confirmed">مؤكد</option>
+            <option value="Cancelled">ملغي</option>
           </select>
-          <button class="btn btn-sm" onclick="refreshBulkList()">Apply Filter</button>
+          <button class="btn btn-sm" onclick="refreshBulkList()">تطبيق الفلتر</button>
         </div>
       </div>
 
@@ -2970,9 +2979,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <table style="width:100%;font-size:0.8571rem">
           <thead><tr style="background:var(--cream)">
             <th style="padding:8px 10px"><input type="checkbox" id="bulk-check-all" onclick="toggleBulkAll()"></th>
-            <th style="padding:8px 10px">Ref</th>
-            <th style="padding:8px 10px">Agency</th>
-            <th style="padding:8px 10px">Status</th>
+            <th style="padding:8px 10px">المرجع</th>
+            <th style="padding:8px 10px">الوكالة</th>
+            <th style="padding:8px 10px">الحالة</th>
             <th style="padding:8px 10px">PAX</th>
           </tr></thead>
           <tbody id="bulk-voucher-tbody"></tbody>
@@ -6877,9 +6886,9 @@ function nvpGoStep(n) {
     }
   }
   // Update sub title
-  const subs = ['','Group & PAX','Flight Details','Hotels & Meals','Transport & Summary'];
+  const subs = ['','المجموعة والمعتمرون','الرحلات الجوية','الفنادق والوجبات','النقل والملخص'];
   const subEl = document.getElementById('nvp-step-sub');
-  if (subEl) subEl.textContent = `Step ${n} of ${NVP_TOTAL_STEPS} — ${subs[n]}`;
+  if (subEl) subEl.textContent = `الخطوة ${n} من ${NVP_TOTAL_STEPS} — ${subs[n]}`;
 
   // Back button
   const backBtn = document.getElementById('nvp-back-btn');
@@ -14781,7 +14790,7 @@ function toggleDarkMode() {
     }
   };
 
-  var _lang = localStorage.getItem('oad_lang') || 'en';
+  var _lang = localStorage.getItem('oad_lang') || 'ar';
 
   function applyLang(lang) {
     _lang = lang;
