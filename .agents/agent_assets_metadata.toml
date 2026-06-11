@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "soAKUMEBVjMvIO7iZNcLR"
+uri = "file://artifacts/ofoq-al-diafah/public/images/bg-waves.png"
+type = "image"
+title = "Dark gold abstract luxury waves"
+
+[[generated]]
+id = "rHDTtLXhuv_4qiIzNK3ny"
+uri = "file://artifacts/ofoq-al-diafah/public/images/bg-network.png"
+type = "image"
+title = "Golden network cloud sync nodes"
+
+[[generated]]
+id = "L3G5LdDwx1jsgERaA9op4"
+uri = "file://artifacts/ofoq-al-diafah/public/images/hotel-lobby.png"
+type = "image"
+title = "Luxury Arabic hotel lobby"

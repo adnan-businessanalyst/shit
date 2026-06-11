@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -66,82 +67,46 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE */
+  /* LIGHT MODE */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
 
-  /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(255,255,255, .03);
+  --elevate-2: rgba(255,255,255, .08);
 
-  --background: red; /*replace with H S L */
+  --background: 20 14% 4%;
+  --foreground: 45 40% 98%;
 
-  --foreground: red; /*replace with H S L */
+  --card: 20 14% 6%;
+  --card-foreground: 45 40% 98%;
 
-  --border: red; /*replace with H S L */
+  --popover: 20 14% 6%;
+  --popover-foreground: 45 40% 98%;
 
-  --card: red; /*replace with H S L */
+  --primary: 44 55% 54%;
+  --primary-foreground: 20 14% 4%;
 
-  --card-foreground: red; /*replace with H S L */
+  --secondary: 24 10% 15%;
+  --secondary-foreground: 45 40% 98%;
 
-  --card-border: red; /*replace with H S L */
+  --muted: 24 10% 15%;
+  --muted-foreground: 45 20% 70%;
 
-  --sidebar: red; /*replace with H S L */
+  --accent: 44 55% 54%;
+  --accent-foreground: 20 14% 4%;
 
-  --sidebar-foreground: red; /*replace with H S L */
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 45 40% 98%;
 
-  --sidebar-border: red; /*replace with H S L */
+  --border: 24 10% 15%;
+  --input: 24 10% 15%;
+  --ring: 44 55% 54%;
 
-  --sidebar-primary: red; /*replace with H S L */
-
-  --sidebar-primary-foreground: red; /*replace with H S L */
-
-  --sidebar-accent: red; /*replace with H S L */
-
-  --sidebar-accent-foreground: red; /*replace with H S L */
-
-  --sidebar-ring: red; /*replace with H S L */
-
-  --popover: red; /*replace with H S L */
-
-  --popover-foreground: red; /*replace with H S L */
-
-  --popover-border: red; /*replace with H S L */
-
-  --primary: red; /*replace with H S L */
-
-  --primary-foreground: red; /*replace with H S L */
-
-  --secondary: red; /*replace with H S L */
-
-  --secondary-foreground: red; /*replace with H S L */
-
-  --muted: red; /*replace with H S L */
-
-  --muted-foreground: red; /*replace with H S L */
-
-  --accent: red; /*replace with H S L */
-
-  --accent-foreground: red; /*replace with H S L */
-
-  --destructive: red; /*replace with H S L */
-
-  --destructive-foreground: red; /*replace with H S L */
-
-  --input: red; /*replace with H S L */
-  --ring: red; /*replace with H S L */
-  --chart-1: red; /*replace with H S L */
-  --chart-2: red; /*replace with H S L */
-  --chart-3: red; /*replace with H S L */
-  --chart-4: red; /*replace with H S L */
-  --chart-5: red; /*replace with H S L */
-
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
+  --app-font-sans: 'Cairo', sans-serif;
+  --app-font-serif: 'Playfair Display', serif;
   --app-font-mono: Menlo, monospace;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00); /*replace with H S L */
