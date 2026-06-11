@@ -5401,14 +5401,29 @@ if (providers.length === 0) {
   providers = [
     { id:'pv1', name:'Al Baraka Catering', type:'Catering', city:'Makkah', cr:'MK-CAT-2201',
       contact:'Hassan Al-Baraka', phone:'+966 50 333 1111', whatsapp:'+966 50 333 1111', email:'info@albaraka.com',
-      services:[{name:'Buffet Meal',unit:'Per Person',rate:45,notes:'Halal certified'},{name:'Boxed Lunch',unit:'Per Box',rate:25,notes:''}],
-      paymentTerms:'Net 15 Days', contractRef:'', notes:'Reliable, 48h notice required.',
+      services:[{name:'Buffet Meal',unit:'Per Person',rate:45,notes:'Halal certified'},{name:'Boxed Lunch',unit:'Per Box',rate:25,notes:''},{name:'Breakfast',unit:'Per Person',rate:30,notes:'Continental'}],
+      paymentTerms:'Net 15 Days', contractRef:'ALB-CAT-2026', notes:'Reliable, 48h notice required. Serves up to 500 PAX/day.',
       createdAt:'2025-01-01' },
-    { id:'pv2', name:'Madinah Laundry Services', type:'Laundry', city:'Madinah', cr:'',
-      contact:'Ali Mahmoud', phone:'+966 55 444 2222', whatsapp:'+966 55 444 2222', email:'',
-      services:[{name:'Per Kg',unit:'Per KG',rate:8,notes:''},{name:'Express (24h)',unit:'Per KG',rate:15,notes:''}],
-      paymentTerms:'Cash on Delivery', contractRef:'', notes:'',
+    { id:'pv2', name:'Madinah Laundry Services', type:'Laundry', city:'Madinah', cr:'MD-LAU-0091',
+      contact:'Ali Mahmoud', phone:'+966 55 444 2222', whatsapp:'+966 55 444 2222', email:'madinahlaundry@gmail.com',
+      services:[{name:'Per Kg',unit:'Per KG',rate:8,notes:''},{name:'Express (24h)',unit:'Per KG',rate:15,notes:''},{name:'Group Block (per bag)',unit:'Per Bag',rate:35,notes:'20 items/bag'}],
+      paymentTerms:'Cash on Delivery', contractRef:'', notes:'24h standard turnaround. Hotel pickup available.',
       createdAt:'2025-01-01' },
+    { id:'pv3', name:'Al Huda Tour Guides', type:'Guide', city:'Makkah', cr:'MK-GDE-3341',
+      contact:'Sheikh Salman Al-Ghamdi', phone:'+966 50 777 4411', whatsapp:'+966 50 777 4411', email:'guides@alhuda.com.sa',
+      services:[{name:'Full Day Guide (Arabic)',unit:'Per Day',rate:350,notes:'8 hrs'},{name:'Full Day Guide (English)',unit:'Per Day',rate:450,notes:'8 hrs'},{name:'Half Day Guide',unit:'Per Day',rate:220,notes:'4 hrs'}],
+      paymentTerms:'Cash on Day', contractRef:'', notes:'Licensed Makkah & Madinah guides. Minimum 24h booking.',
+      createdAt:'2026-01-15' },
+    { id:'pv4', name:'Al Shifa Medical Services', type:'Medical', city:'Makkah', cr:'MK-MED-8821',
+      contact:'Dr. Noura Al-Zahrani', phone:'+966 12 555 7700', whatsapp:'+966 50 555 7700', email:'ops@alshifahealth.sa',
+      services:[{name:'On-Call Doctor (Group)',unit:'Per Day',rate:800,notes:'Available 24/7'},{name:'Nurse Escort',unit:'Per Day',rate:400,notes:'Accompanies group'},{name:'First Aid Kit',unit:'Per Kit',rate:120,notes:'Restocked after use'}],
+      paymentTerms:'Net 30 Days', contractRef:'ALSH-MED-2026', notes:'Medical team for large groups. Emergency response under 30 min.',
+      createdAt:'2026-02-01' },
+    { id:'pv5', name:'Makkah Logistics Co.', type:'Logistics', city:'Makkah', cr:'MK-LOG-5512',
+      contact:'Faris Al-Otaibi', phone:'+966 50 888 6600', whatsapp:'+966 50 888 6600', email:'ops@makkahlogistics.sa',
+      services:[{name:'Luggage Transfer',unit:'Per Bag',rate:15,notes:'Hotel to hotel'},{name:'Airport Luggage Handling',unit:'Per Bag',rate:20,notes:'Includes trolley'},{name:'Bulk Storage (per day)',unit:'Per Day',rate:200,notes:'Up to 50 bags'}],
+      paymentTerms:'Net 15 Days', contractRef:'', notes:'Reliable luggage and logistics for large Umrah groups.',
+      createdAt:'2026-03-05' },
   ];
   DB.save('providers', providers);
 }
@@ -5593,9 +5608,51 @@ if (clientCompanies.length === 0) {
       cr: 'PT-2019-12345', tax: '', licence: 'IATA-991234', year: 2019,
       contactName: 'Ahmad Rizky', contactTitle: 'Director', phone: '+62 21 555 1234', whatsapp: '+62 812 555 1234',
       email: 'ops@safanisarizky.com', billingEmail: 'accounts@safanisarizky.com',
-      website: '', paymentTerms: '50% Deposit + Balance', credit: 50000,
-      contractStart: '', contractEnd: '', notes: 'Long-term Umrah partner.',
-      branches: [], createdAt: '2025-01-01',
+      website: 'www.safanisarizky.com', paymentTerms: '50% Deposit + Balance', credit: 50000,
+      contractStart: '2026-01-01', contractEnd: '2026-12-31', notes: 'Long-term Umrah partner. 2 groups confirmed for 2026.',
+      branches: [{name:'Surabaya Branch', city:'Surabaya', contact:'Rudi Santoso', phone:'+62 31 555 5678', email:'surabaya@safanisarizky.com'}],
+      createdAt: '2025-01-01',
+    },
+    {
+      id: 'cl2', nameEn: 'Nusuk Travel Sdn Bhd', nameLocal: 'نوسوك ترافيل', type: 'Tour Operator',
+      nationality: 'Malaysian', country: 'Malaysia', city: 'Kuala Lumpur', state: 'Selangor', address: 'Jalan Bukit Bintang 12', postal: '55100',
+      cr: 'MY-2017-88776', tax: 'MY1234567890', licence: 'MATTA-7821', year: 2017,
+      contactName: 'Razif Hassan', contactTitle: 'Operations Manager', phone: '+60 3 555 3344', whatsapp: '+60 12 555 3344',
+      email: 'ops@nusuktravel.com.my', billingEmail: 'finance@nusuktravel.com.my',
+      website: 'www.nusuktravel.com.my', paymentTerms: '30% Deposit + 70% Pre-Arrival', credit: 80000,
+      contractStart: '2026-01-01', contractEnd: '2026-12-31', notes: 'Specialises in premium Umrah packages. Prefers 5-star hotels.',
+      branches: [], createdAt: '2026-01-15',
+    },
+    {
+      id: 'cl3', nameEn: 'Al Amin Umrah Tours', nameLocal: 'الأمين لتنظيم العمرة', type: 'Travel Agency',
+      nationality: 'Turkish', country: 'Turkey', city: 'Istanbul', state: '', address: 'Fatih Mah. No:44, Eminönü', postal: '34090',
+      cr: 'TR-2015-556677', tax: 'TR9988776655', licence: 'TURSAB-4412', year: 2015,
+      contactName: 'Mehmet Yilmaz', contactTitle: 'CEO', phone: '+90 212 555 0011', whatsapp: '+90 532 555 0011',
+      email: 'ops@alaminumrah.com.tr', billingEmail: 'muhasebe@alaminumrah.com.tr',
+      website: 'www.alaminumrah.com.tr', paymentTerms: 'Net 45 Days', credit: 120000,
+      contractStart: '2026-01-01', contractEnd: '2026-12-31', notes: 'Large Turkish agency. Groups typically 20–40 PAX. Requires Makkah + Madinah combo.',
+      branches: [{name:'Ankara Branch', city:'Ankara', contact:'Hasan Demir', phone:'+90 312 555 9900', email:'ankara@alaminumrah.com.tr'}],
+      createdAt: '2026-02-01',
+    },
+    {
+      id: 'cl4', nameEn: 'Hayat Travels', nameLocal: 'حیات ٹریولز', type: 'Travel Agency',
+      nationality: 'Pakistani', country: 'Pakistan', city: 'Lahore', state: 'Punjab', address: 'Mall Road, Gulberg III', postal: '54000',
+      cr: 'PK-2020-33441', tax: '', licence: 'PTAO-8834', year: 2020,
+      contactName: 'Tariq Ahmed', contactTitle: 'Director', phone: '+92 42 555 7788', whatsapp: '+92 300 555 7788',
+      email: 'tariq@hayattravels.pk', billingEmail: 'accounts@hayattravels.pk',
+      website: '', paymentTerms: '50% Deposit + Balance', credit: 40000,
+      contractStart: '2026-01-01', contractEnd: '2026-12-31', notes: 'New agency partner from 2026. First group Aug 2026.',
+      branches: [], createdAt: '2026-03-10',
+    },
+    {
+      id: 'cl5', nameEn: 'Al Baraka Hajj & Umrah', nameLocal: 'البركة للحج والعمرة', type: 'Tour Operator',
+      nationality: 'Jordanian', country: 'Jordan', city: 'Amman', state: '', address: 'Shmeisani, King Hussein Street', postal: '11194',
+      cr: 'JO-2012-10023', tax: 'JO776655443', licence: 'JATA-2209', year: 2012,
+      contactName: 'Khalil Ismail', contactTitle: 'Managing Director', phone: '+962 6 555 0011', whatsapp: '+962 79 555 0011',
+      email: 'info@albarakajordan.com', billingEmail: 'accounts@albarakajordan.com',
+      website: 'www.albarakajordan.com', paymentTerms: 'Net 30 Days', credit: 60000,
+      contractStart: '2026-01-01', contractEnd: '2026-12-31', notes: 'Established agency. Group Apr 2026 cancelled — rescheduled to 2027.',
+      branches: [], createdAt: '2026-01-20',
     },
   ];
   DB.save('clientCompanies', clientCompanies);
@@ -13796,19 +13853,372 @@ function _reloadEntities() {
 
   // Seed demo data only on a genuinely empty first install
   if (rooms.length === 0 && !_cache['_seeded']) {
-    rooms = [
-      { id:'rm1', number:'101', type:'Standard', view:'City View', beds:'1 King Bed', occupancy:2, floor:'1', desc:'Comfortable standard room with city view, en-suite bathroom, minibar.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
-      { id:'rm2', number:'102', type:'Standard', view:'City View', beds:'2 Twin Beds', occupancy:2, floor:'1', desc:'Twin beds, city view, ideal for two travelers.', from:'2025-05-17', to:'2025-07-31', costPerNight:450, extraBedCost:80, status:'Available', source:'direct', hotel:'Makkah Grand Hotel', batchRef:'HTL-2025-001', batchName:'Makkah Grand — Season 2025' },
-      { id:'rm3', number:'201', type:'Deluxe', view:'Garden View', beds:'1 King Bed', occupancy:2, floor:'2', desc:'Spacious deluxe room with garden view, sitting area, upgraded amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:650, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
-      { id:'rm4', number:'202', type:'Deluxe', view:'Pool View', beds:'2 Twin Beds', occupancy:3, floor:'2', desc:'Deluxe twin room overlooking the pool. Includes premium bedding.', from:'2025-05-18', to:'2025-07-31', costPerNight:680, extraBedCost:100, status:'Available', source:'agent', hotel:'Makkah Grand Hotel', batchRef:'AGT-2025-001', batchName:'Makkah Grand — Season 2025' },
-      { id:'rm5', number:'301', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, separate sitting area, walk-in shower.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
-      { id:'rm6', number:'302', type:'Suite', view:'Haram View', beds:'King + Sofa Bed', occupancy:3, floor:'3', desc:'Premium suite with Haram view, all amenities.', from:'2025-05-17', to:'2025-07-31', costPerNight:1200, extraBedCost:150, status:'Available', source:'owned', hotel:'Makkah Grand Hotel', batchRef:'ALT-2025-001', batchName:'Makkah Grand — Season 2025' },
+
+    // ── Batches ──────────────────────────────────────────────────────────
+    batches = [
+      { id:'batch-001', ref:'HTL-2026-001', name:'Makkah Grand — Season 2026', hotelId:'ht1', hotel:'Makkah Grand Hotel', hotelAddress:'King Abdul Aziz Road, Ajyad, Makkah', hotelPhone:'+966 12 555 0001', hotelEmail:'reservations@makkahgrand.com', stars:'5', source:'direct', agentName:'', agentPhone:'', agentEmail:'', commission:'', leaseRef:'MKG-2026', internalCost:'', from:'2026-01-01', to:'2026-12-31', contractRef:'MKG-CONTRACT-2026', paymentTerms:'Net 30 Days', notes:'Full year direct hotel block. Premium wing reserved.', confirmedBy:'Adnan Al-Akhonbay', createdAt:'2026-01-01', meals:[] },
+      { id:'batch-002', ref:'HTL-2026-002', name:'Madinah Towers — Season 2026', hotelId:'ht3', hotel:'Madinah Towers Hotel', hotelAddress:'King Faisal Road, Central Area, Madinah', hotelPhone:'+966 14 555 0003', hotelEmail:'reservations@madinahtowers.com', stars:'5', source:'direct', agentName:'', agentPhone:'', agentEmail:'', commission:'', leaseRef:'MDT-2026', internalCost:'', from:'2026-01-01', to:'2026-12-31', contractRef:'MDT-CONTRACT-2026', paymentTerms:'Net 30 Days', notes:'Full year block. Nabawi view suites on floors 15+.', confirmedBy:'Adnan Al-Akhonbay', createdAt:'2026-01-01', meals:[] },
+      { id:'batch-003', ref:'HTL-2026-003', name:'Al Noor Palace — Ramadan 2026', hotelId:'ht2', hotel:'Al Noor Palace Hotel', hotelAddress:'Misfalah District, Makkah', hotelPhone:'+966 12 555 0002', hotelEmail:'info@alnoorpalace.com', stars:'4', source:'agent', agentName:'Tariq Al-Faqih', agentPhone:'+966 55 009 8765', agentEmail:'tariq@alfaraj.com', commission:'5%', leaseRef:'', internalCost:'', from:'2026-03-01', to:'2026-05-31', contractRef:'ANP-RAMADAN-2026', paymentTerms:'50% Deposit + Balance', notes:'Ramadan season block secured via agent Tariq.', confirmedBy:'Salma Al-Rashid', createdAt:'2026-02-15', meals:[] },
     ];
-    batches = [{ id:'batch-demo', ref:'HTL-2025-001', name:'Makkah Grand — Season 2025', hotel:'Makkah Grand Hotel', source:'direct', from:'2025-05-17', to:'2025-07-31', confirmedBy:'Demo User', createdAt:'2025-05-17' }];
-    DB.save('batches', batches);
+
+    // ── Rooms ────────────────────────────────────────────────────────────
+    // Makkah Grand (8 rooms)
+    rooms = [
+      { id:'rm1',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'direct', number:'101', type:'Standard', view:'City View',     beds:'1 King Bed',       occupancy:2, floor:'1', desc:'Comfortable standard room with city view, en-suite bathroom, minibar.',     from:'2026-01-01', to:'2026-12-31', costPerNight:450,  extraBedCost:80,  status:'Available' },
+      { id:'rm2',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'direct', number:'102', type:'Standard', view:'City View',     beds:'2 Twin Beds',      occupancy:2, floor:'1', desc:'Twin beds, city view, ideal for two pilgrims.',                             from:'2026-01-01', to:'2026-12-31', costPerNight:450,  extraBedCost:80,  status:'Reserved' },
+      { id:'rm3',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'direct', number:'103', type:'Standard', view:'Courtyard View',beds:'1 King Bed',       occupancy:2, floor:'1', desc:'Standard room with courtyard view.',                                        from:'2026-01-01', to:'2026-12-31', costPerNight:430,  extraBedCost:80,  status:'Reserved' },
+      { id:'rm4',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'agent',  number:'201', type:'Deluxe',   view:'Garden View',   beds:'1 King Bed',       occupancy:2, floor:'2', desc:'Spacious deluxe room with garden view, sitting area, upgraded amenities.',  from:'2026-01-01', to:'2026-12-31', costPerNight:650,  extraBedCost:100, status:'Available' },
+      { id:'rm5',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'agent',  number:'202', type:'Deluxe',   view:'Pool View',     beds:'2 Twin Beds',      occupancy:3, floor:'2', desc:'Deluxe twin room overlooking the pool, premium bedding.',                  from:'2026-01-01', to:'2026-12-31', costPerNight:680,  extraBedCost:100, status:'Reserved' },
+      { id:'rm6',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'owned',  number:'301', type:'Suite',    view:'Haram View',    beds:'King + Sofa Bed',  occupancy:3, floor:'3', desc:'Premium suite with direct Haram view, walk-in shower, sitting area.',      from:'2026-01-01', to:'2026-12-31', costPerNight:1200, extraBedCost:150, status:'Available' },
+      { id:'rm7',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'owned',  number:'302', type:'Suite',    view:'Haram View',    beds:'King + Sofa Bed',  occupancy:3, floor:'3', desc:'Premium Haram view suite, all premium amenities.',                         from:'2026-01-01', to:'2026-12-31', costPerNight:1200, extraBedCost:150, status:'Available' },
+      { id:'rm8',  batchId:'batch-001', batchRef:'HTL-2026-001', batchName:'Makkah Grand — Season 2026',  hotel:'Makkah Grand Hotel',  source:'direct', number:'401', type:'Family',   view:'City View',     beds:'2 Double Beds',    occupancy:4, floor:'4', desc:'Spacious family room with city view, ideal for families of 4.',            from:'2026-01-01', to:'2026-12-31', costPerNight:900,  extraBedCost:120, status:'Available' },
+      // Madinah Towers (8 rooms)
+      { id:'rm9',  batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'101', type:'Standard', view:'City View',     beds:'2 Twin Beds',      occupancy:2, floor:'1', desc:'Standard twin room, city view.',                                           from:'2026-01-01', to:'2026-12-31', costPerNight:500,  extraBedCost:90,  status:'Reserved' },
+      { id:'rm10', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'102', type:'Standard', view:'City View',     beds:'1 King Bed',       occupancy:2, floor:'1', desc:'Standard king room, city view.',                                           from:'2026-01-01', to:'2026-12-31', costPerNight:500,  extraBedCost:90,  status:'Reserved' },
+      { id:'rm11', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'201', type:'Deluxe',   view:'Courtyard View',beds:'1 King Bed',       occupancy:2, floor:'2', desc:'Deluxe room with courtyard view.',                                         from:'2026-01-01', to:'2026-12-31', costPerNight:750,  extraBedCost:110, status:'Reserved' },
+      { id:'rm12', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'202', type:'Deluxe',   view:'Courtyard View',beds:'2 Twin Beds',      occupancy:3, floor:'2', desc:'Deluxe twin, courtyard view.',                                             from:'2026-01-01', to:'2026-12-31', costPerNight:780,  extraBedCost:110, status:'Available' },
+      { id:'rm13', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'owned',  number:'301', type:'Suite',    view:'Haram View',    beds:'King + Sofa Bed',  occupancy:3, floor:'3', desc:"Spectacular Masjid al-Nabawi view suite.",                                 from:'2026-01-01', to:'2026-12-31', costPerNight:1400, extraBedCost:180, status:'Available' },
+      { id:'rm14', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'owned',  number:'302', type:'Suite',    view:'Haram View',    beds:'King + Sofa Bed',  occupancy:3, floor:'3', desc:'Premium Nabawi view suite, all amenities.',                                from:'2026-01-01', to:'2026-12-31', costPerNight:1400, extraBedCost:180, status:'Available' },
+      { id:'rm15', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'401', type:'Family',   view:'City View',     beds:'2 Double Beds',    occupancy:4, floor:'4', desc:'Large family room, city view.',                                            from:'2026-01-01', to:'2026-12-31', costPerNight:1050, extraBedCost:130, status:'Available' },
+      { id:'rm16', batchId:'batch-002', batchRef:'HTL-2026-002', batchName:'Madinah Towers — Season 2026', hotel:'Madinah Towers Hotel', source:'direct', number:'402', type:'Family',   view:'City View',     beds:'2 Double Beds',    occupancy:4, floor:'4', desc:'Large family room.',                                                       from:'2026-01-01', to:'2026-12-31', costPerNight:1050, extraBedCost:130, status:'Available' },
+      // Al Noor Palace (4 rooms)
+      { id:'rm17', batchId:'batch-003', batchRef:'HTL-2026-003', batchName:'Al Noor Palace — Ramadan 2026', hotel:'Al Noor Palace Hotel', source:'agent', number:'A101', type:'Standard', view:'City View',    beds:'1 King Bed',       occupancy:2, floor:'1', desc:'Standard room.',                                                           from:'2026-03-01', to:'2026-05-31', costPerNight:400,  extraBedCost:70,  status:'Available' },
+      { id:'rm18', batchId:'batch-003', batchRef:'HTL-2026-003', batchName:'Al Noor Palace — Ramadan 2026', hotel:'Al Noor Palace Hotel', source:'agent', number:'A102', type:'Standard', view:'City View',    beds:'2 Twin Beds',      occupancy:2, floor:'1', desc:'Standard twin room.',                                                      from:'2026-03-01', to:'2026-05-31', costPerNight:400,  extraBedCost:70,  status:'Available' },
+      { id:'rm19', batchId:'batch-003', batchRef:'HTL-2026-003', batchName:'Al Noor Palace — Ramadan 2026', hotel:'Al Noor Palace Hotel', source:'agent', number:'B101', type:'Deluxe',  view:'Garden View',   beds:'1 King Bed',       occupancy:2, floor:'2', desc:'Deluxe room, garden view.',                                                from:'2026-03-01', to:'2026-05-31', costPerNight:580,  extraBedCost:90,  status:'Available' },
+      { id:'rm20', batchId:'batch-003', batchRef:'HTL-2026-003', batchName:'Al Noor Palace — Ramadan 2026', hotel:'Al Noor Palace Hotel', source:'agent', number:'B102', type:'Deluxe',  view:'Garden View',   beds:'2 Twin Beds',      occupancy:3, floor:'2', desc:'Deluxe twin, garden view.',                                                from:'2026-03-01', to:'2026-05-31', costPerNight:600,  extraBedCost:90,  status:'Available' },
+    ];
+
+    // ── Vouchers ─────────────────────────────────────────────────────────
+    vouchers = [
+      {
+        id:'vch-001', ref:'VCH-2026-001', agency:'PT Safa Nisa Rizky', agencyRef:'SNR-2026-45',
+        leaderPhone:'+62 812 555 9001', agent:'Ahmad Rizky', agentPhone:'+62 812 555 1234', agentEmail:'ops@safanisarizky.com',
+        paxTotal:10, paxMen:6, paxWomen:4,
+        arrDate:'2026-05-10', arrFlight:'SV 820', arrAirport:'JED', arrTime:'07:30',
+        depDate:'2026-05-17', depFlight:'SV 821', depAirport:'JED', depTime:'14:00',
+        hotelConfs:[{hotelId:'ht1', hotelName:'Makkah Grand Hotel', city:'Makkah', checkIn:'2026-05-10', checkOut:'2026-05-17'}],
+        transport:[{date:'2026-05-11', from:'Makkah Grand Hotel', to:'Makkah Ziyarah Circuit', time:'08:00'},{date:'2026-05-10', from:'King Abdulaziz Airport', to:'Makkah Grand Hotel', time:'09:00'}],
+        guests:[
+          {name:'Ahmad Rizky',    gender:'Male',   dob:'1978-03-15', nationality:'Indonesian', passport:'A12345678', passportExpiry:'2028-03-15', phone:'+62 812 555 1234'},
+          {name:'Siti Nurfadilah',gender:'Female', dob:'1982-07-22', nationality:'Indonesian', passport:'A23456789', passportExpiry:'2027-07-22', phone:''},
+          {name:'Budi Santoso',   gender:'Male',   dob:'1975-11-05', nationality:'Indonesian', passport:'A34567890', passportExpiry:'2029-11-05', phone:''},
+          {name:'Dewi Rahayu',    gender:'Female', dob:'1985-04-18', nationality:'Indonesian', passport:'A45678901', passportExpiry:'2028-04-18', phone:''},
+          {name:'Hendra Wijaya',  gender:'Male',   dob:'1968-09-30', nationality:'Indonesian', passport:'A56789012', passportExpiry:'2027-09-30', phone:'+62 812 555 6789'},
+          {name:'Rina Marlina',   gender:'Female', dob:'1970-01-25', nationality:'Indonesian', passport:'A67890123', passportExpiry:'2026-06-30', phone:''},
+          {name:'Dedi Kurniawan', gender:'Male',   dob:'1980-06-14', nationality:'Indonesian', passport:'A78901234', passportExpiry:'2029-06-14', phone:''},
+          {name:'Fitri Handayani',gender:'Female', dob:'1990-12-03', nationality:'Indonesian', passport:'A89012345', passportExpiry:'2028-12-03', phone:''},
+          {name:'Yusuf Hakim',    gender:'Male',   dob:'1965-08-20', nationality:'Indonesian', passport:'A90123456', passportExpiry:'2027-08-20', phone:''},
+          {name:'Nurul Hidayah',  gender:'Female', dob:'1972-02-08', nationality:'Indonesian', passport:'B01234567', passportExpiry:'2027-02-08', phone:''},
+        ],
+        rooms:[
+          {roomId:'rm2', guestsNote:'Ahmad Rizky + Budi Santoso',   checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:450, sellPerNight:600},
+          {roomId:'rm3', guestsNote:'Hendra Wijaya + Yusuf Hakim',  checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:430, sellPerNight:580},
+          {roomId:'rm5', guestsNote:'Siti Nurfadilah + Dewi Rahayu',checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:680, sellPerNight:850},
+        ],
+        meals:[{type:'Breakfast', notes:'Halal buffet', count:7},{type:'Dinner', notes:'', count:6}],
+        extras:['Bus Tour / Ziyarah','Airport Transfer'],
+        extTour:true, extAirport:true, extLaundry:false,
+        notes:'Group 1 of 2 for 2026 season. Leader: Ahmad Rizky.',
+        checkIn:'2026-05-10', checkOut:'2026-05-17',
+        totalRoomCost:(450+430+680)*7, totalRoomSell:(600+580+850)*7,
+        totalMealCost:0, totalMealSell:0,
+        totalCost:(450+430+680)*7, totalSell:(600+580+850)*7,
+        status:'Confirmed', createdAt:'2026-04-12',
+      },
+      {
+        id:'vch-002', ref:'VCH-2026-002', agency:'Al Amin Umrah Tours', agencyRef:'ALM-2026-88',
+        leaderPhone:'+90 532 555 0011', agent:'Mehmet Yilmaz', agentPhone:'+90 532 555 0011', agentEmail:'ops@alaminumrah.com.tr',
+        paxTotal:20, paxMen:12, paxWomen:8,
+        arrDate:'2026-06-15', arrFlight:'TK 134', arrAirport:'JED', arrTime:'05:45',
+        depDate:'2026-06-25', depFlight:'TK 135', depAirport:'MED', depTime:'21:00',
+        hotelConfs:[
+          {hotelId:'ht1', hotelName:'Makkah Grand Hotel',  city:'Makkah',  checkIn:'2026-06-15', checkOut:'2026-06-20'},
+          {hotelId:'ht3', hotelName:'Madinah Towers Hotel', city:'Madinah', checkIn:'2026-06-20', checkOut:'2026-06-25'},
+        ],
+        transport:[
+          {date:'2026-06-15', from:'King Abdulaziz Airport',  to:'Makkah Grand Hotel',          time:'07:00'},
+          {date:'2026-06-16', from:'Makkah Grand Hotel',       to:'Makkah Ziyarah Circuit',       time:'08:00'},
+          {date:'2026-06-20', from:'Makkah Grand Hotel',       to:'Madinah Towers Hotel',         time:'09:00'},
+          {date:'2026-06-21', from:'Madinah Towers Hotel',     to:'Madinah Ziyarah Circuit',      time:'08:30'},
+        ],
+        guests:[
+          {name:'Mehmet Yilmaz', gender:'Male',   dob:'1975-05-12', nationality:'Turkish', passport:'U12345678', passportExpiry:'2029-05-12', phone:'+90 532 555 0011'},
+          {name:'Fatima Yilmaz', gender:'Female', dob:'1978-09-30', nationality:'Turkish', passport:'U23456789', passportExpiry:'2028-09-30', phone:''},
+          {name:'Ibrahim Kaya',  gender:'Male',   dob:'1980-11-14', nationality:'Turkish', passport:'U34567890', passportExpiry:'2027-11-14', phone:''},
+          {name:'Zeynep Kaya',   gender:'Female', dob:'1983-03-22', nationality:'Turkish', passport:'U45678901', passportExpiry:'2027-03-22', phone:''},
+          {name:'Ali Hassan',    gender:'Male',   dob:'1970-07-08', nationality:'Turkish', passport:'U56789012', passportExpiry:'2029-07-08', phone:''},
+          {name:'Ayse Demir',    gender:'Female', dob:'1972-01-15', nationality:'Turkish', passport:'U67890123', passportExpiry:'2028-01-15', phone:''},
+          {name:'Omar Abdullah', gender:'Male',   dob:'1968-04-25', nationality:'Turkish', passport:'U78901234', passportExpiry:'2029-04-25', phone:''},
+          {name:'Halima Saad',   gender:'Female', dob:'1990-08-17', nationality:'Turkish', passport:'U89012345', passportExpiry:'2028-08-17', phone:''},
+          {name:'Karim Mansour', gender:'Male',   dob:'1985-02-28', nationality:'Turkish', passport:'U90123456', passportExpiry:'2027-02-28', phone:''},
+          {name:'Leyla Arslan',  gender:'Female', dob:'1995-06-10', nationality:'Turkish', passport:'V01234567', passportExpiry:'2029-06-10', phone:''},
+        ],
+        rooms:[
+          {roomId:'rm9',  guestsNote:'Mehmet + Ibrahim',    checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm10', guestsNote:'Omar + Karim',        checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm11', guestsNote:'Ali Hassan + 1 guest',checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:750, sellPerNight:950},
+        ],
+        meals:[{type:'Breakfast', notes:'Halal', count:5},{type:'Dinner', notes:'Group dinner', count:4}],
+        extras:['Bus Tour / Ziyarah','Airport Transfer'],
+        extTour:true, extAirport:true, extLaundry:false,
+        notes:'Makkah 5 nights + Madinah 5 nights. Airport transfer both ends. Guide required.',
+        checkIn:'2026-06-15', checkOut:'2026-06-25',
+        totalRoomCost:(500+500+750)*5, totalRoomSell:(680+680+950)*5,
+        totalMealCost:0, totalMealSell:0,
+        totalCost:(500+500+750)*5, totalSell:(680+680+950)*5,
+        status:'Confirmed', createdAt:'2026-05-20',
+      },
+      {
+        id:'vch-003', ref:'VCH-2026-003', agency:'Nusuk Travel Sdn Bhd', agencyRef:'NTB-2026-12',
+        leaderPhone:'+60 12 555 3344', agent:'Razif Hassan', agentPhone:'+60 12 555 3344', agentEmail:'ops@nusuktravel.com.my',
+        paxTotal:8, paxMen:5, paxWomen:3,
+        arrDate:'2026-07-10', arrFlight:'MH 80', arrAirport:'JED', arrTime:'10:20',
+        depDate:'2026-07-17', depFlight:'MH 81', depAirport:'JED', depTime:'18:30',
+        hotelConfs:[{hotelId:'ht1', hotelName:'Makkah Grand Hotel', city:'Makkah', checkIn:'2026-07-10', checkOut:'2026-07-17'}],
+        transport:[],
+        guests:[
+          {name:'Razif Hassan',  gender:'Male',   dob:'1977-04-19', nationality:'Malaysian', passport:'A21111111', passportExpiry:'2029-04-19', phone:'+60 12 555 3344'},
+          {name:'Alia Hassan',   gender:'Female', dob:'1980-08-05', nationality:'Malaysian', passport:'A21111112', passportExpiry:'2028-08-05', phone:''},
+          {name:'Syafiq Johari', gender:'Male',   dob:'1982-11-27', nationality:'Malaysian', passport:'A21111113', passportExpiry:'2027-11-27', phone:''},
+        ],
+        rooms:[],
+        meals:[{type:'Breakfast', notes:'', count:7}],
+        extras:[],
+        extTour:false, extAirport:false, extLaundry:false,
+        notes:'Small premium group. Needs 4 rooms from Makkah Grand — pending room allocation.',
+        checkIn:'2026-07-10', checkOut:'2026-07-17',
+        totalRoomCost:0, totalRoomSell:0, totalMealCost:0, totalMealSell:0, totalCost:0, totalSell:0,
+        status:'Tentative – Pending Reservation', createdAt:'2026-06-01',
+      },
+      {
+        id:'vch-004', ref:'VCH-2026-004', agency:'Hayat Travels', agencyRef:'HT-2026-77',
+        leaderPhone:'+92 300 555 7788', agent:'Tariq Ahmed', agentPhone:'+92 300 555 7788', agentEmail:'tariq@hayattravels.pk',
+        paxTotal:12, paxMen:7, paxWomen:5,
+        arrDate:'2026-08-01', arrFlight:'PK 852', arrAirport:'JED', arrTime:'02:10',
+        depDate:'2026-08-08', depFlight:'PK 853', depAirport:'JED', depTime:'04:30',
+        hotelConfs:[{hotelId:'ht2', hotelName:'Al Noor Palace Hotel', city:'Makkah', checkIn:'2026-08-01', checkOut:'2026-08-08'}],
+        transport:[],
+        guests:[
+          {name:'Tariq Ahmed', gender:'Male',   dob:'1973-06-03', nationality:'Pakistani', passport:'AY1234567', passportExpiry:'2028-06-03', phone:'+92 300 555 7788'},
+          {name:'Amina Khan',  gender:'Female', dob:'1976-10-14', nationality:'Pakistani', passport:'AY2345678', passportExpiry:'2027-10-14', phone:''},
+          {name:'Usman Farooq',gender:'Male',   dob:'1985-03-28', nationality:'Pakistani', passport:'AY3456789', passportExpiry:'2029-03-28', phone:''},
+        ],
+        rooms:[],
+        meals:[{type:'Breakfast', notes:'', count:7},{type:'Lunch', notes:'', count:4}],
+        extras:[],
+        extTour:false, extAirport:false, extLaundry:false,
+        notes:'New partner — first group. Agent prefers Misfalah area. Awaiting room allocation.',
+        checkIn:'2026-08-01', checkOut:'2026-08-08',
+        totalRoomCost:0, totalRoomSell:0, totalMealCost:0, totalMealSell:0, totalCost:0, totalSell:0,
+        status:'Tentative – Pending Reservation', createdAt:'2026-06-08',
+      },
+      {
+        id:'vch-005', ref:'VCH-2026-005', agency:'Al Baraka Hajj & Umrah', agencyRef:'ABJ-2026-03',
+        leaderPhone:'+962 79 555 0011', agent:'Khalil Ismail', agentPhone:'+962 79 555 0011', agentEmail:'info@albarakajordan.com',
+        paxTotal:6, paxMen:3, paxWomen:3,
+        arrDate:'2026-04-20', arrFlight:'RJ 121', arrAirport:'JED', arrTime:'08:00',
+        depDate:'2026-04-27', depFlight:'RJ 122', depAirport:'JED', depTime:'10:00',
+        hotelConfs:[{hotelId:'ht1', hotelName:'Makkah Grand Hotel', city:'Makkah', checkIn:'2026-04-20', checkOut:'2026-04-27'}],
+        transport:[],
+        guests:[
+          {name:'Khalil Ismail', gender:'Male',   dob:'1969-05-15', nationality:'Jordanian', passport:'JN1234567', passportExpiry:'2027-05-15', phone:'+962 79 555 0011'},
+          {name:'Rania Ismail',  gender:'Female', dob:'1972-09-20', nationality:'Jordanian', passport:'JN2345678', passportExpiry:'2027-09-20', phone:''},
+        ],
+        rooms:[], meals:[], extras:[],
+        extTour:false, extAirport:false, extLaundry:false,
+        notes:'Cancelled by client — group postponed to Hajj season 2027.',
+        checkIn:'2026-04-20', checkOut:'2026-04-27',
+        totalRoomCost:0, totalRoomSell:0, totalMealCost:0, totalMealSell:0, totalCost:0, totalSell:0,
+        status:'Cancelled', createdAt:'2026-03-05',
+      },
+    ];
+
+    // ── Confirmations ─────────────────────────────────────────────────────
+    confirmations = [
+      {
+        id:'cnf-001', ref:'CNF-2026-001', voucherId:'vch-001', voucherRef:'VCH-2026-001',
+        agency:'PT Safa Nisa Rizky', agencyRef:'SNR-2026-45', agent:'Ahmad Rizky',
+        agentPhone:'+62 812 555 1234', agentEmail:'ops@safanisarizky.com',
+        guests:[
+          {name:'Ahmad Rizky',    gender:'Male',   dob:'1978-03-15', nationality:'Indonesian', passport:'A12345678'},
+          {name:'Siti Nurfadilah',gender:'Female', dob:'1982-07-22', nationality:'Indonesian', passport:'A23456789'},
+          {name:'Budi Santoso',   gender:'Male',   dob:'1975-11-05', nationality:'Indonesian', passport:'A34567890'},
+          {name:'Dewi Rahayu',    gender:'Female', dob:'1985-04-18', nationality:'Indonesian', passport:'A45678901'},
+          {name:'Hendra Wijaya',  gender:'Male',   dob:'1968-09-30', nationality:'Indonesian', passport:'A56789012'},
+          {name:'Rina Marlina',   gender:'Female', dob:'1970-01-25', nationality:'Indonesian', passport:'A67890123'},
+          {name:'Dedi Kurniawan', gender:'Male',   dob:'1980-06-14', nationality:'Indonesian', passport:'A78901234'},
+          {name:'Fitri Handayani',gender:'Female', dob:'1990-12-03', nationality:'Indonesian', passport:'A89012345'},
+          {name:'Yusuf Hakim',    gender:'Male',   dob:'1965-08-20', nationality:'Indonesian', passport:'A90123456'},
+          {name:'Nurul Hidayah',  gender:'Female', dob:'1972-02-08', nationality:'Indonesian', passport:'B01234567'},
+        ],
+        rooms:[
+          {roomId:'rm2', guestsNote:'Ahmad Rizky + Budi Santoso',    checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:450, sellPerNight:600},
+          {roomId:'rm3', guestsNote:'Hendra Wijaya + Yusuf Hakim',   checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:430, sellPerNight:580},
+          {roomId:'rm5', guestsNote:'Siti Nurfadilah + Dewi Rahayu', checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:680, sellPerNight:850},
+        ],
+        extras:['Bus Tour / Ziyarah','Airport Transfer'], extTour:true, extAirport:true, extLaundry:false,
+        notes:'Group 1 of 2 for 2026 season.', checkIn:'2026-05-10', checkOut:'2026-05-17',
+        totalRoomCost:(450+430+680)*7, extrasCost:10*200, totalCost:(450+430+680)*7+10*200,
+        issuedAt:'2026-04-15', status:'Confirmed',
+      },
+      {
+        id:'cnf-002', ref:'CNF-2026-002', voucherId:'vch-002', voucherRef:'VCH-2026-002',
+        agency:'Al Amin Umrah Tours', agencyRef:'ALM-2026-88', agent:'Mehmet Yilmaz',
+        agentPhone:'+90 532 555 0011', agentEmail:'ops@alaminumrah.com.tr',
+        guests:[
+          {name:'Mehmet Yilmaz', gender:'Male',   dob:'1975-05-12', nationality:'Turkish', passport:'U12345678'},
+          {name:'Fatima Yilmaz', gender:'Female', dob:'1978-09-30', nationality:'Turkish', passport:'U23456789'},
+          {name:'Ibrahim Kaya',  gender:'Male',   dob:'1980-11-14', nationality:'Turkish', passport:'U34567890'},
+          {name:'Zeynep Kaya',   gender:'Female', dob:'1983-03-22', nationality:'Turkish', passport:'U45678901'},
+          {name:'Ali Hassan',    gender:'Male',   dob:'1970-07-08', nationality:'Turkish', passport:'U56789012'},
+          {name:'Ayse Demir',    gender:'Female', dob:'1972-01-15', nationality:'Turkish', passport:'U67890123'},
+          {name:'Omar Abdullah', gender:'Male',   dob:'1968-04-25', nationality:'Turkish', passport:'U78901234'},
+          {name:'Halima Saad',   gender:'Female', dob:'1990-08-17', nationality:'Turkish', passport:'U89012345'},
+          {name:'Karim Mansour', gender:'Male',   dob:'1985-02-28', nationality:'Turkish', passport:'U90123456'},
+          {name:'Leyla Arslan',  gender:'Female', dob:'1995-06-10', nationality:'Turkish', passport:'V01234567'},
+        ],
+        rooms:[
+          {roomId:'rm9',  guestsNote:'Mehmet + Ibrahim',     checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm10', guestsNote:'Omar + Karim',         checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm11', guestsNote:'Ali Hassan + 1 guest', checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:750, sellPerNight:950},
+        ],
+        extras:['Bus Tour / Ziyarah','Airport Transfer'], extTour:true, extAirport:true, extLaundry:false,
+        notes:'Makkah + Madinah combo.', checkIn:'2026-06-15', checkOut:'2026-06-25',
+        totalRoomCost:(500+500+750)*5, extrasCost:20*200, totalCost:(500+500+750)*5+20*200,
+        issuedAt:'2026-05-22', status:'Confirmed',
+      },
+    ];
+
+    // ── Mutamers ──────────────────────────────────────────────────────────
+    mutamers = [
+      { id:'mut-01', firstName:'Ahmad',   middleName:'', lastName:'Rizky',      sex:'Male',   dob:'1978-03-15', nationality:'Indonesian', passportNo:'A12345678', passportExpiry:'2028-03-15', idNumber:'3201011503780001', phone:'+62 812 555 1234', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-02', firstName:'Siti',    middleName:'', lastName:'Nurfadilah', sex:'Female', dob:'1982-07-22', nationality:'Indonesian', passportNo:'A23456789', passportExpiry:'2027-07-22', idNumber:'3201012207820002', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-03', firstName:'Budi',    middleName:'', lastName:'Santoso',    sex:'Male',   dob:'1975-11-05', nationality:'Indonesian', passportNo:'A34567890', passportExpiry:'2029-11-05', idNumber:'3201010511750003', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-04', firstName:'Dewi',    middleName:'', lastName:'Rahayu',     sex:'Female', dob:'1985-04-18', nationality:'Indonesian', passportNo:'A45678901', passportExpiry:'2028-04-18', idNumber:'3201011804850004', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-05', firstName:'Hendra',  middleName:'', lastName:'Wijaya',     sex:'Male',   dob:'1968-09-30', nationality:'Indonesian', passportNo:'A56789012', passportExpiry:'2027-09-30', idNumber:'3201013009680005', phone:'+62 812 555 6789', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-06', firstName:'Rina',    middleName:'', lastName:'Marlina',    sex:'Female', dob:'1970-01-25', nationality:'Indonesian', passportNo:'A67890123', passportExpiry:'2026-06-30', idNumber:'3201012501700006', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-07', firstName:'Dedi',    middleName:'', lastName:'Kurniawan',  sex:'Male',   dob:'1980-06-14', nationality:'Indonesian', passportNo:'A78901234', passportExpiry:'2029-06-14', idNumber:'3201011406800007', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-08', firstName:'Fitri',   middleName:'', lastName:'Handayani',  sex:'Female', dob:'1990-12-03', nationality:'Indonesian', passportNo:'A89012345', passportExpiry:'2028-12-03', idNumber:'3201010312900008', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-09', firstName:'Yusuf',   middleName:'', lastName:'Hakim',      sex:'Male',   dob:'1965-08-20', nationality:'Indonesian', passportNo:'A90123456', passportExpiry:'2027-08-20', idNumber:'3201012008650009', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-10', firstName:'Nurul',   middleName:'', lastName:'Hidayah',    sex:'Female', dob:'1972-02-08', nationality:'Indonesian', passportNo:'B01234567', passportExpiry:'2027-02-08', idNumber:'3201010802720010', phone:'', voucherId:'vch-001', createdAt:'2026-04-12' },
+      { id:'mut-11', firstName:'Mehmet',  middleName:'', lastName:'Yilmaz',     sex:'Male',   dob:'1975-05-12', nationality:'Turkish',    passportNo:'U12345678', passportExpiry:'2029-05-12', idNumber:'', phone:'+90 532 555 0011', voucherId:'vch-002', createdAt:'2026-05-20' },
+      { id:'mut-12', firstName:'Fatima',  middleName:'', lastName:'Yilmaz',     sex:'Female', dob:'1978-09-30', nationality:'Turkish',    passportNo:'U23456789', passportExpiry:'2028-09-30', idNumber:'', phone:'', voucherId:'vch-002', createdAt:'2026-05-20' },
+      { id:'mut-13', firstName:'Ibrahim', middleName:'', lastName:'Kaya',       sex:'Male',   dob:'1980-11-14', nationality:'Turkish',    passportNo:'U34567890', passportExpiry:'2027-11-14', idNumber:'', phone:'', voucherId:'vch-002', createdAt:'2026-05-20' },
+      { id:'mut-14', firstName:'Zeynep',  middleName:'', lastName:'Kaya',       sex:'Female', dob:'1983-03-22', nationality:'Turkish',    passportNo:'U45678901', passportExpiry:'2027-03-22', idNumber:'', phone:'', voucherId:'vch-002', createdAt:'2026-05-20' },
+      { id:'mut-15', firstName:'Ali',     middleName:'', lastName:'Hassan',     sex:'Male',   dob:'1970-07-08', nationality:'Turkish',    passportNo:'U56789012', passportExpiry:'2029-07-08', idNumber:'', phone:'', voucherId:'vch-002', createdAt:'2026-05-20' },
+    ];
+
+    // ── Hotel Reservations ────────────────────────────────────────────────
+    hotelReservations = [
+      {
+        id:'hr-001', voucherId:'vch-001', voucherRef:'VCH-2026-001', confRef:'CNF-2026-001',
+        agency:'PT Safa Nisa Rizky', groupRef:'SNR-2026-45', agentPhone:'+62 812 555 1234', agentEmail:'ops@safanisarizky.com',
+        paxTotal:10, paxMen:6, paxWomen:4,
+        guests:[{name:'Ahmad Rizky'},{name:'Siti Nurfadilah'},{name:'Budi Santoso'},{name:'Dewi Rahayu'},{name:'Hendra Wijaya'},{name:'Rina Marlina'},{name:'Dedi Kurniawan'},{name:'Fitri Handayani'},{name:'Yusuf Hakim'},{name:'Nurul Hidayah'}],
+        hotelConfs:[{hotelId:'ht1', hotelName:'Makkah Grand Hotel', city:'Makkah', checkIn:'2026-05-10', checkOut:'2026-05-17'}],
+        rooms:[
+          {roomId:'rm2', guestsNote:'Ahmad + Budi',     checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:450, sellPerNight:600},
+          {roomId:'rm3', guestsNote:'Hendra + Yusuf',   checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:430, sellPerNight:580},
+          {roomId:'rm5', guestsNote:'Siti + Dewi',      checkIn:'2026-05-10', checkOut:'2026-05-17', costPerNight:680, sellPerNight:850},
+        ],
+        meals:[{type:'Breakfast', notes:'Halal buffet', count:7},{type:'Dinner', notes:'', count:6}],
+        checkIn:'2026-05-10', checkOut:'2026-05-17',
+        status:'Completed', notes:'All rooms confirmed. Group checked out May 17 without issues.', confirmedBy:'Salma Al-Rashid', createdAt:'2026-04-15',
+      },
+      {
+        id:'hr-002', voucherId:'vch-002', voucherRef:'VCH-2026-002', confRef:'CNF-2026-002',
+        agency:'Al Amin Umrah Tours', groupRef:'ALM-2026-88', agentPhone:'+90 532 555 0011', agentEmail:'ops@alaminumrah.com.tr',
+        paxTotal:20, paxMen:12, paxWomen:8,
+        guests:[{name:'Mehmet Yilmaz'},{name:'Fatima Yilmaz'},{name:'Ibrahim Kaya'},{name:'Zeynep Kaya'},{name:'Ali Hassan'},{name:'Ayse Demir'},{name:'Omar Abdullah'},{name:'Halima Saad'},{name:'Karim Mansour'},{name:'Leyla Arslan'}],
+        hotelConfs:[
+          {hotelId:'ht1', hotelName:'Makkah Grand Hotel',  city:'Makkah',  checkIn:'2026-06-15', checkOut:'2026-06-20'},
+          {hotelId:'ht3', hotelName:'Madinah Towers Hotel', city:'Madinah', checkIn:'2026-06-20', checkOut:'2026-06-25'},
+        ],
+        rooms:[
+          {roomId:'rm9',  guestsNote:'Mehmet + Ibrahim',     checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm10', guestsNote:'Omar + Karim',         checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:500, sellPerNight:680},
+          {roomId:'rm11', guestsNote:'Ali Hassan + 1 guest', checkIn:'2026-06-20', checkOut:'2026-06-25', costPerNight:750, sellPerNight:950},
+        ],
+        meals:[{type:'Breakfast', notes:'Halal', count:5},{type:'Dinner', notes:'Group dinner', count:4}],
+        checkIn:'2026-06-15', checkOut:'2026-06-25',
+        status:'In Progress', notes:'Makkah segment completed. Group transferred to Madinah Jun 20. Madinah rooms confirmed.', confirmedBy:'Ahmed Khalil', createdAt:'2026-05-22',
+      },
+      {
+        id:'hr-003', voucherId:null, voucherRef:'DIRECT-882341', confRef:'',
+        agency:'Saudi Airlines Employees Club', groupRef:'SAEC-2026-07', agentPhone:'+966 50 111 9999', agentEmail:'group@saudia.com',
+        paxTotal:15, paxMen:9, paxWomen:6, guests:[],
+        hotelConfs:[{hotelId:'ht3', hotelName:'Madinah Towers Hotel', city:'Madinah', checkIn:'2026-07-05', checkOut:'2026-07-10'}],
+        rooms:[], meals:[{type:'Full Board', notes:'', count:5}],
+        checkIn:'2026-07-05', checkOut:'2026-07-10',
+        status:'Pending', notes:'Direct corporate booking. Awaiting room allocation.', confirmedBy:'', createdAt:'2026-06-09', isDirect:true,
+      },
+    ];
+
+    // ── Bus Reservations ──────────────────────────────────────────────────
+    busReservations = [
+      {
+        id:'br-001', voucherId:'vch-001', voucherRef:'VCH-2026-001', confRef:'CNF-2026-001',
+        agency:'PT Safa Nisa Rizky', groupRef:'SNR-2026-45', paxTotal:10,
+        transport:[
+          {date:'2026-05-10', from:'King Abdulaziz Airport',to:'Makkah Grand Hotel',    time:'09:00'},
+          {date:'2026-05-11', from:'Makkah Grand Hotel',    to:'Makkah Ziyarah Circuit',time:'08:00'},
+        ],
+        extTour:true, busCompanyId:'bc1', busCompanyName:'Al Rawdah Transport Co.',
+        assignedBuses:[{type:'Coach', count:1, seats:50}],
+        agentPickup:'Sami Al-Harbi', agentDropoff:'Sami Al-Harbi',
+        status:'Completed', notes:'Airport pickup + Ziyarah tour completed. Coach departed on time.', confirmedBy:'Omar Badr', createdAt:'2026-04-15', comments:[],
+      },
+      {
+        id:'br-002', voucherId:'vch-002', voucherRef:'VCH-2026-002', confRef:'CNF-2026-002',
+        agency:'Al Amin Umrah Tours', groupRef:'ALM-2026-88', paxTotal:20,
+        transport:[
+          {date:'2026-06-15', from:'King Abdulaziz Airport', to:'Makkah Grand Hotel',     time:'07:00'},
+          {date:'2026-06-16', from:'Makkah Grand Hotel',      to:'Makkah Ziyarah Circuit', time:'08:00'},
+          {date:'2026-06-20', from:'Makkah Grand Hotel',      to:'Madinah Towers Hotel',   time:'09:00'},
+          {date:'2026-06-21', from:'Madinah Towers Hotel',    to:'Madinah Ziyarah Circuit',time:'08:30'},
+        ],
+        extTour:true, busCompanyId:'bc1', busCompanyName:'Al Rawdah Transport Co.',
+        assignedBuses:[{type:'Coach', count:1, seats:50}],
+        agentPickup:'Sami Al-Harbi', agentDropoff:'',
+        status:'In Progress', notes:'Airport pickup Jun 15 completed. Makkah Ziyarah Jun 16 completed. Intercity transfer Jun 20 confirmed.', confirmedBy:'Omar Badr', createdAt:'2026-05-22', comments:[],
+      },
+    ];
+
+    // ── IT Tickets ────────────────────────────────────────────────────────
+    itTickets = [
+      { id:'tkt-001', ref:'TKT-0001', title:'Voucher PDF export blank for VCH-2026-002', description:'Clicking Print Voucher on VCH-2026-002 opens a blank PDF. All other vouchers print correctly. Tested on Chrome 124 and Edge 122.', category:'Bug', priority:'High', module:'Vouchers', reporter:'Salma Al-Rashid', status:'In Progress', assigned:'IT Department', resolution:'', attachments:[], createdAt:'2026-06-03', updatedAt:'2026-06-05', log:[{ts:'2026-06-03T09:00:00Z',action:'Created',by:'Salma Al-Rashid'},{ts:'2026-06-05T11:00:00Z',action:'Status → In Progress',by:'IT Department'}] },
+      { id:'tkt-002', ref:'TKT-0002', title:'Inventory "Reserved" filter returns empty results', description:'On the Inventory page, filtering by status "Reserved" shows empty results even though rooms rm2, rm3, rm5, rm9, rm10, rm11 are marked Reserved in the database.', category:'Bug', priority:'Medium', module:'Inventory', reporter:'Ahmed Khalil', status:'Open', assigned:'', resolution:'', attachments:[], createdAt:'2026-06-07', updatedAt:'2026-06-07', log:[{ts:'2026-06-07T14:30:00Z',action:'Created',by:'Ahmed Khalil'}] },
+      { id:'tkt-003', ref:'TKT-0003', title:'Add PAX capacity total to batch detail view', description:'Operations team requested a "Total Capacity" metric on each batch showing max PAX across all rooms (sum of occupancy). Useful for quick group matching.', category:'Feature Request', priority:'Low', module:'Inventory', reporter:'Omar Badr', status:'Open', assigned:'', resolution:'', attachments:[], createdAt:'2026-06-04', updatedAt:'2026-06-04', log:[{ts:'2026-06-04T10:00:00Z',action:'Created',by:'Omar Badr'}] },
+      { id:'tkt-004', ref:'TKT-0004', title:'Dark mode preference resets on page refresh', description:'Switching to dark mode and refreshing the page reverts to light mode. Dark mode preference is not persisted in localStorage. Affects all users.', category:'Bug', priority:'Low', module:'Settings', reporter:'Nadia Al-Qahtani', status:'Resolved', assigned:'IT Department', resolution:'Fixed by persisting darkMode to localStorage key oad_pref_darkMode in the toggleDark() function. Released Jun 6.', attachments:[], createdAt:'2026-05-28', updatedAt:'2026-06-06', log:[{ts:'2026-05-28T08:00:00Z',action:'Created',by:'Nadia Al-Qahtani'},{ts:'2026-06-06T15:00:00Z',action:'Status → Resolved',by:'IT Department'}] },
+    ];
+
+    // ── Notifications ─────────────────────────────────────────────────────
+    notifications = [
+      { id:'notif-001', type:'general', title:'Welcome to Ofoq Al Diafah', body:'Your hospitality platform is live with demo data. Explore the dashboard, vouchers, inventory, and reservations to see the full workflow.', voucherId:null, refId:null, read:true,  ts:'2026-01-01T08:00:00Z' },
+      { id:'notif-002', type:'room',    title:'Hotel Reservation Required — VCH-2026-003', body:'Nusuk Travel Sdn Bhd · 8 PAX · Makkah Grand Hotel · Jul 10–17. Awaiting room allocation and confirmation.', voucherId:'vch-003', refId:'hr-003', read:false, ts:'2026-06-01T09:30:00Z' },
+      { id:'notif-003', type:'room',    title:'Hotel Reservation Required — VCH-2026-004', body:'Hayat Travels · 12 PAX · Al Noor Palace Hotel · Aug 1–8. New group, first booking with agency.', voucherId:'vch-004', refId:null, read:false, ts:'2026-06-08T11:00:00Z' },
+      { id:'notif-004', type:'bus',     title:'Bus Tour In Progress — VCH-2026-002', body:'Al Amin Umrah Tours · 20 PAX · 4 transport legs assigned to Al Rawdah. Airport pickup completed Jun 15. Ziyarah Jun 16 confirmed.', voucherId:'vch-002', refId:'br-002', read:true, ts:'2026-06-15T07:30:00Z' },
+      { id:'notif-005', type:'general', title:'New IT Ticket — TKT-0001 (High)', body:'Voucher PDF export not generating for VCH-2026-002. Assigned to IT Department.', voucherId:null, refId:null, read:false, ts:'2026-06-03T09:00:00Z' },
+      { id:'notif-006', type:'room',    title:'Reservation Completed — VCH-2026-001', body:'PT Safa Nisa Rizky · 10 PAX · Makkah Grand Hotel · May 10–17. Group checked out successfully. CNF-2026-001 closed.', voucherId:'vch-001', refId:'hr-001', read:true, ts:'2026-05-17T14:00:00Z' },
+    ];
+
+    // ── Counters ──────────────────────────────────────────────────────────
+    voucherCounter = 6;
+    confCounter    = 3;
+    batchCounter   = 4;
+    guestIdCounter = 16;
+
+    DB.save('batches',           batches);
+    DB.save('vouchers',          vouchers);
+    DB.save('confirmations',     confirmations);
+    DB.save('mutamers',          mutamers);
+    DB.save('hotelReservations', hotelReservations);
+    DB.save('busReservations',   busReservations);
+    DB.save('itTickets',         itTickets);
+    DB.save('notifications',     notifications);
     DB.save('_seeded', '1');
     _cache['_seeded'] = '1';
-    persist();
+    persist(); // saves rooms, vc, cc, bc, gc
   }
 }
 
