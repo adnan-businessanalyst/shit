@@ -1244,13 +1244,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <!-- Add Widget Panel -->
   <div id="dash-add-panel">
     <div style="padding:20px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:1.0714rem;font-weight:600">Add Widget</div>
+      <div style="font-size:1.0714rem;font-weight:600" data-i18n="dash.panel.title">Add Widget</div>
       <button class="modal-close" onclick="closeDashPanel()">×</button>
     </div>
     <div style="flex:1;overflow-y:auto;padding:16px">
-      <div style="font-size:0.7857rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:10px">KPI Metrics</div>
+      <div style="font-size:0.7857rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:10px" data-i18n="dash.panel.kpi">KPI Metrics</div>
       <div class="widget-catalog" id="widget-catalog-kpi"></div>
-      <div style="font-size:0.7857rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink-muted);margin:16px 0 10px">Lists & Charts</div>
+      <div style="font-size:0.7857rem;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink-muted);margin:16px 0 10px" data-i18n="dash.panel.lists">Lists & Charts</div>
       <div class="widget-catalog" id="widget-catalog-charts"></div>
     </div>
     <div style="padding:14px 16px;border-top:1px solid var(--border);background:var(--cream)">
@@ -1265,12 +1265,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-clients" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Clients</div>
-        <div class="topbar-sub" id="clients-subtitle">Client companies and travel agencies</div>
+        <div class="topbar-title" data-i18n="pages.clients.title">Clients</div>
+        <div class="topbar-sub" id="clients-subtitle" data-i18n="pages.clients.sub">Client companies and travel agencies</div>
       </div>
       <button class="btn btn-gold" onclick="openClientModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Client Company
+        <span data-i18n="pages.clients.addBtn">Add Client Company</span>
       </button>
     </div>
     <div class="content">
@@ -1278,10 +1278,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <input id="client-search" type="text" oninput="renderClients()" placeholder="Search company, CR, city..."
           style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink);width:240px">
         <select id="client-filter-country" onchange="renderClients()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Countries</option>
+          <option value="" data-i18n="filter.allCountries">All Countries</option>
         </select>
         <select id="client-filter-type" onchange="renderClients()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Types</option>
+          <option value="" data-i18n="filter.allTypes">All Types</option>
           <option value="Travel Agency">Travel Agency</option>
           <option value="Tour Operator">Tour Operator</option>
           <option value="Corporate">Corporate</option>
@@ -1297,12 +1297,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-hotels" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Hotels</div>
-        <div class="topbar-sub" id="hotels-subtitle">Manage your hotel directory</div>
+        <div class="topbar-title" data-i18n="pages.hotels.title">Hotels</div>
+        <div class="topbar-sub" id="hotels-subtitle" data-i18n="pages.hotels.sub">Manage your hotel directory</div>
       </div>
       <button class="btn btn-gold" onclick="openHotelModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Hotel
+        <span data-i18n="pages.hotels.addBtn">Add Hotel</span>
       </button>
     </div>
     <div class="content">
@@ -1310,14 +1310,14 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <input id="hotel-search" type="text" oninput="renderHotels()" placeholder="Search hotels..."
           style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);width:220px">
         <select id="hotel-filter-stars" onchange="renderHotels()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-          <option value="">All Ratings</option>
+          <option value="" data-i18n="filter.allRatings">All Ratings</option>
           <option value="2">2 Stars</option>
           <option value="3">3 Stars</option>
           <option value="4">4 Stars</option>
           <option value="5">5 Stars</option>
         </select>
         <select id="hotel-filter-city" onchange="renderHotels()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-          <option value="">All Cities</option>
+          <option value="" data-i18n="filter.allCities">All Cities</option>
         </select>
       </div>
       <div id="hotels-grid"></div>
@@ -1328,12 +1328,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-providers" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Third-Party Providers</div>
-        <div class="topbar-sub" id="providers-subtitle">Service & supply providers</div>
+        <div class="topbar-title" data-i18n="pages.providers.title">Third-Party Providers</div>
+        <div class="topbar-sub" id="providers-subtitle" data-i18n="pages.providers.sub">Service & supply providers</div>
       </div>
       <button class="btn btn-gold" onclick="openProviderModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Provider
+        <span data-i18n="pages.providers.addBtn">Add Provider</span>
       </button>
     </div>
     <div class="content">
@@ -1352,7 +1352,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <option value="Other">Other</option>
         </select>
         <select id="prov-filter-city" onchange="renderProviders()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Cities</option>
+          <option value="" data-i18n="filter.allCities">All Cities</option>
         </select>
       </div>
       <div id="providers-grid"></div>
@@ -1363,12 +1363,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-buses" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Bus Companies</div>
-        <div class="topbar-sub" id="buses-subtitle">Manage your transport providers</div>
+        <div class="topbar-title" data-i18n="pages.buses.title">Bus Companies</div>
+        <div class="topbar-sub" id="buses-subtitle" data-i18n="pages.buses.sub">Manage your transport providers</div>
       </div>
       <button class="btn btn-gold" onclick="openBusModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Bus Company
+        <span data-i18n="pages.buses.addBtn">Add Bus Company</span>
       </button>
     </div>
     <div class="content">
@@ -1376,10 +1376,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <input id="bus-search" type="text" oninput="renderBuses()" placeholder="Search companies..."
           style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);width:220px">
         <select id="bus-filter-city" onchange="renderBuses()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-          <option value="">All Cities</option>
+          <option value="" data-i18n="filter.allCities">All Cities</option>
         </select>
         <select id="bus-filter-type" onchange="renderBuses()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
-          <option value="">All Bus Types</option>
+          <option value="" data-i18n="filter.allBusTypes">All Bus Types</option>
           <option value="Standard">Standard</option>
           <option value="VIP">VIP</option>
           <option value="Mini Bus">Mini Bus</option>
@@ -1395,12 +1395,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-tours" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Tours Inventory</div>
-        <div class="topbar-sub" id="tours-subtitle">Bus tour packages and pricing</div>
+        <div class="topbar-title" data-i18n="pages.tours.title">Tours Inventory</div>
+        <div class="topbar-sub" id="tours-subtitle" data-i18n="pages.tours.sub">Bus tour packages and pricing</div>
       </div>
       <button class="btn btn-gold" onclick="openTourModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Tour Package
+        <span data-i18n="pages.tours.addBtn">Add Tour Package</span>
       </button>
     </div>
     <div class="content">
@@ -1411,7 +1411,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <option value="">All Companies</option>
         </select>
         <select id="tour-filter-city" onchange="renderTours()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="">All Cities</option>
+          <option value="" data-i18n="filter.allCities">All Cities</option>
         </select>
       </div>
       <div id="tours-grid"></div>
@@ -1421,18 +1421,18 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-inventory" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Rooms &amp; Meals Inventory</div>
+        <div class="topbar-title" data-i18n="pages.inventory.title">Rooms &amp; Meals Inventory</div>
         <div class="topbar-sub" id="inv-subtitle"></div>
       </div>
       <button class="btn btn-gold" onclick="openRoomModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Import Rooms &amp; Meals (Batch)
+        <span data-i18n="pages.inventory.addBtn">Import Rooms &amp; Meals (Batch)</span>
       </button>
     </div>
     <div class="content">
       <div class="tab-bar">
-        <button class="tab-btn active" id="inv-tab-rooms" onclick="switchInvTab('rooms')">Rooms</button>
-        <button class="tab-btn" id="inv-tab-log" onclick="switchInvTab('log')">Activity Log <span id="inv-log-count" style="background:var(--cream-dark);color:var(--ink-muted);border-radius:999px;padding:1px 7px;font-size:0.7857rem;margin-left:4px">0</span></button>
+        <button class="tab-btn active" id="inv-tab-rooms" onclick="switchInvTab('rooms')" data-i18n="tab.rooms">Rooms</button>
+        <button class="tab-btn" id="inv-tab-log" onclick="switchInvTab('log')"><span data-i18n="tab.activityLog">Activity Log</span> <span id="inv-log-count" style="background:var(--cream-dark);color:var(--ink-muted);border-radius:999px;padding:1px 7px;font-size:0.7857rem;margin-left:4px">0</span></button>
       </div>
 
       <!-- Rooms tab -->
@@ -1470,10 +1470,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Inventory Activity Log</div>
-              <div class="card-sub">All changes to rooms and batches</div>
+              <div class="card-title" data-i18n="inv.logTitle">Inventory Activity Log</div>
+              <div class="card-sub" data-i18n="inv.logSub">All changes to rooms and batches</div>
             </div>
-            <button class="btn btn-xs btn-red" onclick="clearLog('inv')">Clear Log</button>
+            <button class="btn btn-xs btn-red" onclick="clearLog('inv')" data-i18n="btn.clearLog">Clear Log</button>
           </div>
           <div id="inv-log-list"></div>
         </div>
@@ -1485,18 +1485,18 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-vouchers" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">B2B Bookings</div>
+        <div class="topbar-title" data-i18n="pages.vouchers.title">B2B Bookings</div>
         <div class="topbar-sub" id="voucher-subtitle"></div>
       </div>
       <button class="btn btn-gold" onclick="openNewVoucherPage()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Voucher
+        <span data-i18n="pages.vouchers.addBtn">New Voucher</span>
       </button>
     </div>
     <div class="content">
       <div class="tab-bar">
-        <button class="tab-btn active" id="vou-tab-vouchers" onclick="switchVouTab('vouchers')">Vouchers</button>
-        <button class="tab-btn" id="vou-tab-log" onclick="switchVouTab('log')">Activity Log <span id="vou-log-count" style="background:var(--cream-dark);color:var(--ink-muted);border-radius:999px;padding:1px 7px;font-size:0.7857rem;margin-left:4px">0</span></button>
+        <button class="tab-btn active" id="vou-tab-vouchers" onclick="switchVouTab('vouchers')" data-i18n="tab.vouchers">Vouchers</button>
+        <button class="tab-btn" id="vou-tab-log" onclick="switchVouTab('log')"><span data-i18n="tab.activityLog">Activity Log</span> <span id="vou-log-count" style="background:var(--cream-dark);color:var(--ink-muted);border-radius:999px;padding:1px 7px;font-size:0.7857rem;margin-left:4px">0</span></button>
       </div>
 
       <!-- Vouchers tab -->
@@ -1518,10 +1518,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Voucher Activity Log</div>
-              <div class="card-sub">All voucher actions and status changes</div>
+              <div class="card-title" data-i18n="vou.logTitle">Voucher Activity Log</div>
+              <div class="card-sub" data-i18n="vou.logSub">All voucher actions and status changes</div>
             </div>
-            <button class="btn btn-xs btn-red" onclick="clearLog('vou')">Clear Log</button>
+            <button class="btn btn-xs btn-red" onclick="clearLog('vou')" data-i18n="btn.clearLog">Clear Log</button>
           </div>
           <div id="vou-log-list"></div>
         </div>
@@ -1535,12 +1535,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <input type="hidden" id="v-nvp-edit-id">
     <div class="topbar">
       <div>
-        <div class="topbar-title" id="nvp-title">New B2B Voucher</div>
+        <div class="topbar-title" id="nvp-title" data-i18n="pages.newVoucher.title">New B2B Voucher</div>
         <div class="topbar-sub" id="nvp-step-sub">Step 1 of 4</div>
       </div>
       <button class="btn" onclick="navigate(document.querySelector('[data-page=vouchers]'),'vouchers')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg>
-        Cancel
+        <span data-i18n="btn.cancel">Cancel</span>
       </button>
     </div>
 
@@ -1551,22 +1551,22 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div id="nvp-step-tab-1" onclick="nvpGoStep(1)" style="flex:1;padding:14px 10px;text-align:center;cursor:pointer;border-right:1px solid var(--border);transition:all 0.15s">
           <div style="font-size:1.2857rem">👥</div>
           <div style="font-size:0.7857rem;font-weight:600;margin-top:3px">Step 1</div>
-          <div style="font-size:0.7143rem;color:var(--ink-muted)">Group & PAX</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted)" data-i18n="nvp.step1sub">Group & PAX</div>
         </div>
         <div id="nvp-step-tab-2" onclick="nvpGoStep(2)" style="flex:1;padding:14px 10px;text-align:center;cursor:pointer;border-right:1px solid var(--border);transition:all 0.15s">
           <div style="font-size:1.2857rem">✈️</div>
           <div style="font-size:0.7857rem;font-weight:600;margin-top:3px">Step 2</div>
-          <div style="font-size:0.7143rem;color:var(--ink-muted)">Flights</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted)" data-i18n="nvp.step2sub">Flights</div>
         </div>
         <div id="nvp-step-tab-3" onclick="nvpGoStep(3)" style="flex:1;padding:14px 10px;text-align:center;cursor:pointer;border-right:1px solid var(--border);transition:all 0.15s">
           <div style="font-size:1.2857rem">🏨</div>
           <div style="font-size:0.7857rem;font-weight:600;margin-top:3px">Step 3</div>
-          <div style="font-size:0.7143rem;color:var(--ink-muted)">Hotels & Meals</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted)" data-i18n="nvp.step3sub">Hotels & Meals</div>
         </div>
         <div id="nvp-step-tab-4" onclick="nvpGoStep(4)" style="flex:1;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.15s">
           <div style="font-size:1.2857rem">🚌</div>
           <div style="font-size:0.7857rem;font-weight:600;margin-top:3px">Step 4</div>
-          <div style="font-size:0.7143rem;color:var(--ink-muted)">Transport</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted)" data-i18n="nvp.step4sub">Transport</div>
         </div>
       </div>
 
@@ -1684,16 +1684,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-top:8px">
         <button class="btn" id="nvp-back-btn" onclick="nvpBack()" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
+          <span data-i18n="btn.back">Back</span>
         </button>
         <div style="flex:1"></div>
         <button class="btn btn-gold" id="nvp-next-btn" onclick="nvpNext()">
-          Next
+          <span data-i18n="btn.next">Next</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="btn btn-gold" id="nvp-save-btn" onclick="saveVoucher()" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg>
-          Save Voucher
+          <span data-i18n="btn.saveVoucher">Save Voucher</span>
         </button>
       </div>
     </div>
@@ -1704,12 +1704,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-reservations" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Individual Bookings</div>
-        <div class="topbar-sub" id="res-subtitle">Direct B2C reservations</div>
+        <div class="topbar-title" data-i18n="pages.reservations.title">Individual Bookings</div>
+        <div class="topbar-sub" id="res-subtitle" data-i18n="pages.reservations.sub">Direct B2C reservations</div>
       </div>
       <button class="btn btn-gold" onclick="openB2CBooking()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Individual Booking
+        <span data-i18n="pages.reservations.addBtn">New Individual Booking</span>
       </button>
     </div>
     <div class="content">
@@ -1729,7 +1729,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-bus-reservations" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title" id="bus-res-page-title">Bus Tour Bookings</div>
+        <div class="topbar-title" id="bus-res-page-title" data-i18n="pages.busRes.title">Bus Tour Bookings</div>
         <div class="topbar-sub" id="busres-subtitle"></div>
       </div>
     </div>
@@ -1753,12 +1753,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-notifications" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Notifications</div>
+        <div class="topbar-title" data-i18n="pages.notif.title">Notifications</div>
         <div class="topbar-sub" id="notif-subtitle"></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" onclick="markAllNotificationsRead()">✓ Mark All Read</button>
-        <button class="btn btn-sm btn-red" onclick="clearAllNotifications()">🗑 Clear All</button>
+        <button class="btn btn-sm" onclick="markAllNotificationsRead()">✓ <span data-i18n="pages.notif.markRead">Mark All Read</span></button>
+        <button class="btn btn-sm btn-red" onclick="clearAllNotifications()">🗑 <span data-i18n="pages.notif.clearAll">Clear All</span></button>
       </div>
     </div>
     <div class="content">
@@ -1771,19 +1771,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-reports" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Reports</div>
-        <div class="topbar-sub" id="reports-subtitle">Operational overview</div>
+        <div class="topbar-title" data-i18n="pages.reports.title">Reports</div>
+        <div class="topbar-sub" id="reports-subtitle" data-i18n="pages.reports.sub">Operational overview</div>
       </div>
       <div style="display:flex;gap:8px">
         <select id="rep-period" onchange="renderReports()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="all">All Time</option>
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
+          <option value="all" data-i18n="filter.allTime">All Time</option>
+          <option value="month" data-i18n="filter.thisMonth">This Month</option>
+          <option value="quarter" data-i18n="filter.thisQuarter">This Quarter</option>
+          <option value="year" data-i18n="filter.thisYear">This Year</option>
         </select>
         <button class="btn" onclick="window.print()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print
+          <span data-i18n="btn.print">Print</span>
         </button>
       </div>
     </div>
@@ -1794,32 +1794,32 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
         <!-- Vouchers by status -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Vouchers by Status</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.vouchersByStatus">Vouchers by Status</div></div>
           <div id="rep-voucher-status"></div>
         </div>
         <!-- Top agencies -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Top Agencies by PAX</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.topAgencies">Top Agencies by PAX</div></div>
           <div id="rep-top-agencies"></div>
         </div>
         <!-- Room occupancy -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Room Inventory by Status</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.roomInventory">Room Inventory by Status</div></div>
           <div id="rep-room-status"></div>
         </div>
         <!-- Rooms by type -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Rooms by Type</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.roomsByType">Rooms by Type</div></div>
           <div id="rep-room-types"></div>
         </div>
         <!-- Mutamers nationality -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Mutamers by Nationality</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.mutamersByNat">Mutamers by Nationality</div></div>
           <div id="rep-nationalities"></div>
         </div>
         <!-- Hotels usage -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Hotels — Batch Usage</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="rep.hotelsUsage">Hotels — Batch Usage</div></div>
           <div id="rep-hotels"></div>
         </div>
       </div>
@@ -1827,8 +1827,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Voucher detail table -->
       <div class="card" style="margin-top:18px">
         <div class="card-header">
-          <div class="card-title">Voucher Summary Table</div>
-          <button class="btn btn-sm" onclick="exportReportCSV()">⬇ Export CSV</button>
+          <div class="card-title" data-i18n="rep.voucherTable">Voucher Summary Table</div>
+          <button class="btn btn-sm" onclick="exportReportCSV()">⬇ <span data-i18n="btn.exportCSV">Export CSV</span></button>
         </div>
         <div class="table-wrap" id="rep-voucher-table"></div>
       </div>
@@ -1840,19 +1840,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-ops-reports" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Operations Report</div>
-        <div class="topbar-sub" id="ops-subtitle">Key ratios & operational performance</div>
+        <div class="topbar-title" data-i18n="pages.opsReports.title">Operations Report</div>
+        <div class="topbar-sub" id="ops-subtitle" data-i18n="pages.opsReports.sub">Key ratios & operational performance</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <select id="ops-period" onchange="renderOpsReports()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="all">All Time</option>
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
+          <option value="all" data-i18n="filter.allTime">All Time</option>
+          <option value="month" data-i18n="filter.thisMonth">This Month</option>
+          <option value="quarter" data-i18n="filter.thisQuarter">This Quarter</option>
+          <option value="year" data-i18n="filter.thisYear">This Year</option>
         </select>
         <button class="btn" onclick="window.print()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print
+          <span data-i18n="btn.print">Print</span>
         </button>
       </div>
     </div>
@@ -1865,49 +1865,49 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
         <!-- Room Utilisation -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Room Utilisation</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.roomUtil">Room Utilisation</div></div>
           <div id="ops-room-util"></div>
         </div>
 
         <!-- Voucher Conversion -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Voucher Conversion Rate</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.voucherConv">Voucher Conversion Rate</div></div>
           <div id="ops-voucher-conv"></div>
         </div>
 
         <!-- Reservation Completion -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Reservation Completion</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.resCompletion">Reservation Completion</div></div>
           <div id="ops-res-completion"></div>
         </div>
 
         <!-- PAX per Voucher -->
         <div class="card">
-          <div class="card-header"><div class="card-title">PAX per Voucher</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.paxVoucher">PAX per Voucher</div></div>
           <div id="ops-pax-voucher"></div>
         </div>
 
         <!-- Lead time analysis -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Avg. Nights per Stay</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.avgNights">Avg. Nights per Stay</div></div>
           <div id="ops-avg-nights"></div>
         </div>
 
         <!-- Nationality breakdown -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Mutamers by Nationality</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.mutamersByNat">Mutamers by Nationality</div></div>
           <div id="ops-nationality"></div>
         </div>
 
         <!-- Bus reservation status -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Bus Reservations Status</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.busStatus">Bus Reservations Status</div></div>
           <div id="ops-bus-status"></div>
         </div>
 
         <!-- Source mix -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Inventory Source Mix</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="ops.sourceMix">Inventory Source Mix</div></div>
           <div id="ops-source-mix"></div>
         </div>
 
@@ -1919,19 +1919,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-financial" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Profit & Loss Statement</div>
-        <div class="topbar-sub" id="fin-subtitle">Income, cost of sales, gross profit & net result</div>
+        <div class="topbar-title" data-i18n="pages.financial.title">Profit & Loss Statement</div>
+        <div class="topbar-sub" id="fin-subtitle" data-i18n="pages.financial.sub">Income, cost of sales, gross profit & net result</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <select id="fin-period" onchange="renderFinancial()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="all">All Time</option>
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
+          <option value="all" data-i18n="filter.allTime">All Time</option>
+          <option value="month" data-i18n="filter.thisMonth">This Month</option>
+          <option value="quarter" data-i18n="filter.thisQuarter">This Quarter</option>
+          <option value="year" data-i18n="filter.thisYear">This Year</option>
         </select>
         <button class="btn btn-sm" onclick="exportFinancialCSV()">⬇ CSV</button>
         <button class="btn btn-sm" onclick="exportFinancialExcel()">⬇ Excel</button>
-        <button class="btn btn-sm" onclick="printPandL()">🖨 Print P&amp;L</button>
+        <button class="btn btn-sm" onclick="printPandL()">🖨 <span data-i18n="btn.printPL">Print P&amp;L</span></button>
       </div>
     </div>
     <div class="content" style="max-width:900px">
@@ -1943,7 +1943,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="card" id="fin-pl-card">
         <div class="card-header" style="margin-bottom:20px">
           <div>
-            <div class="card-title">Profit & Loss Statement</div>
+            <div class="card-title" data-i18n="fin.plTitle">Profit & Loss Statement</div>
             <div class="card-sub" id="fin-period-label">All Time</div>
           </div>
           <div id="fin-company-name" style="font-family:'Alexandria',sans-serif;font-weight:700;font-size:1.0714rem;color:var(--gold-dark)">أفق الضيافة · Ofoq Al Diafah</div>
@@ -1953,13 +1953,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
       <!-- P&L by Agency -->
       <div class="card" style="margin-top:18px">
-        <div class="card-header"><div class="card-title">P&L by Agency</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="fin.plByAgency">P&L by Agency</div></div>
         <div class="table-wrap" id="fin-agency-table"></div>
       </div>
 
       <!-- P&L by Hotel -->
       <div class="card" style="margin-top:18px">
-        <div class="card-header"><div class="card-title">P&L by Hotel</div></div>
+        <div class="card-header"><div class="card-title" data-i18n="fin.plByHotel">P&L by Hotel</div></div>
         <div class="table-wrap" id="fin-hotel-table"></div>
       </div>
 
@@ -1973,25 +1973,25 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-users" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">User Management</div>
-        <div class="topbar-sub" id="users-subtitle">Team members and access control</div>
+        <div class="topbar-title" data-i18n="pages.users.title">User Management</div>
+        <div class="topbar-sub" id="users-subtitle" data-i18n="pages.users.sub">Team members and access control</div>
       </div>
       <button class="btn btn-gold" onclick="openAddUserModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add User
+        <span data-i18n="pages.users.addBtn">Add User</span>
       </button>
     </div>
     <div class="content">
 
       <!-- Departments filter strip -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="users-dept-filter">
-        <button class="btn btn-sm btn-gold" onclick="filterUsersByDept('')" id="udept-all">All</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Transportation')" id="udept-Transportation">Transportation</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Sales')" id="udept-Sales">Sales</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Operations')" id="udept-Operations">Operations</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Accounting')" id="udept-Accounting">Accounting</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Marketing')" id="udept-Marketing">Marketing</button>
-        <button class="btn btn-sm" onclick="filterUsersByDept('Admin')" id="udept-Admin">Admin</button>
+        <button class="btn btn-sm btn-gold" onclick="filterUsersByDept('')" id="udept-all" data-i18n="udept.all">All</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Transportation')" id="udept-Transportation" data-i18n="udept.transportation">Transportation</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Sales')" id="udept-Sales" data-i18n="udept.sales">Sales</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Operations')" id="udept-Operations" data-i18n="udept.operations">Operations</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Accounting')" id="udept-Accounting" data-i18n="udept.accounting">Accounting</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Marketing')" id="udept-Marketing" data-i18n="udept.marketing">Marketing</button>
+        <button class="btn btn-sm" onclick="filterUsersByDept('Admin')" id="udept-Admin" data-i18n="udept.admin">Admin</button>
       </div>
 
       <!-- Pending approvals -->
@@ -2007,14 +2007,14 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-settings" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">General Settings</div>
-        <div class="topbar-sub">System configuration for Ofoq Al Diafah</div>
+        <div class="topbar-title" data-i18n="pages.settings.title">General Settings</div>
+        <div class="topbar-sub" data-i18n="pages.settings.sub">System configuration for Ofoq Al Diafah</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-sm" onclick="resetAndRunOnboarding()">🧙 Setup Wizard</button>
+        <button class="btn btn-sm" onclick="resetAndRunOnboarding()">🧙 <span data-i18n="pages.settings.wizard">Setup Wizard</span></button>
         <button class="btn btn-gold" onclick="saveSettings()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save Settings
+          <span data-i18n="pages.settings.save">Save Settings</span>
         </button>
       </div>
     </div>
@@ -2023,7 +2023,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Company Info -->
       <div class="card">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title">Company Information</div>
+          <div class="card-title" data-i18n="set.companyInfo">Company Information</div>
         </div>
         <div class="form-grid">
           <div class="field"><label>Company Name (English)</label><input id="set-name-en" type="text" placeholder="Ofoq Al Diafah"></div>
@@ -2041,7 +2041,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Voucher & Booking Defaults -->
       <div class="card">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title">Voucher & Booking Defaults</div>
+          <div class="card-title" data-i18n="set.voucherDefaults">Voucher & Booking Defaults</div>
         </div>
         <div class="form-grid">
           <div class="field"><label>Default Check-in Time</label><input id="set-checkin-time" type="time" value="14:00"></div>
@@ -2065,7 +2065,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Notification Preferences -->
       <div class="card">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title">Notification Preferences</div>
+          <div class="card-title" data-i18n="set.notifPrefs">Notification Preferences</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="checkbox-label"><input type="checkbox" id="set-notif-voucher" checked><label for="set-notif-voucher">Notify when a voucher is confirmed</label></div>
@@ -2078,7 +2078,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Confirmation & Sharing Defaults -->
       <div class="card">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title">Sharing Defaults</div>
+          <div class="card-title" data-i18n="set.sharingDefaults">Sharing Defaults</div>
         </div>
         <div class="form-grid">
           <div class="field"><label>Default Agency Email Footer</label><textarea id="set-email-footer" placeholder="e.g. Thank you for choosing Ofoq Al Diafah. For queries contact: +966..."></textarea></div>
@@ -2089,8 +2089,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Lookup Tables -->
       <div class="card">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title">Lookup Tables</div>
-          <div class="card-sub">Customise the dropdown options used throughout the system</div>
+          <div class="card-title" data-i18n="set.lookupTables">Lookup Tables</div>
+          <div class="card-sub" data-i18n="set.lookupTablesSub">Customise the dropdown options used throughout the system</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -2141,7 +2141,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Data Management -->
       <div class="card" style="border-color:rgba(192,57,43,0.3)">
         <div class="card-header" style="margin-bottom:14px">
-          <div class="card-title" style="color:var(--red)">Data Management</div>
+          <div class="card-title" style="color:var(--red)" data-i18n="set.dataManagement">Data Management</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
@@ -2184,12 +2184,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-it-tickets" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">IT Support Tickets</div>
-        <div class="topbar-sub" id="it-subtitle">Report issues and track resolutions</div>
+        <div class="topbar-title" data-i18n="pages.itTickets.title">IT Support Tickets</div>
+        <div class="topbar-sub" id="it-subtitle" data-i18n="pages.itTickets.sub">Report issues and track resolutions</div>
       </div>
       <button class="btn btn-gold" onclick="openTicketModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Ticket
+        <span data-i18n="pages.itTickets.addBtn">New Ticket</span>
       </button>
     </div>
     <div class="content">
@@ -2231,12 +2231,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-ar" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Accounts Receivable</div>
-        <div class="topbar-sub" id="ar-subtitle">Outstanding payments across all bookings</div>
+        <div class="topbar-title" data-i18n="pages.ar.title">Accounts Receivable</div>
+        <div class="topbar-sub" id="ar-subtitle" data-i18n="pages.ar.sub">Outstanding payments across all bookings</div>
       </div>
       <div style="display:flex;gap:8px">
         <select id="ar-filter" onchange="renderAR()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
-          <option value="all">All Outstanding</option>
+          <option value="all" data-i18n="filter.allOutstanding">All Outstanding</option>
           <option value="overdue">Overdue Only</option>
           <option value="thisweek">Due This Week</option>
           <option value="confirmed">Collected</option>
@@ -2251,7 +2251,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Timeline view -->
       <div class="card" style="margin-bottom:0">
         <div class="card-header">
-          <div class="card-title">Payment Schedule</div>
+          <div class="card-title" data-i18n="ar.paymentSchedule">Payment Schedule</div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-xs" onclick="setARView('table')" id="ar-view-table-btn" style="background:var(--gold);color:#010101">Table</button>
             <button class="btn btn-xs" onclick="setARView('timeline')" id="ar-view-timeline-btn">Timeline</button>
@@ -2265,8 +2265,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="card" style="margin-top:14px">
         <div class="card-header">
           <div>
-            <div class="card-title" style="color:var(--red)">⚠ Overdue Accounts</div>
-            <div class="card-sub">Hold expired or unpaid for more than 7 days</div>
+            <div class="card-title" style="color:var(--red)" data-i18n="ar.overdueAccounts">⚠ Overdue Accounts</div>
+            <div class="card-sub" data-i18n="ar.overdueSub">Hold expired or unpaid for more than 7 days</div>
           </div>
         </div>
         <div class="table-wrap" id="ar-overdue-table"></div>
@@ -2274,7 +2274,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
       <!-- Collected -->
       <div class="card" style="margin-top:14px">
-        <div class="card-header"><div class="card-title" style="color:var(--green)">✅ Recently Collected</div></div>
+        <div class="card-header"><div class="card-title" style="color:var(--green)" data-i18n="ar.recentlyCollected">✅ Recently Collected</div></div>
         <div class="table-wrap" id="ar-collected-table"></div>
       </div>
     </div>
@@ -2283,8 +2283,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <!-- ── ACTIVITY LOG ── -->
   <div id="page-activity-log" class="page">
     <div class="topbar">
-      <div><div class="topbar-title">Activity Log</div><div class="topbar-sub" id="log-subtitle">Full audit trail of system actions</div></div>
-      <button class="btn btn-sm" onclick="clearActivityLog()">Clear Log</button>
+      <div><div class="topbar-title" data-i18n="pages.log.title">Activity Log</div><div class="topbar-sub" id="log-subtitle" data-i18n="pages.log.sub">Full audit trail of system actions</div></div>
+      <button class="btn btn-sm" onclick="clearActivityLog()" data-i18n="btn.clearLog">Clear Log</button>
     </div>
     <div class="content">
       <div class="action-bar">
@@ -2305,21 +2305,21 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <!-- ── CALENDAR ── -->
   <div id="page-calendar" class="page">
     <div class="topbar">
-      <div><div class="topbar-title">Calendar</div><div class="topbar-sub" id="cal-subtitle">Arrivals, departures &amp; hold deadlines</div></div>
+      <div><div class="topbar-title" data-i18n="pages.calendar.title">Calendar</div><div class="topbar-sub" id="cal-subtitle" data-i18n="pages.calendar.sub">Arrivals, departures &amp; hold deadlines</div></div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-sm" onclick="calPrev()">‹</button>
         <span id="cal-month-label" style="font-weight:600;font-size:1.0rem;min-width:140px;text-align:center"></span>
         <button class="btn btn-sm" onclick="calNext()">›</button>
-        <button class="btn btn-sm btn-gold" onclick="calGoToday()">Today</button>
+        <button class="btn btn-sm btn-gold" onclick="calGoToday()" data-i18n="pages.calendar.today">Today</button>
       </div>
     </div>
     <div class="content">
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden" id="cal-grid"></div>
       <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;font-size:0.8571rem">
-        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--green);display:inline-block"></span>Arrival</span>
-        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--red);display:inline-block"></span>Departure</span>
-        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--amber);display:inline-block"></span>Hold Expiry</span>
-        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--blue);display:inline-block"></span>Individual Booking</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--green);display:inline-block"></span><span data-i18n="cal.arrival">Arrival</span></span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--red);display:inline-block"></span><span data-i18n="cal.departure">Departure</span></span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--amber);display:inline-block"></span><span data-i18n="cal.holdExpiry">Hold Expiry</span></span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:var(--blue);display:inline-block"></span><span data-i18n="cal.individualBooking">Individual Booking</span></span>
       </div>
     </div>
   </div>
@@ -2328,10 +2328,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-all-reservations" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">All Reservations</div>
-        <div class="topbar-sub" id="allres-subtitle">Every booking across all types</div>
+        <div class="topbar-title" data-i18n="pages.allRes.title">All Reservations</div>
+        <div class="topbar-sub" id="allres-subtitle" data-i18n="pages.allRes.sub">Every booking across all types</div>
       </div>
-      <button class="btn btn-sm" onclick="exportAllReservations()">⬇ Export CSV</button>
+      <button class="btn btn-sm" onclick="exportAllReservations()">⬇ <span data-i18n="btn.exportCSV">Export CSV</span></button>
     </div>
     <div class="content">
       <!-- KPI strip -->
@@ -2374,25 +2374,25 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-visitors" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Mutamers</div>
+        <div class="topbar-title" data-i18n="pages.mutamers.title">Mutamers</div>
         <div class="topbar-sub" id="visitors-sub"></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="window.print()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print
+          <span data-i18n="btn.print">Print</span>
         </button>
         <button class="btn btn-gold" onclick="openMutamerModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Mutamer
+          <span data-i18n="pages.mutamers.addBtn">Add Mutamer</span>
         </button>
       </div>
     </div>
     <div class="content">
       <div class="tab-bar">
-        <button class="tab-btn active" id="mut-tab-all" onclick="switchMutTab('all')">All Mutamers</button>
-        <button class="tab-btn" id="mut-tab-voucher" onclick="switchMutTab('voucher')">By Voucher</button>
-        <button class="tab-btn" id="mut-tab-upload" onclick="switchMutTab('upload')">Upload CSV</button>
+        <button class="tab-btn active" id="mut-tab-all" onclick="switchMutTab('all')" data-i18n="tab.allMutamers">All Mutamers</button>
+        <button class="tab-btn" id="mut-tab-voucher" onclick="switchMutTab('voucher')" data-i18n="tab.byVoucher">By Voucher</button>
+        <button class="tab-btn" id="mut-tab-upload" onclick="switchMutTab('upload')" data-i18n="tab.uploadCSV">Upload CSV</button>
       </div>
 
       <!-- All Mutamers tab -->
@@ -2429,8 +2429,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Upload Mutamers from CSV</div>
-              <div class="card-sub">Upload a CSV file with mutamer details and associate them to a voucher</div>
+              <div class="card-title" data-i18n="mut.uploadTitle">Upload Mutamers from CSV</div>
+              <div class="card-sub" data-i18n="mut.uploadSub">Upload a CSV file with mutamer details and associate them to a voucher</div>
             </div>
           </div>
 
@@ -14020,7 +14020,139 @@ function toggleDarkMode() {
       'auth.pendingMsg': 'Your account is pending approval by the administrator. You will be able to sign in once approved.',
       'auth.watchVideo': 'Watch Product Video',
       'dash.customise': 'Customise',
-      'dash.addWidget': 'Add Widget'
+      'dash.addWidget': 'Add Widget',
+      'dash.panel.title': 'Add Widget',
+      'dash.panel.kpi': 'KPI Metrics',
+      'dash.panel.lists': 'Lists & Charts',
+      'pages.clients.title': 'Clients',
+      'pages.clients.sub': 'Client companies & travel agencies',
+      'pages.clients.addBtn': 'Add Client Company',
+      'pages.hotels.title': 'Hotels',
+      'pages.hotels.sub': 'Manage your hotel directory',
+      'pages.hotels.addBtn': 'Add Hotel',
+      'pages.providers.title': 'Third-Party Providers',
+      'pages.providers.sub': 'Service & supply providers',
+      'pages.providers.addBtn': 'Add Provider',
+      'pages.buses.title': 'Bus Companies',
+      'pages.buses.sub': 'Manage your transport providers',
+      'pages.buses.addBtn': 'Add Bus Company',
+      'pages.tours.title': 'Tours Inventory',
+      'pages.tours.sub': 'Bus tour packages and pricing',
+      'pages.tours.addBtn': 'Add Tour Package',
+      'pages.inventory.title': 'Rooms & Meals Inventory',
+      'pages.inventory.addBtn': 'Import Rooms & Meals (Batch)',
+      'pages.vouchers.title': 'B2B Bookings',
+      'pages.vouchers.addBtn': 'New Voucher',
+      'pages.newVoucher.title': 'New B2B Voucher',
+      'pages.reservations.title': 'Individual Bookings',
+      'pages.reservations.sub': 'Direct B2C reservations',
+      'pages.reservations.addBtn': 'New Individual Booking',
+      'pages.busRes.title': 'Bus Tour Bookings',
+      'pages.notif.title': 'Notifications',
+      'pages.notif.markRead': 'Mark All Read',
+      'pages.notif.clearAll': 'Clear All',
+      'pages.reports.title': 'Reports',
+      'pages.reports.sub': 'Operational overview',
+      'pages.opsReports.title': 'Operations Report',
+      'pages.opsReports.sub': 'Key ratios & operational performance',
+      'pages.financial.title': 'Profit & Loss Statement',
+      'pages.financial.sub': 'Income, cost of sales, gross profit & net result',
+      'pages.users.title': 'User Management',
+      'pages.users.sub': 'Team members and access control',
+      'pages.users.addBtn': 'Add User',
+      'pages.settings.title': 'General Settings',
+      'pages.settings.sub': 'System configuration for Ofoq Al Diafah',
+      'pages.settings.wizard': 'Setup Wizard',
+      'pages.settings.save': 'Save Settings',
+      'pages.itTickets.title': 'IT Support Tickets',
+      'pages.itTickets.sub': 'Report issues and track resolutions',
+      'pages.itTickets.addBtn': 'New Ticket',
+      'pages.ar.title': 'Accounts Receivable',
+      'pages.ar.sub': 'Outstanding payments across all bookings',
+      'pages.log.title': 'Activity Log',
+      'pages.log.sub': 'Full audit trail of system actions',
+      'pages.calendar.title': 'Calendar',
+      'pages.calendar.sub': 'Arrivals, departures & hold deadlines',
+      'pages.calendar.today': 'Today',
+      'pages.allRes.title': 'All Reservations',
+      'pages.allRes.sub': 'Every booking across all types',
+      'pages.mutamers.title': 'Mutamers',
+      'pages.mutamers.addBtn': 'Add Mutamer',
+      'filter.allCities': 'All Cities',
+      'filter.allCountries': 'All Countries',
+      'filter.allTypes': 'All Types',
+      'filter.allRatings': 'All Ratings',
+      'filter.allStatus': 'All Status',
+      'filter.allBusTypes': 'All Bus Types',
+      'filter.allTime': 'All Time',
+      'filter.thisMonth': 'This Month',
+      'filter.thisQuarter': 'This Quarter',
+      'filter.thisYear': 'This Year',
+      'filter.allOutstanding': 'All Outstanding',
+      'tab.rooms': 'Rooms',
+      'tab.activityLog': 'Activity Log',
+      'tab.vouchers': 'Vouchers',
+      'tab.allMutamers': 'All Mutamers',
+      'tab.byVoucher': 'By Voucher',
+      'tab.uploadCSV': 'Upload CSV',
+      'btn.print': 'Print',
+      'btn.exportCSV': 'Export CSV',
+      'btn.clearLog': 'Clear Log',
+      'btn.cancel': 'Cancel',
+      'btn.back': 'Back',
+      'btn.next': 'Next',
+      'btn.saveVoucher': 'Save Voucher',
+      'btn.printPL': 'Print P&L',
+      'nvp.step1sub': 'Group & PAX',
+      'nvp.step2sub': 'Flights',
+      'nvp.step3sub': 'Hotels & Meals',
+      'nvp.step4sub': 'Transport',
+      'inv.logTitle': 'Inventory Activity Log',
+      'inv.logSub': 'All changes to rooms and batches',
+      'vou.logTitle': 'Voucher Activity Log',
+      'vou.logSub': 'All voucher actions and status changes',
+      'rep.vouchersByStatus': 'Vouchers by Status',
+      'rep.topAgencies': 'Top Agencies by PAX',
+      'rep.roomInventory': 'Room Inventory by Status',
+      'rep.roomsByType': 'Rooms by Type',
+      'rep.mutamersByNat': 'Mutamers by Nationality',
+      'rep.hotelsUsage': 'Hotels \u2014 Batch Usage',
+      'rep.voucherTable': 'Voucher Summary Table',
+      'ops.roomUtil': 'Room Utilisation',
+      'ops.voucherConv': 'Voucher Conversion Rate',
+      'ops.resCompletion': 'Reservation Completion',
+      'ops.paxVoucher': 'PAX per Voucher',
+      'ops.avgNights': 'Avg. Nights per Stay',
+      'ops.mutamersByNat': 'Mutamers by Nationality',
+      'ops.busStatus': 'Bus Reservations Status',
+      'ops.sourceMix': 'Inventory Source Mix',
+      'fin.plTitle': 'Profit & Loss Statement',
+      'fin.plByAgency': 'P&L by Agency',
+      'fin.plByHotel': 'P&L by Hotel',
+      'udept.all': 'All',
+      'udept.transportation': 'Transportation',
+      'udept.sales': 'Sales',
+      'udept.operations': 'Operations',
+      'udept.accounting': 'Accounting',
+      'udept.marketing': 'Marketing',
+      'udept.admin': 'Admin',
+      'set.companyInfo': 'Company Information',
+      'set.voucherDefaults': 'Voucher & Booking Defaults',
+      'set.notifPrefs': 'Notification Preferences',
+      'set.sharingDefaults': 'Sharing Defaults',
+      'set.lookupTables': 'Lookup Tables',
+      'set.lookupTablesSub': 'Customise the dropdown options used throughout the system',
+      'set.dataManagement': 'Data Management',
+      'ar.paymentSchedule': 'Payment Schedule',
+      'ar.overdueAccounts': '\u26a0 Overdue Accounts',
+      'ar.overdueSub': 'Hold expired or unpaid for more than 7 days',
+      'ar.recentlyCollected': '\u2705 Recently Collected',
+      'cal.arrival': 'Arrival',
+      'cal.departure': 'Departure',
+      'cal.holdExpiry': 'Hold Expiry',
+      'cal.individualBooking': 'Individual Booking',
+      'mut.uploadTitle': 'Upload Mutamers from CSV',
+      'mut.uploadSub': 'Upload a CSV file with mutamer details and associate them to a voucher'
     },
     ar: {
       'nav.home': '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629',
@@ -14068,7 +14200,139 @@ function toggleDarkMode() {
       'auth.pendingMsg': '\u062d\u0633\u0627\u0628\u0643 \u0642\u064a\u062f \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629 \u0645\u0646 \u0642\u0628\u0644 \u0627\u0644\u0645\u0633\u0624\u0648\u0644. \u0633\u062a\u062a\u0645\u0643\u0646 \u0645\u0646 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0628\u0639\u062f \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629.',
       'auth.watchVideo': '\u0645\u0634\u0627\u0647\u062f\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648 \u0627\u0644\u062a\u0639\u0631\u064a\u0641\u064a',
       'dash.customise': '\u062a\u062e\u0635\u064a\u0635',
-      'dash.addWidget': '\u0625\u0636\u0627\u0641\u0629 \u0648\u062f\u062c\u062a'
+      'dash.addWidget': '\u0625\u0636\u0627\u0641\u0629 \u0648\u062f\u062c\u062a',
+      'dash.panel.title': '\u0625\u0636\u0627\u0641\u0629 \u0648\u062f\u062c\u062a',
+      'dash.panel.kpi': '\u0645\u0624\u0634\u0631\u0627\u062a \u0627\u0644\u0623\u062f\u0627\u0621',
+      'dash.panel.lists': '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0648\u0627\u0644\u0631\u0633\u0648\u0645 \u0627\u0644\u0628\u064a\u0627\u0646\u064a\u0629',
+      'pages.clients.title': '\u0627\u0644\u0639\u0645\u0644\u0627\u0621',
+      'pages.clients.sub': '\u0634\u0631\u0643\u0627\u062a \u0627\u0644\u0639\u0645\u0644\u0627\u0621 \u0648\u0648\u0643\u0627\u0644\u0627\u062a \u0627\u0644\u0633\u0641\u0631',
+      'pages.clients.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0634\u0631\u0643\u0629 \u0639\u0645\u064a\u0644',
+      'pages.hotels.title': '\u0627\u0644\u0641\u0646\u0627\u062f\u0642',
+      'pages.hotels.sub': '\u0625\u062f\u0627\u0631\u0629 \u062f\u0644\u064a\u0644 \u0627\u0644\u0641\u0646\u0627\u062f\u0642',
+      'pages.hotels.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0641\u0646\u062f\u0642',
+      'pages.providers.title': '\u0645\u0632\u0648\u062f\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a',
+      'pages.providers.sub': '\u0645\u0648\u0631\u062f\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0648\u0627\u0644\u0645\u0633\u062a\u0644\u0632\u0645\u0627\u062a',
+      'pages.providers.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0645\u0632\u0648\u062f',
+      'pages.buses.title': '\u0634\u0631\u0643\u0627\u062a \u0627\u0644\u062d\u0627\u0641\u0644\u0627\u062a',
+      'pages.buses.sub': '\u0625\u062f\u0627\u0631\u0629 \u0645\u0632\u0648\u062f\u064a \u0627\u0644\u0646\u0642\u0644',
+      'pages.buses.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0634\u0631\u0643\u0629 \u062d\u0627\u0641\u0644\u0627\u062a',
+      'pages.tours.title': '\u0645\u062e\u0632\u0648\u0646 \u0627\u0644\u062c\u0648\u0644\u0627\u062a',
+      'pages.tours.sub': '\u0628\u0627\u0642\u0627\u062a \u062c\u0648\u0644\u0627\u062a \u0627\u0644\u062d\u0627\u0641\u0644\u0627\u062a \u0648\u0627\u0644\u0623\u0633\u0639\u0627\u0631',
+      'pages.tours.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0628\u0627\u0642\u0629 \u062c\u0648\u0644\u0629',
+      'pages.inventory.title': '\u0645\u062e\u0632\u0648\u0646 \u0627\u0644\u063a\u0631\u0641 \u0648\u0627\u0644\u0648\u062c\u0628\u0627\u062a',
+      'pages.inventory.addBtn': '\u0627\u0633\u062a\u064a\u0631\u0627\u062f \u063a\u0631\u0641 \u0648\u0648\u062c\u0628\u0627\u062a (\u062f\u0641\u0639\u0629)',
+      'pages.vouchers.title': '\u062d\u062c\u0648\u0632\u0627\u062a \u0627\u0644\u0648\u0643\u0644\u0627\u0621',
+      'pages.vouchers.addBtn': '\u0642\u0633\u064a\u0645\u0629 \u062c\u062f\u064a\u062f\u0629',
+      'pages.newVoucher.title': '\u0642\u0633\u064a\u0645\u0629 \u0648\u0643\u064a\u0644 \u062c\u062f\u064a\u062f\u0629',
+      'pages.reservations.title': '\u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a \u0627\u0644\u0641\u0631\u062f\u064a\u0629',
+      'pages.reservations.sub': '\u062d\u062c\u0648\u0632\u0627\u062a \u0645\u0628\u0627\u0634\u0631\u0629 \u0645\u0646 \u0627\u0644\u0639\u0645\u064a\u0644',
+      'pages.reservations.addBtn': '\u062d\u062c\u0632 \u0641\u0631\u062f\u064a \u062c\u062f\u064a\u062f',
+      'pages.busRes.title': '\u062d\u062c\u0648\u0632\u0627\u062a \u062c\u0648\u0644\u0627\u062a \u0627\u0644\u062d\u0627\u0641\u0644\u0627\u062a',
+      'pages.notif.title': '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a',
+      'pages.notif.markRead': '\u062a\u0639\u0644\u064a\u0645 \u0627\u0644\u0643\u0644 \u0643\u0645\u0642\u0631\u0648\u0621',
+      'pages.notif.clearAll': '\u0645\u0633\u062d \u0627\u0644\u0643\u0644',
+      'pages.reports.title': '\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631',
+      'pages.reports.sub': '\u0646\u0638\u0631\u0629 \u0639\u0627\u0645\u0629 \u062a\u0634\u063a\u064a\u0644\u064a\u0629',
+      'pages.opsReports.title': '\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a',
+      'pages.opsReports.sub': '\u0627\u0644\u0645\u0624\u0634\u0631\u0627\u062a \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629 \u0648\u0627\u0644\u0623\u062f\u0627\u0621 \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u064a',
+      'pages.financial.title': '\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0623\u0631\u0628\u0627\u062d \u0648\u0627\u0644\u062e\u0633\u0627\u0626\u0631',
+      'pages.financial.sub': '\u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a\u060c \u062a\u0643\u0644\u0641\u0629 \u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a\u060c \u0627\u0644\u0631\u0628\u062d \u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0627\u0644\u0635\u0627\u0641\u064a\u0629',
+      'pages.users.title': '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646',
+      'pages.users.sub': '\u0623\u0639\u0636\u0627\u0621 \u0627\u0644\u0641\u0631\u064a\u0642 \u0648\u0627\u0644\u062a\u062d\u0643\u0645 \u0641\u064a \u0627\u0644\u0648\u0635\u0648\u0644',
+      'pages.users.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0645\u0633\u062a\u062e\u062f\u0645',
+      'pages.settings.title': '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0639\u0627\u0645\u0629',
+      'pages.settings.sub': '\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0646\u0638\u0627\u0645 \u0623\u0641\u0642 \u0627\u0644\u0636\u064a\u0627\u0641\u0629',
+      'pages.settings.wizard': '\u0645\u0639\u0627\u0644\u062c \u0627\u0644\u0625\u0639\u062f\u0627\u062f',
+      'pages.settings.save': '\u062d\u0641\u0638 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a',
+      'pages.itTickets.title': '\u062a\u0630\u0627\u0643\u0631 \u0627\u0644\u062f\u0639\u0645 \u0627\u0644\u062a\u0642\u0646\u064a',
+      'pages.itTickets.sub': '\u0627\u0644\u0625\u0628\u0644\u0627\u063a \u0639\u0646 \u0627\u0644\u0645\u0634\u0643\u0644\u0627\u062a \u0648\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u062d\u0644\u0648\u0644',
+      'pages.itTickets.addBtn': '\u062a\u0630\u0643\u0631\u0629 \u062c\u062f\u064a\u062f\u0629',
+      'pages.ar.title': '\u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0627\u0644\u0645\u062f\u064a\u0646\u0629',
+      'pages.ar.sub': '\u0627\u0644\u0645\u062f\u0641\u0648\u0639\u0627\u062a \u0627\u0644\u0645\u0633\u062a\u062d\u0642\u0629 \u0639\u0628\u0631 \u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a',
+      'pages.log.title': '\u0633\u062c\u0644 \u0627\u0644\u0646\u0634\u0627\u0637',
+      'pages.log.sub': '\u0633\u062c\u0644 \u062a\u062f\u0642\u064a\u0642 \u0634\u0627\u0645\u0644 \u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u0646\u0638\u0627\u0645',
+      'pages.calendar.title': '\u0627\u0644\u062a\u0642\u0648\u064a\u0645',
+      'pages.calendar.sub': '\u0627\u0644\u0648\u0635\u0648\u0644 \u0648\u0627\u0644\u0645\u063a\u0627\u062f\u0631\u0629 \u0648\u0645\u0648\u0627\u0639\u064a\u062f \u0627\u0646\u062a\u0647\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0645\u0624\u0642\u062a',
+      'pages.calendar.today': '\u0627\u0644\u064a\u0648\u0645',
+      'pages.allRes.title': '\u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a',
+      'pages.allRes.sub': '\u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a \u0645\u0646 \u0643\u0644 \u0627\u0644\u0623\u0646\u0648\u0627\u0639',
+      'pages.mutamers.title': '\u0627\u0644\u0645\u0639\u062a\u0645\u0631\u0648\u0646',
+      'pages.mutamers.addBtn': '\u0625\u0636\u0627\u0641\u0629 \u0645\u0639\u062a\u0645\u0631',
+      'filter.allCities': '\u0643\u0644 \u0627\u0644\u0645\u062f\u0646',
+      'filter.allCountries': '\u0643\u0644 \u0627\u0644\u062f\u0648\u0644',
+      'filter.allTypes': '\u0643\u0644 \u0627\u0644\u0623\u0646\u0648\u0627\u0639',
+      'filter.allRatings': '\u0643\u0644 \u0627\u0644\u062a\u0642\u064a\u064a\u0645\u0627\u062a',
+      'filter.allStatus': '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
+      'filter.allBusTypes': '\u0643\u0644 \u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u062d\u0627\u0641\u0644\u0627\u062a',
+      'filter.allTime': '\u0643\u0644 \u0627\u0644\u0623\u0648\u0642\u0627\u062a',
+      'filter.thisMonth': '\u0647\u0630\u0627 \u0627\u0644\u0634\u0647\u0631',
+      'filter.thisQuarter': '\u0647\u0630\u0627 \u0627\u0644\u0631\u0628\u0639',
+      'filter.thisYear': '\u0647\u0630\u0647 \u0627\u0644\u0633\u0646\u0629',
+      'filter.allOutstanding': '\u0643\u0644 \u0627\u0644\u0645\u0633\u062a\u062d\u0642\u0627\u062a',
+      'tab.rooms': '\u0627\u0644\u063a\u0631\u0641',
+      'tab.activityLog': '\u0633\u062c\u0644 \u0627\u0644\u0646\u0634\u0627\u0637',
+      'tab.vouchers': '\u0627\u0644\u0642\u0633\u0627\u0626\u0645',
+      'tab.allMutamers': '\u0643\u0644 \u0627\u0644\u0645\u0639\u062a\u0645\u0631\u064a\u0646',
+      'tab.byVoucher': '\u0628\u062d\u0633\u0628 \u0627\u0644\u0642\u0633\u064a\u0645\u0629',
+      'tab.uploadCSV': '\u0631\u0641\u0639 CSV',
+      'btn.print': '\u0637\u0628\u0627\u0639\u0629',
+      'btn.exportCSV': '\u062a\u0635\u062f\u064a\u0631 CSV',
+      'btn.clearLog': '\u0645\u0633\u062d \u0627\u0644\u0633\u062c\u0644',
+      'btn.cancel': '\u0625\u0644\u063a\u0627\u0621',
+      'btn.back': '\u0631\u062c\u0648\u0639',
+      'btn.next': '\u0627\u0644\u062a\u0627\u0644\u064a',
+      'btn.saveVoucher': '\u062d\u0641\u0638 \u0627\u0644\u0642\u0633\u064a\u0645\u0629',
+      'btn.printPL': '\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0623\u0631\u0628\u0627\u062d \u0648\u0627\u0644\u062e\u0633\u0627\u0626\u0631',
+      'nvp.step1sub': '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629 \u0648\u0627\u0644\u0645\u0639\u062a\u0645\u0631\u0648\u0646',
+      'nvp.step2sub': '\u0627\u0644\u0631\u062d\u0644\u0627\u062a',
+      'nvp.step3sub': '\u0627\u0644\u0641\u0646\u0627\u062f\u0642 \u0648\u0627\u0644\u0648\u062c\u0628\u0627\u062a',
+      'nvp.step4sub': '\u0627\u0644\u0646\u0642\u0644',
+      'inv.logTitle': '\u0633\u062c\u0644 \u0646\u0634\u0627\u0637 \u0627\u0644\u0645\u062e\u0632\u0648\u0646',
+      'inv.logSub': '\u062c\u0645\u064a\u0639 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0639\u0644\u0649 \u0627\u0644\u063a\u0631\u0641 \u0648\u0627\u0644\u062f\u0641\u0639\u0627\u062a',
+      'vou.logTitle': '\u0633\u062c\u0644 \u0646\u0634\u0627\u0637 \u0627\u0644\u0642\u0633\u0627\u0626\u0645',
+      'vou.logSub': '\u062c\u0645\u064a\u0639 \u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u0642\u0633\u0627\u0626\u0645 \u0648\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0627\u0644\u062d\u0627\u0644\u0629',
+      'rep.vouchersByStatus': '\u0627\u0644\u0642\u0633\u0627\u0626\u0645 \u062d\u0633\u0628 \u0627\u0644\u062d\u0627\u0644\u0629',
+      'rep.topAgencies': '\u0623\u0641\u0636\u0644 \u0627\u0644\u0648\u0643\u0627\u0644\u0627\u062a \u062d\u0633\u0628 \u0639\u062f\u062f \u0627\u0644\u0645\u0639\u062a\u0645\u0631\u064a\u0646',
+      'rep.roomInventory': '\u0645\u062e\u0632\u0648\u0646 \u0627\u0644\u063a\u0631\u0641 \u062d\u0633\u0628 \u0627\u0644\u062d\u0627\u0644\u0629',
+      'rep.roomsByType': '\u0627\u0644\u063a\u0631\u0641 \u062d\u0633\u0628 \u0627\u0644\u0646\u0648\u0639',
+      'rep.mutamersByNat': '\u0627\u0644\u0645\u0639\u062a\u0645\u0631\u0648\u0646 \u062d\u0633\u0628 \u0627\u0644\u062c\u0646\u0633\u064a\u0629',
+      'rep.hotelsUsage': '\u0627\u0644\u0641\u0646\u0627\u062f\u0642 \u2014 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u062f\u0641\u0639\u0629',
+      'rep.voucherTable': '\u062c\u062f\u0648\u0644 \u0645\u0644\u062e\u0635 \u0627\u0644\u0642\u0633\u0627\u0626\u0645',
+      'ops.roomUtil': '\u0646\u0633\u0628\u0629 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0627\u0644\u063a\u0631\u0641',
+      'ops.voucherConv': '\u0645\u0639\u062f\u0644 \u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0642\u0633\u0627\u0626\u0645',
+      'ops.resCompletion': '\u0627\u0643\u062a\u0645\u0627\u0644 \u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a',
+      'ops.paxVoucher': '\u0627\u0644\u0645\u0639\u062a\u0645\u0631\u0648\u0646 \u0644\u0643\u0644 \u0642\u0633\u064a\u0645\u0629',
+      'ops.avgNights': '\u0645\u062a\u0648\u0633\u0637 \u0627\u0644\u0644\u064a\u0627\u0644\u064a \u0644\u0644\u0625\u0642\u0627\u0645\u0629',
+      'ops.mutamersByNat': '\u0627\u0644\u0645\u0639\u062a\u0645\u0631\u0648\u0646 \u062d\u0633\u0628 \u0627\u0644\u062c\u0646\u0633\u064a\u0629',
+      'ops.busStatus': '\u062d\u0627\u0644\u0629 \u062d\u062c\u0648\u0632\u0627\u062a \u0627\u0644\u062d\u0627\u0641\u0644\u0627\u062a',
+      'ops.sourceMix': '\u0645\u0632\u064a\u062c \u0645\u0635\u0627\u062f\u0631 \u0627\u0644\u0645\u062e\u0632\u0648\u0646',
+      'fin.plTitle': '\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0623\u0631\u0628\u0627\u062d \u0648\u0627\u0644\u062e\u0633\u0627\u0626\u0631',
+      'fin.plByAgency': '\u0627\u0644\u0623\u0631\u0628\u0627\u062d \u0648\u0627\u0644\u062e\u0633\u0627\u0626\u0631 \u062d\u0633\u0628 \u0627\u0644\u0648\u0643\u0627\u0644\u0629',
+      'fin.plByHotel': '\u0627\u0644\u0623\u0631\u0628\u0627\u062d \u0648\u0627\u0644\u062e\u0633\u0627\u0626\u0631 \u062d\u0633\u0628 \u0627\u0644\u0641\u0646\u062f\u0642',
+      'udept.all': '\u0627\u0644\u0643\u0644',
+      'udept.transportation': '\u0627\u0644\u0646\u0642\u0644',
+      'udept.sales': '\u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a',
+      'udept.operations': '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a',
+      'udept.accounting': '\u0627\u0644\u0645\u062d\u0627\u0633\u0628\u0629',
+      'udept.marketing': '\u0627\u0644\u062a\u0633\u0648\u064a\u0642',
+      'udept.admin': '\u0627\u0644\u0625\u062f\u0627\u0631\u0629',
+      'set.companyInfo': '\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0634\u0631\u0643\u0629',
+      'set.voucherDefaults': '\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0642\u0633\u0627\u0626\u0645 \u0648\u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a\u0629',
+      'set.notifPrefs': '\u062a\u0641\u0636\u064a\u0644\u0627\u062a \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a',
+      'set.sharingDefaults': '\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a\u0629',
+      'set.lookupTables': '\u062c\u062f\u0627\u0648\u0644 \u0627\u0644\u0628\u062d\u062b',
+      'set.lookupTablesSub': '\u062a\u062e\u0635\u064a\u0635 \u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0646\u0633\u062f\u0644\u0629 \u0641\u064a \u0627\u0644\u0646\u0638\u0627\u0645',
+      'set.dataManagement': '\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a',
+      'ar.paymentSchedule': '\u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u062f\u0641\u0648\u0639\u0627\u062a',
+      'ar.overdueAccounts': '\u26a0 \u062d\u0633\u0627\u0628\u0627\u062a \u0645\u062a\u0623\u062e\u0631\u0629',
+      'ar.overdueSub': '\u0627\u0646\u062a\u0647\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0645\u0624\u0642\u062a \u0623\u0648 \u063a\u064a\u0631 \u0645\u062f\u0641\u0648\u0639 \u0644\u0623\u0643\u062b\u0631 \u0645\u0646 7 \u0623\u064a\u0627\u0645',
+      'ar.recentlyCollected': '\u2705 \u0627\u0644\u0645\u062d\u0635\u0651\u0644 \u062d\u062f\u064a\u062b\u0627\u064b',
+      'cal.arrival': '\u0648\u0635\u0648\u0644',
+      'cal.departure': '\u0645\u063a\u0627\u062f\u0631\u0629',
+      'cal.holdExpiry': '\u0627\u0646\u062a\u0647\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0645\u0624\u0642\u062a',
+      'cal.individualBooking': '\u062d\u062c\u0632 \u0641\u0631\u062f\u064a',
+      'mut.uploadTitle': '\u0631\u0641\u0639 \u0627\u0644\u0645\u0639\u062a\u0645\u0631\u064a\u0646 \u0645\u0646 CSV',
+      'mut.uploadSub': '\u0631\u0641\u0639 \u0645\u0644\u0641 CSV \u0628\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0645\u0639\u062a\u0645\u0631\u064a\u0646 \u0648\u0631\u0628\u0637\u0647\u0645 \u0628\u0642\u0633\u064a\u0645\u0629'
     }
   };
 
