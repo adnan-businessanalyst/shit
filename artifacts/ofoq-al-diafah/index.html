@@ -444,11 +444,12 @@ tbody tr:hover td { background: var(--cream); }
 
   #main { margin-left: 0 !important; margin-right: 0 !important; }
 
-  .topbar { padding: 0 12px 0 58px; gap: 8px; }
-  [dir="rtl"] .topbar { padding: 0 58px 0 12px; }
+  /* Hide font-size controls on mobile (use native zoom) */
+  #font-controls { display: none !important; }
 
-  #font-controls { right: 46px; }
-  [dir="rtl"] #font-controls { right: auto; left: 46px; }
+  /* Topbar: left room for hamburger (58px) + right room for notif bell (60px) */
+  .topbar { padding: 0 60px 0 58px; gap: 8px; }
+  [dir="rtl"] .topbar { padding: 0 58px 0 60px; }
 
   .content { padding: 16px; }
 
@@ -728,14 +729,10 @@ tbody tr:hover td { background: var(--cream); }
 .btn svg:not(.no-3d),
 .tab-btn svg:not(.no-3d) {
   stroke: #BE9C5C;
-  filter: url(#icon-3d);
-  overflow: visible;
 }
-/* Sidebar: black icons with subtle 3D */
+/* Sidebar: dark icons */
 #sidebar svg:not(.no-3d) {
   stroke: rgba(1,1,1,0.75);
-  filter: url(#icon-3d-dark);
-  overflow: visible;
 }
 /* Dark surface icons stay inherit */
 .conf-header-band svg,
