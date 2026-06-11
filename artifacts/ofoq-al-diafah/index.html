@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1209,7 +1209,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div class="sidebar-footer" style="padding:12px 16px">
   <div style="display:flex;gap:6px;margin-bottom:8px">
     <div title="Toggle dark mode" onclick="toggleDarkMode()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;flex:1;text-align:center" id="dark-mode-btn">🌙 <span data-i18n="sidebar.dark">Dark</span></div>
-    <div title="Switch language" onclick="toggleLang()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;text-align:center;white-space:nowrap" id="lang-toggle-btn">🌐 EN</div>
+    <div title="Switch language" onclick="toggleLang()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;text-align:center;white-space:nowrap" id="lang-toggle-btn">🌐 عربي</div>
   </div>
   <div class="nav-item" style="color:rgba(1,1,1,0.75);margin-bottom:4px" onclick="doLogout()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:17px;height:17px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -12122,6 +12122,8 @@ function doLogin() {
   if (email === (SUPER_ADMIN?.email||'').toLowerCase() && password === (SUPER_ADMIN?.password||'')) {
     currentUser = SUPER_ADMIN;
     sessionSet(currentUser);
+    localStorage.removeItem('oad_lang');
+    if (window.applyLang) window.applyLang('en');
     enterApp();
     return;
   }
@@ -12141,6 +12143,8 @@ function doLogin() {
 
   currentUser = user;
   sessionSet(currentUser);
+  localStorage.removeItem('oad_lang');
+  if (window.applyLang) window.applyLang('en');
   enterApp();
 }
 
@@ -12229,6 +12233,8 @@ function updateUserPill() {
 function doLogout() {
   sessionClear();
   currentUser = null;
+  localStorage.removeItem('oad_lang');
+  if (window.applyLang) window.applyLang('en');
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
@@ -14790,7 +14796,7 @@ function toggleDarkMode() {
     }
   };
 
-  var _lang = localStorage.getItem('oad_lang') || 'ar';
+  var _lang = localStorage.getItem('oad_lang') || 'en';
 
   function applyLang(lang) {
     _lang = lang;
@@ -14807,6 +14813,8 @@ function toggleDarkMode() {
   }
 
   window.toggleLang = function() { applyLang(_lang === 'en' ? 'ar' : 'en'); };
+  window.applyLang = applyLang;
+  window.addEventListener('beforeunload', function() { localStorage.removeItem('oad_lang'); });
 
   document.addEventListener('DOMContentLoaded', function() {
     applyLang(_lang);
