@@ -13851,8 +13851,8 @@ function _reloadEntities() {
   notifications     = DB.load('notifications');
   itTickets         = DB.load('itTickets');
 
-  // Seed demo data only on a genuinely empty first install
-  if (rooms.length === 0 && !_cache['_seeded']) {
+  // Seed demo data — v2 check re-seeds if only old slim data is present
+  if (!_cache['_seeded_v2']) {
 
     // ── Batches ──────────────────────────────────────────────────────────
     batches = [
@@ -14216,8 +14216,8 @@ function _reloadEntities() {
     DB.save('busReservations',   busReservations);
     DB.save('itTickets',         itTickets);
     DB.save('notifications',     notifications);
-    DB.save('_seeded', '1');
-    _cache['_seeded'] = '1';
+    DB.save('_seeded_v2', '1');
+    _cache['_seeded_v2'] = '1';
     persist(); // saves rooms, vc, cc, bc, gc
   }
 }
