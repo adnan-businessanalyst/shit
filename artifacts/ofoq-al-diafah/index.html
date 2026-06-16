@@ -112,6 +112,41 @@ body {
   font-size: 0.7857rem; color: rgba(1,1,1,0.60);
 }
 
+/* ─── Sidebar minimize ──────────────────────────────────── */
+#sidebar { transition: width 0.22s ease, min-width 0.22s ease; }
+#main    { transition: margin-left 0.22s ease, margin-right 0.22s ease; }
+body.sidebar-min #sidebar { width: 56px; min-width: 56px; }
+body.sidebar-min #main    { margin-left: 56px; }
+[dir="rtl"] body.sidebar-min #main { margin-left: 0; margin-right: 56px; }
+body.sidebar-min .nav-section-label,
+body.sidebar-min .brand-ar,
+body.sidebar-min .brand-en,
+body.sidebar-min .nav-item > span,
+body.sidebar-min .sb-min-hide { display: none !important; }
+body.sidebar-min .nav  { padding: 8px 4px; }
+body.sidebar-min .nav-item { justify-content: center; padding: 10px 0; }
+body.sidebar-min .nav-item svg { opacity: 0.85; }
+body.sidebar-min .brand { padding: 14px 0; justify-content: center; }
+body.sidebar-min .sidebar-footer { padding: 8px 4px; }
+body.sidebar-min #sidebar-min-btn svg { transform: scaleX(-1); }
+[dir="rtl"] body.sidebar-min #sidebar-min-btn svg { transform: scaleX(1); }
+[dir="rtl"] #sidebar-min-btn svg { transform: scaleX(-1); }
+#sidebar-min-btn {
+  background: rgba(1,1,1,0.10); border: none; border-radius: var(--r-sm);
+  width: 30px; height: 30px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(1,1,1,0.65); transition: background 0.15s;
+}
+#sidebar-min-btn:hover { background: rgba(1,1,1,0.22); }
+#sidebar-min-btn svg { width: 16px; height: 16px; transition: transform 0.22s; }
+#sb-tooltip {
+  position: fixed; background: rgba(10,10,10,0.84); color: #fff;
+  padding: 5px 11px; border-radius: 6px; font-size: 0.82rem;
+  white-space: nowrap; z-index: 400; pointer-events: none;
+  display: none; font-family: 'Alexandria', sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
 /* ─── Main ──────────────────────────────────────────────── */
 #main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 .topbar {
@@ -1101,11 +1136,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
 <!-- ════════ SIDEBAR ════════ -->
 <nav id="sidebar">
-  <div class="brand">
-    <div class="brand-ar">أفق الضيافة</div>
-    <div class="brand-en">Ofoq Al Diafah</div>
+  <div class="brand" style="display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div class="brand-ar">أفق الضيافة</div>
+      <div class="brand-en">Ofoq Al Diafah</div>
+    </div>
+    <button id="sidebar-min-btn" onclick="toggleSidebarMinimize()" title="Minimize sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
   </div>
-  <div style="padding:0 16px 10px">
+  <div class="sb-min-hide" style="padding:0 16px 10px">
     <div style="position:relative">
       <input id="global-search-input" type="text" placeholder="Search vouchers, guests, rooms..."
         oninput="globalSearch(this.value)"
@@ -1221,7 +1261,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     </div>
   </div>
   <div class="sidebar-footer" style="padding:12px 16px">
-  <div style="display:flex;gap:6px;margin-bottom:8px">
+  <div class="sb-min-hide" style="display:flex;gap:6px;margin-bottom:8px">
     <div title="Toggle dark mode" onclick="toggleDarkMode()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;flex:1;text-align:center" id="dark-mode-btn">🌙 <span data-i18n="sidebar.dark">Dark</span></div>
     <div title="Switch language" onclick="toggleLang()" style="cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);background:rgba(1,1,1,0.08);font-size:0.8571rem;text-align:center;white-space:nowrap" id="lang-toggle-btn">🌐 عربي</div>
   </div>
@@ -1229,7 +1269,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:17px;height:17px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     <span data-i18n="nav.signOut">Sign Out</span>
   </div>
-  <div style="font-size:0.7143rem;color:rgba(1,1,1,0.50);margin-top:6px">v1.0 · Ofoq Al Diafah</div>
+  <div class="sb-min-hide" style="font-size:0.7143rem;color:rgba(1,1,1,0.50);margin-top:6px">v1.0 · Ofoq Al Diafah</div>
 </div>
 </nav>
 
@@ -14308,6 +14348,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Re-populate entity variables with cloud data
   _reloadEntities();
 
+  // Restore sidebar minimized state
+  if (localStorage.getItem('oad_sidebar_min') === '1') document.body.classList.add('sidebar-min');
   // Restore collapsed sidebar sections
   initNavSections();
 
@@ -14342,6 +14384,39 @@ applyFontScale(_fontScale);
 
 // Ensure html font-size applied before any render
 document.documentElement.style.fontSize = (_fontScale * 14) + 'px';
+
+function toggleSidebarMinimize() {
+  const min = document.body.classList.toggle('sidebar-min');
+  localStorage.setItem('oad_sidebar_min', min ? '1' : '0');
+}
+
+// Tooltip for nav items when sidebar is minimized
+(function() {
+  var tip = document.createElement('div');
+  tip.id = 'sb-tooltip';
+  document.body.appendChild(tip);
+  document.addEventListener('mouseover', function(e) {
+    if (!document.body.classList.contains('sidebar-min')) { tip.style.display = 'none'; return; }
+    var item = e.target.closest && e.target.closest('#sidebar .nav-item');
+    if (!item) { tip.style.display = 'none'; return; }
+    var span = item.querySelector('span');
+    if (!span) return;
+    var text = span.textContent.trim();
+    if (!text) return;
+    var rect = item.getBoundingClientRect();
+    tip.textContent = text;
+    tip.style.display = 'block';
+    tip.style.top = Math.round(rect.top + (rect.height - 28) / 2) + 'px';
+    if (document.documentElement.dir === 'rtl') {
+      tip.style.left = 'auto'; tip.style.right = '62px';
+    } else {
+      tip.style.left = '62px'; tip.style.right = 'auto';
+    }
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (!e.target.closest || !e.target.closest('#sidebar .nav-item')) tip.style.display = 'none';
+  });
+})();
 
 function toggleNavSec(el, key) {
   const collapsed = el.classList.toggle('sec-collapsed');
