@@ -1625,12 +1625,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             <div><div class="card-title">👥 معلومات المجموعة والعميل</div><div class="card-sub">اختر شركة العميل وأدخل تفاصيل المجموعة</div></div>
           </div>
           <div class="form-grid-3">
-            <div class="field" style="grid-column:span 2"><label class="required">شركة العميل</label>
+            <div class="field" style="grid-column:span 2">
+              <label class="required" style="display:flex;align-items:center;justify-content:space-between">
+                <span>شركة العميل</span>
+                <button type="button" onclick="openQuickAddAgency()" style="font-size:0.75rem;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:600">＋ إضافة وكالة جديدة</button>
+              </label>
               <select id="v-agency-select" onchange="onVoucherClientSelect()">
                 <option value="">— اختر شركة العميل —</option>
               </select>
+              <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:5px">شركة العميل هي الوكالة أو الشركة التي تمثّل المجموعة — اختر من القائمة وسيُعبأ اسم الوكالة تلقائياً</div>
             </div>
-            <div class="field"><label>اسم الوكالة</label><input id="v-agency" type="text" placeholder="اسم الوكالة أو يُعبأ تلقائياً"></div>
+            <div class="field"><label>اسم الوكالة</label><input id="v-agency" type="text" placeholder="يُعبأ تلقائياً عند اختيار الشركة"></div>
             <div class="field"><label class="required">رقم المجموعة</label><input id="v-agency-ref" type="text" placeholder="مثال: 901002419"></div>
             <div class="field"><label class="required">هاتف القائد</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
             <div class="field"><label>هاتف الوكيل</label><input id="v-phone" type="text" placeholder="+966..."></div>
@@ -5788,6 +5793,14 @@ function collectBranches() {
   return branches;
 }
 
+function openQuickAddAgency() {
+  openClientModal();
+  const typeEl = document.getElementById('cl-type');
+  if (typeEl) typeEl.value = 'Travel Agency';
+  const titleEl = document.getElementById('client-modal-title');
+  if (titleEl) titleEl.textContent = 'إضافة وكالة سفر جديدة';
+}
+
 function openNewTravelAgency() {
   // Navigate to the Clients page and activate its nav item
   const clientsNav = document.querySelector('[data-page="clients"]');
@@ -5881,6 +5894,21 @@ function saveClient() {
   DB.save('clientCompanies', clientCompanies);
   closeModal('modal-client');
   renderClients();
+  // Refresh the agency picker in the voucher wizard if it's present
+  const vAgencySel = document.getElementById('v-agency-select');
+  if (vAgencySel) {
+    const prev = vAgencySel.value;
+    vAgencySel.innerHTML = '<option value="">— اختر شركة العميل —</option>' +
+      clientCompanies.map(c => `<option value="${c.id}"${c.id===prev?' selected':''}>${c.nameEn}${c.nameLocal?' ('+c.nameLocal+')':''}</option>`).join('');
+    // Auto-select the newly added company if it was a new save
+    if (!editingClientId) {
+      const newest = clientCompanies[clientCompanies.length - 1];
+      if (newest) {
+        vAgencySel.value = newest.id;
+        onVoucherClientSelect();
+      }
+    }
+  }
 }
 
 function deleteClient(id) {
