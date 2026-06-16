@@ -1836,6 +1836,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="topbar-title" id="bus-res-page-title" data-i18n="pages.busRes.title">Bus Tour Bookings</div>
         <div class="topbar-sub" id="busres-subtitle"></div>
       </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-gold" onclick="openNewBusResModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Reservation
+        </button>
+      </div>
     </div>
     <div class="content">
       <div class="action-bar">
@@ -3268,6 +3274,24 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     </div>
     <div class="modal-body" id="busresm-body"></div>
     <div class="modal-footer" id="busresm-footer"></div>
+  </div>
+</div>
+
+<!-- ════════ NEW BUS TOUR RESERVATION MODAL ════════ -->
+<div class="modal-backdrop" id="modal-new-bus-res">
+  <div class="modal" style="width:700px;max-width:100%">
+    <div class="modal-header">
+      <div class="modal-title">New Bus Tour Reservation</div>
+      <button class="modal-close" onclick="closeModal('modal-new-bus-res')">×</button>
+    </div>
+    <div class="modal-body" id="new-busres-body" style="max-height:72vh;overflow-y:auto"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-new-bus-res')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveNewBusRes()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create Reservation
+      </button>
+    </div>
   </div>
 </div>
 
@@ -11624,6 +11648,252 @@ function deleteHotelReservation(id) {
   addLog('vou', 'Hotel Reservation Deleted', `${r.voucherRef} — ${r.agency}`, `Deleted by ${currentUser?.name||'unknown'}`);
   renderReservations();
   toast(`Reservation for ${r.voucherRef} deleted`);
+}
+
+/* ─── New Bus Tour Reservation ───────────────────── */
+var _nbrLegIdx = 0;
+
+function openNewBusResModal() {
+  _nbrLegIdx = 0;
+  renderNewBusResForm('voucher');
+  openModal('modal-new-bus-res');
+}
+
+function renderNewBusResForm(mode) {
+  const confirmedVouchers = vouchers.filter(v => v.status === 'Confirmed' || v.status === 'Tentative');
+  const vOpts = confirmedVouchers.length
+    ? confirmedVouchers.map(v =>
+        `<option value="${v.id}">${v.ref} — ${v.agency} (${v.paxTotal||v.guests.length} PAX)</option>`
+      ).join('')
+    : '<option value="" disabled>No vouchers found</option>';
+
+  const today_val = (new Date()).toISOString().split('T')[0];
+
+  document.getElementById('new-busres-body').innerHTML = `
+    <input type="hidden" id="nbr-mode" value="${mode}">
+
+    <div style="display:flex;gap:0;background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;margin-bottom:18px">
+      <button onclick="renderNewBusResForm('voucher')" style="flex:1;padding:8px;border:none;border-radius:calc(var(--r-sm) - 2px);cursor:pointer;font-family:inherit;font-size:0.9rem;font-weight:${mode==='voucher'?'600':'400'};background:${mode==='voucher'?'var(--gold)':'transparent'};color:${mode==='voucher'?'#fff':'var(--ink)'};transition:all 0.15s">
+        📋 Linked to Voucher
+      </button>
+      <button onclick="renderNewBusResForm('standalone')" style="flex:1;padding:8px;border:none;border-radius:calc(var(--r-sm) - 2px);cursor:pointer;font-family:inherit;font-size:0.9rem;font-weight:${mode==='standalone'?'600':'400'};background:${mode==='standalone'?'var(--gold)':'transparent'};color:${mode==='standalone'?'#fff':'var(--ink)'};transition:all 0.15s">
+        🚌 Standalone
+      </button>
+    </div>
+
+    ${mode === 'voucher' ? `
+    <div class="form-section">
+      <div class="form-section-title">Select Voucher</div>
+      <div class="field">
+        <label>Voucher</label>
+        <select id="nbr-voucher" onchange="onNbrVoucherChange()" style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+          <option value="">— Select a voucher —</option>
+          ${vOpts}
+        </select>
+      </div>
+    </div>
+    <div id="nbr-voucher-preview"></div>
+    ` : `
+    <div class="form-section">
+      <div class="form-section-title">Reservation Details</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Agency / Client *</label>
+          <input id="nbr-agency" type="text" placeholder="Agency or client name">
+        </div>
+        <div class="field">
+          <label>Group Ref</label>
+          <input id="nbr-group-ref" type="text" placeholder="Internal group reference">
+        </div>
+        <div class="field">
+          <label>Total PAX *</label>
+          <input id="nbr-pax" type="number" min="1" value="1">
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="nbr-date" type="date" value="${today_val}">
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400">
+          <input type="checkbox" id="nbr-ext-tour" style="width:16px;height:16px">
+          Includes Ziyarah / External Tour
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="form-section-title" style="margin-bottom:0">Transport Legs</div>
+        <button class="btn btn-sm btn-gold" onclick="addNbrLeg()">+ Add Leg</button>
+      </div>
+      <div id="nbr-legs"></div>
+      <div id="nbr-no-legs" style="font-size:0.8571rem;color:var(--ink-muted);padding:6px 0">No legs added yet — click "Add Leg" to build the itinerary.</div>
+    </div>
+    `}
+
+    <div class="form-section">
+      <div class="form-section-title">Notes</div>
+      <div class="field">
+        <textarea id="nbr-notes" rows="3" placeholder="Additional instructions or notes for this reservation..." style="width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9rem;resize:vertical"></textarea>
+      </div>
+    </div>
+  `;
+
+  if (mode === 'standalone') {
+    addNbrLeg();
+  }
+}
+
+function onNbrVoucherChange() {
+  const vId = document.getElementById('nbr-voucher')?.value;
+  const v = vouchers.find(x => x.id === vId);
+  const el = document.getElementById('nbr-voucher-preview');
+  if (!el) return;
+  if (!v) { el.innerHTML = ''; return; }
+
+  const legs = (v.transport || []).map((t, i) => `
+    <div style="display:flex;gap:10px;align-items:center;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:5px;font-size:0.8571rem">
+      <span style="font-weight:600;color:var(--gold)">Leg ${i+1}</span>
+      <span>${t.from} → ${t.to}</span>
+      <span style="color:var(--ink-muted)">${fmtDate(t.date)}${t.time ? ' @ '+t.time : ''}</span>
+    </div>`).join('');
+
+  const existing = busReservations.find(r => r.voucherId === v.id);
+
+  el.innerHTML = `
+    <div class="form-section" style="background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:14px">
+      ${existing ? `<div style="background:var(--amber-light);color:var(--amber);padding:8px 12px;border-radius:var(--r-sm);font-size:0.8571rem;font-weight:500;margin-bottom:12px">⚠️ A bus reservation already exists for this voucher (${existing.voucherRef}). A new one will be created in addition.</div>` : ''}
+      <div class="form-section-title" style="margin-bottom:10px">Voucher Summary</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+        <div class="conf-field"><div class="conf-field-label">Ref</div>${v.ref}</div>
+        <div class="conf-field"><div class="conf-field-label">Agency</div>${v.agency}</div>
+        <div class="conf-field"><div class="conf-field-label">Group Ref</div>${v.agencyRef||'—'}</div>
+        <div class="conf-field"><div class="conf-field-label">PAX</div><strong>${v.paxTotal||v.guests.length}</strong></div>
+        <div class="conf-field"><div class="conf-field-label">Check-In</div>${fmtDate(v.checkIn)}</div>
+        <div class="conf-field"><div class="conf-field-label">Ziyarah</div>${v.extTour?'✓ Yes':'—'}</div>
+      </div>
+      ${(v.transport||[]).length ? `
+        <div style="font-size:0.8rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Transport (${v.transport.length} leg${v.transport.length!==1?'s':''})</div>
+        ${legs}
+      ` : `<div style="font-size:0.8571rem;color:var(--ink-muted)">No transport legs in this voucher — reservation will be created with empty itinerary.</div>`}
+    </div>
+  `;
+}
+
+function addNbrLeg() {
+  const idx = _nbrLegIdx++;
+  const container = document.getElementById('nbr-legs');
+  const noLegs = document.getElementById('nbr-no-legs');
+  if (noLegs) noLegs.style.display = 'none';
+  if (!container) return;
+  const div = document.createElement('div');
+  div.id = `nbr-leg-${idx}`;
+  div.style.cssText = 'background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:0.8rem;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:0.8px">Leg ${idx+1}</span>
+      <button onclick="removeNbrLeg('${idx}')" style="border:none;background:none;cursor:pointer;color:var(--red);font-size:1.1rem;line-height:1;padding:0 4px" title="Remove leg">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 130px 100px;gap:8px;align-items:end">
+      <div class="field" style="margin-bottom:0">
+        <label>From</label>
+        <input id="nbr-leg-from-${idx}" type="text" placeholder="Pickup point">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>To</label>
+        <input id="nbr-leg-to-${idx}" type="text" placeholder="Destination">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Date</label>
+        <input id="nbr-leg-date-${idx}" type="date">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Time</label>
+        <input id="nbr-leg-time-${idx}" type="time">
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function removeNbrLeg(idx) {
+  const el = document.getElementById(`nbr-leg-${idx}`);
+  if (el) el.remove();
+  const container = document.getElementById('nbr-legs');
+  const noLegs = document.getElementById('nbr-no-legs');
+  if (noLegs && container && container.children.length === 0) noLegs.style.display = 'block';
+}
+
+function saveNewBusRes() {
+  const mode = document.getElementById('nbr-mode')?.value;
+  let entry;
+
+  if (mode === 'voucher') {
+    const vId = document.getElementById('nbr-voucher')?.value;
+    if (!vId) { toast('Please select a voucher', false); return; }
+    const v = vouchers.find(x => x.id === vId);
+    if (!v) { toast('Voucher not found', false); return; }
+    entry = {
+      id: uid(),
+      voucherId: v.id,
+      voucherRef: v.ref,
+      confRef: '',
+      agency: v.agency,
+      groupRef: v.agencyRef || '',
+      paxTotal: v.paxTotal || v.guests.length,
+      transport: v.transport ? JSON.parse(JSON.stringify(v.transport)) : [],
+      extTour: v.extTour || false,
+      status: 'Pending',
+      busCompanyId: '',
+      busCompanyName: '',
+      legAssignments: [],
+      assignedBuses: [],
+      notes: document.getElementById('nbr-notes')?.value.trim() || '',
+      confirmedBy: '',
+      createdAt: today(),
+    };
+  } else {
+    const agency = document.getElementById('nbr-agency')?.value.trim();
+    if (!agency) { toast('Please enter an agency or client name', false); return; }
+    const pax = parseInt(document.getElementById('nbr-pax')?.value) || 1;
+    const legs = [];
+    document.querySelectorAll('#nbr-legs > div[id^="nbr-leg-"]').forEach(legDiv => {
+      const i = legDiv.id.replace('nbr-leg-', '');
+      const from = document.getElementById(`nbr-leg-from-${i}`)?.value.trim() || '';
+      const to   = document.getElementById(`nbr-leg-to-${i}`)?.value.trim() || '';
+      const date = document.getElementById(`nbr-leg-date-${i}`)?.value || '';
+      const time = document.getElementById(`nbr-leg-time-${i}`)?.value || '';
+      legs.push({ from, to, date, time });
+    });
+    const ref = 'BSR-' + Date.now().toString(36).toUpperCase().slice(-6);
+    entry = {
+      id: uid(),
+      voucherId: null,
+      voucherRef: ref,
+      confRef: '',
+      agency,
+      groupRef: document.getElementById('nbr-group-ref')?.value.trim() || '',
+      paxTotal: pax,
+      transport: legs,
+      extTour: document.getElementById('nbr-ext-tour')?.checked || false,
+      status: 'Pending',
+      busCompanyId: '',
+      busCompanyName: '',
+      legAssignments: [],
+      assignedBuses: [],
+      notes: document.getElementById('nbr-notes')?.value.trim() || '',
+      confirmedBy: '',
+      createdAt: today(),
+    };
+  }
+
+  busReservations.push(entry);
+  persistReservations();
+  renderBusReservations();
+  closeModal('modal-new-bus-res');
+  toast('Bus tour reservation created');
+  setTimeout(() => openBusReservationDetail(entry.id), 350);
 }
 
 function renderBusReservations() {
