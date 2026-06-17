@@ -1806,7 +1806,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
                 <div style="font-size:0.9286rem;font-weight:600;color:var(--gold-dark)">🔄 مسار داخلي</div>
                 <div style="font-size:0.7857rem;color:var(--ink-muted)">Internal Route — multiple</div>
               </div>
-              <button class="btn btn-sm" onclick="addTripRow('internal')">+ إضافة</button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-sm" style="background:var(--cream-dark);color:var(--gold-dark);border:1px solid var(--gold-light)" onclick="importInternalRoutes()" title="استيراد مسارات من تأكيدات الفنادق">🏨 استيراد من الفنادق</button>
+                <button class="btn btn-sm" onclick="addTripRow('internal')">+ إضافة</button>
+              </div>
             </div>
             <div id="tr-internal-container"></div>
           </div>
@@ -7726,6 +7729,61 @@ function collectHotelConfs() {
     }
   });
   return confs;
+}
+
+function importInternalRoutes() {
+  // Read hotel data live from the form
+  const hotelRows = [];
+  document.querySelectorAll('[id^=hc-row-]').forEach(row => {
+    const idx = row.id.split('-').pop();
+    const isAdHoc = document.getElementById(`hc-adhoc-${idx}`)?.style.display !== 'none';
+    let city, hotelName, checkIn, checkOut;
+    if (isAdHoc) {
+      hotelName = document.getElementById(`hc-adhoc-name-${idx}`)?.value.trim() || '';
+      city      = document.getElementById(`hc-adhoc-city-${idx}`)?.value.trim() || '';
+      checkIn   = document.getElementById(`hc-adhoc-in-${idx}`)?.value  || '';
+      checkOut  = document.getElementById(`hc-adhoc-out-${idx}`)?.value || '';
+    } else {
+      const hotelId = document.getElementById(`hc-hotel-${idx}`)?.value;
+      const h = hotels.find(x => x.id === hotelId);
+      hotelName = h ? h.name : '';
+      city      = h ? h.city : (document.getElementById(`hc-city-${idx}`)?.value || '');
+      checkIn   = document.getElementById(`hc-in-${idx}`)?.value  || '';
+      checkOut  = document.getElementById(`hc-out-${idx}`)?.value || '';
+    }
+    if (city || hotelName) hotelRows.push({ city, hotelName, checkIn, checkOut });
+  });
+
+  // Sort hotels by check-in date
+  hotelRows.sort((a, b) => (a.checkIn || '').localeCompare(b.checkIn || ''));
+
+  if (hotelRows.length < 2) {
+    toast('أضف فندقَين على الأقل في تأكيدات الفنادق لاستيراد المسار الداخلي', false);
+    return;
+  }
+
+  // Clear existing internal rows
+  const container = document.getElementById('tr-internal-container');
+  if (container) container.innerHTML = '';
+
+  // Generate one leg per consecutive hotel pair
+  let imported = 0;
+  for (let i = 0; i < hotelRows.length - 1; i++) {
+    const from = hotelRows[i];
+    const to   = hotelRows[i + 1];
+    // Transfer date = checkout of hotel[i] (same day as checkin of hotel[i+1])
+    const date = from.checkOut || to.checkIn || '';
+    addTripRow('internal', {
+      date,
+      fromCity: from.city,
+      fromArea: from.hotelName,
+      toCity:   to.city,
+      toArea:   to.hotelName,
+    });
+    imported++;
+  }
+
+  toast(`تم استيراد ${imported} مسار داخلي من تأكيدات الفنادق ✓`);
 }
 
 function addTripRow(category, prefill) {
