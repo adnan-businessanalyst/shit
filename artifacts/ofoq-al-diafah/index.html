@@ -2488,6 +2488,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
           </div>
 
+          <!-- Transport Companies -->
+          <div style="grid-column:1/-1">
+            <div class="form-section-title" style="margin-bottom:6px">شركات النقل — Transport Companies</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">تظهر في قائمة شركة النقل عند إدخال تفاصيل النقل — يمكن اختيار "أخرى" وكتابة اسم حر</div>
+            <div id="set-transportCompanies-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>
+            <div style="display:flex;gap:6px;max-width:400px">
+              <input id="set-transportCompanies-new" type="text" placeholder="مثال: شركة النقل الذهبي" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('transportCompanies')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('transportCompanies')">+ إضافة</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -7795,6 +7806,14 @@ function importInternalRoutes() {
   toast(`تم استيراد ${imported} مسار داخلي من تأكيدات الفنادق ✓`);
 }
 
+function onTransCompanyChange(idx) {
+  const sel   = document.getElementById(`tr-transCompany-${idx}`);
+  const other = document.getElementById(`tr-transCompany-other-${idx}`);
+  if (!sel || !other) return;
+  other.style.display = sel.value === '__other__' ? 'block' : 'none';
+  if (sel.value !== '__other__') other.value = '';
+}
+
 function addTripRow(category, prefill) {
   transportCount++;
   const idx = transportCount;
@@ -7847,7 +7866,12 @@ function addTripRow(category, prefill) {
       </div>
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">شركة النقل</div>
-        ${inp(`tr-transCompany-${idx}`, 'text', 'شركة النقل...')}
+        <select id="tr-transCompany-${idx}" onchange="onTransCompanyChange(${idx})" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%;margin-bottom:4px">
+          <option value="">— اختر شركة النقل —</option>
+          ${getLookupList('transportCompanies').map(c=>`<option value="${c}">${c}</option>`).join('')}
+          <option value="__other__">✏️ أخرى...</option>
+        </select>
+        <input id="tr-transCompany-other-${idx}" type="text" placeholder="اسم الشركة..." style="display:none;font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%;box-sizing:border-box">
       </div>
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">شركتنا</div>
@@ -7897,7 +7921,18 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-toArea-${idx}`).value       = prefill.toArea       || '';
     document.getElementById(`tr-time-${idx}`).value         = prefill.time         || '';
     document.getElementById(`tr-paymentBy-${idx}`).value    = prefill.paymentBy    || '';
-    document.getElementById(`tr-transCompany-${idx}`).value = prefill.transCompany || '';
+    const _tcSel = document.getElementById(`tr-transCompany-${idx}`);
+    const _tcVal = prefill.transCompany || '';
+    if (_tcSel) {
+      const _tcOpts = [..._tcSel.options].map(o => o.value);
+      if (_tcOpts.includes(_tcVal)) {
+        _tcSel.value = _tcVal;
+      } else if (_tcVal) {
+        _tcSel.value = '__other__';
+        const _tcOther = document.getElementById(`tr-transCompany-other-${idx}`);
+        if (_tcOther) { _tcOther.style.display = 'block'; _tcOther.value = _tcVal; }
+      }
+    }
     document.getElementById(`tr-ourCompany-${idx}`).value   = prefill.ourCompany   || '';
     document.getElementById(`tr-driver-${idx}`).value       = prefill.driver       || '';
     document.getElementById(`tr-dphone-${idx}`).value       = prefill.dphone       || '';
@@ -7964,7 +7999,7 @@ function collectTransport() {
         toArea,
         time:         document.getElementById(`tr-time-${idx}`)?.value.trim()         || '',
         paymentBy:    document.getElementById(`tr-paymentBy-${idx}`)?.value           || '',
-        transCompany: document.getElementById(`tr-transCompany-${idx}`)?.value.trim() || '',
+        transCompany: (() => { const s=document.getElementById(`tr-transCompany-${idx}`); return s?.value==='__other__' ? (document.getElementById(`tr-transCompany-other-${idx}`)?.value.trim()||'') : (s?.value.trim()||''); })(),
         ourCompany:   document.getElementById(`tr-ourCompany-${idx}`)?.value          || '',
         driver:       document.getElementById(`tr-driver-${idx}`)?.value.trim()       || '',
         dphone:       document.getElementById(`tr-dphone-${idx}`)?.value.trim()       || '',
@@ -14817,6 +14852,7 @@ const LOOKUP_DEFAULTS = {
   ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
   cities:        ['مكة المكرمة','المدينة المنورة','جدة','الطائف','الرياض','تبوك','أبها','الدمام','أخرى'],
   areas:         ['الحرم المكي','العزيزية','المعابدة','النزهة','الشوقية','أجياد','الجعرانة','المطار','الحرم النبوي','قباء','العوالي','المدينة المنورة المركز','أخرى'],
+  transportCompanies: [],
 };
 
 function getLookups() {
@@ -14894,7 +14930,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds','ports','cities','areas'].forEach(k => renderLookupList(k));
+  ['views','types','cancellations','refunds','ports','cities','areas','transportCompanies'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
