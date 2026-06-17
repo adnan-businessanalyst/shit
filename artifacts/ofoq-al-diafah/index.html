@@ -266,6 +266,7 @@ tbody tr:hover td { background: var(--cream); }
 }
 .required::after { content: ' *'; color: var(--red); font-size: 0.85rem; font-weight: 600; }
 .mandatory::after { content: ' *'; color: var(--red); font-size: 0.75rem; font-weight: 700; }
+.recommended::after { content: ' *'; color: var(--gold-dark); font-size: 0.85rem; font-weight: 600; }
 .checkbox-label {
   display: flex; align-items: center; gap: 10px;
   font-size: 0.9286rem; cursor: pointer; padding: 8px 0;
@@ -1706,7 +1707,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
             <div class="field"><label>اسم الوكالة</label><input id="v-agency" type="text" placeholder="يُعبأ تلقائياً عند اختيار الشركة"></div>
             <div class="field"><label class="required">رقم المجموعة</label><input id="v-agency-ref" type="text" placeholder="مثال: 901002419"></div>
-            <div class="field"><label class="required">هاتف القائد</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
+            <div class="field"><label class="recommended">اسم القائد</label><input id="v-leader-name" type="text" placeholder="الاسم الكامل..."></div>
+            <div class="field"><label class="recommended">هاتف القائد</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
             <div class="field"><label>هاتف الوكيل</label><input id="v-phone" type="text" placeholder="+966..."></div>
             <div class="field"><label>بريد الوكيل</label><input id="v-email" type="email" placeholder="agent@agency.com"></div>
             <div class="field"><label>ملاحظات داخلية</label><input id="v-notes" type="text" placeholder="أي ملاحظات..."></div>
@@ -7384,7 +7386,7 @@ function openNewVoucherPage(editId) {
   }
   // Populate port dropdowns from lookup list
   populatePortDropdowns();
-  ['v-agency','v-agency-ref','v-leader-phone','v-phone','v-email','v-notes',
+  ['v-agency','v-agency-ref','v-leader-name','v-leader-phone','v-phone','v-email','v-notes',
    'v-arr-date','v-arr-flight','v-arr-time','v-dep-date','v-dep-flight','v-dep-time',
    'v-pax-total','v-pax-men','v-pax-women'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
@@ -7413,6 +7415,7 @@ function openNewVoucherPage(editId) {
     document.getElementById('v-agency').value = editing.agency || '';
     if (editing.clientId) document.getElementById('v-agency-select').value = editing.clientId;
     document.getElementById('v-agency-ref').value = editing.agencyRef || '';
+    document.getElementById('v-leader-name').value = editing.leaderName || '';
     document.getElementById('v-leader-phone').value = editing.leaderPhone || '';
     document.getElementById('v-phone').value = editing.agentPhone || '';
     document.getElementById('v-email').value = editing.agentEmail || '';
@@ -8174,6 +8177,7 @@ function saveVoucher() {
     ref: `VCH-${new Date().getFullYear()}-${String(voucherCounter).padStart(3, '0')}`,
     agency,
     agencyRef: document.getElementById('v-agency-ref').value.trim(),
+    leaderName: document.getElementById('v-leader-name').value.trim(),
     leaderPhone: document.getElementById('v-leader-phone').value.trim(),
     agent: document.getElementById('v-agency').value.trim(),
     agentPhone: document.getElementById('v-phone').value.trim(),
