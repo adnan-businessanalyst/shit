@@ -7040,17 +7040,22 @@ function nvpBack() {
 }
 
 function nvpValidateStep(step) {
+  const errors = [];
   const warnings = [];
 
   if (step === 1) {
     const agency = document.getElementById('v-agency-select')?.value || document.getElementById('v-agency')?.value.trim();
-    if (!agency) warnings.push('Client company is not selected');
+    if (!agency) errors.push('شركة العميل — Client company is required');
     const pax = Number(document.getElementById('v-pax-total')?.value);
-    if (!pax || pax < 1) warnings.push('Total PAX count is missing');
+    if (!pax || pax < 1) errors.push('إجمالي المعتمرين — Total pilgrim count is required');
+    const men = document.getElementById('v-pax-men')?.value;
+    if (!men || men === '') errors.push('رجال — Men count is required');
+    const women = document.getElementById('v-pax-women')?.value;
+    if (!women || women === '') errors.push('نساء — Women count is required');
     const agencyRef = document.getElementById('v-agency-ref')?.value.trim();
-    if (!agencyRef) warnings.push('Group Reference (رقم المجموعة) is missing');
+    if (!agencyRef) warnings.push('رقم المجموعة (Group Reference) is missing');
     const leaderPhone = document.getElementById('v-leader-phone')?.value.trim();
-    if (!leaderPhone) warnings.push('Leader Phone (هاتف القائد) is missing');
+    if (!leaderPhone) warnings.push('هاتف القائد (Leader Phone) is missing');
   }
 
   if (step === 2) {
@@ -7060,10 +7065,10 @@ function nvpValidateStep(step) {
     if (!document.getElementById('v-dep-flight')?.value?.trim()) warnings.push('Departure flight number is missing');
   }
 
-  // Show or clear the inline warning banner for this step
+  // Show or clear the inline banner for this step
   const warnId = `nvp-incomplete-warn-${step}`;
   let warnEl = document.getElementById(warnId);
-  if (warnings.length > 0) {
+  if (errors.length > 0 || warnings.length > 0) {
     if (!warnEl) {
       warnEl = document.createElement('div');
       warnEl.id = warnId;
@@ -7071,19 +7076,27 @@ function nvpValidateStep(step) {
       if (panel) panel.insertBefore(warnEl, panel.firstChild);
     }
     warnEl.innerHTML = `
+      ${errors.length > 0 ? `
+      <div style="background:#FEE2E2;border:1px solid #EF4444;border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px">
+        <div style="font-weight:600;color:#991B1B;margin-bottom:6px;font-size:0.9rem">✗ الحقول الإلزامية مطلوبة — Required fields are missing:</div>
+        <ul style="margin:0;padding-inline-start:18px;color:#7F1D1D;line-height:1.85;font-size:0.8571rem">
+          ${errors.map(e => `<li>${e}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+      ${warnings.length > 0 ? `
       <div style="background:#FEF9C3;border:1px solid #D4A017;border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px">
-        <div style="font-weight:600;color:#7A5000;margin-bottom:6px;font-size:0.9rem">⚠ Some recommended fields are empty — the voucher may be incomplete:</div>
+        <div style="font-weight:600;color:#7A5000;margin-bottom:6px;font-size:0.9rem">⚠ Recommended fields are empty:</div>
         <ul style="margin:0 0 8px;padding-inline-start:18px;color:#5A3A00;line-height:1.85;font-size:0.8571rem">
           ${warnings.map(w => `<li>${w}</li>`).join('')}
         </ul>
-        <div style="font-size:0.8214rem;color:#7A5000">You can still continue and fill in the missing details later by editing the voucher.</div>
-      </div>`;
+        <div style="font-size:0.8214rem;color:#7A5000">You can still continue and fill these in later by editing the voucher.</div>
+      </div>` : ''}`;
   } else if (warnEl) {
     warnEl.remove();
   }
 
-  // Always allow proceeding — steps are optional
-  return true;
+  // Block if there are hard errors
+  return errors.length === 0;
 }
 
 function nvpBuildSummary() {
