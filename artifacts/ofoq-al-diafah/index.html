@@ -7516,6 +7516,15 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-from-${idx}`).value = prefill.from || '';
     document.getElementById(`tr-to-${idx}`).value = prefill.to || '';
     document.getElementById(`tr-time-${idx}`).value = prefill.time || '';
+  } else {
+    // Default date from the matching flight date
+    if (category === 'arrival') {
+      const d = document.getElementById('v-arr-date')?.value || '';
+      if (d) document.getElementById(`tr-date-${idx}`).value = d;
+    } else if (category === 'departure') {
+      const d = document.getElementById('v-dep-date')?.value || '';
+      if (d) document.getElementById(`tr-date-${idx}`).value = d;
+    }
   }
 
   // Hide the add button for "once" categories after adding
