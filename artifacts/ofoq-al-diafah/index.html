@@ -7728,8 +7728,8 @@ function collectHotelConfs() {
   return confs;
 }
 
-function importInternalRoutes() {
-  // Read hotel data live from the form
+// Shared helper: read all hotel conf rows from the live NVP form, sorted by check-in
+function readHotelConfsFromForm() {
   const hotelRows = [];
   document.querySelectorAll('[id^=hc-row-]').forEach(row => {
     const idx = row.id.split('-').pop();
@@ -7750,9 +7750,12 @@ function importInternalRoutes() {
     }
     if (city || hotelName) hotelRows.push({ city, hotelName, checkIn, checkOut });
   });
-
-  // Sort hotels by check-in date
   hotelRows.sort((a, b) => (a.checkIn || '').localeCompare(b.checkIn || ''));
+  return hotelRows;
+}
+
+function importInternalRoutes() {
+  const hotelRows = readHotelConfsFromForm();
 
   if (hotelRows.length < 2) {
     toast('أضف فندقَين على الأقل في تأكيدات الفنادق لاستيراد المسار الداخلي', false);
@@ -7768,7 +7771,6 @@ function importInternalRoutes() {
   for (let i = 0; i < hotelRows.length - 1; i++) {
     const from = hotelRows[i];
     const to   = hotelRows[i + 1];
-    // Transfer date = checkout of hotel[i] (same day as checkin of hotel[i+1])
     const date = from.checkOut || to.checkIn || '';
     addTripRow('internal', {
       date,
@@ -7894,17 +7896,29 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-permit-${idx}`).value       = prefill.permit       || '';
     document.getElementById(`tr-conf-${idx}`).value         = prefill.conf         || '';
   } else {
-    // Default date and fromCity from the matching flight fields
+    // Auto-fill from flight + hotel confirmation fields
+    const portCity = port => (port || '').replace(/\s*\(.*\)\s*$/, '').trim();
+
     if (category === 'arrival') {
-      const d = document.getElementById('v-arr-date')?.value || '';
-      const p = document.getElementById('v-arr-airport')?.value || '';
-      if (d) document.getElementById(`tr-date-${idx}`).value = d;
-      if (p) document.getElementById(`tr-fromCity-${idx}`).value = p;
+      const date    = document.getElementById('v-arr-date')?.value    || '';
+      const port    = document.getElementById('v-arr-airport')?.value || '';
+      const hotels  = readHotelConfsFromForm();
+      const first   = hotels[0];
+      document.getElementById(`tr-date-${idx}`).value     = date;
+      document.getElementById(`tr-fromCity-${idx}`).value = portCity(port);
+      document.getElementById(`tr-fromArea-${idx}`).value = port;
+      document.getElementById(`tr-toCity-${idx}`).value   = first?.city      || '';
+      document.getElementById(`tr-toArea-${idx}`).value   = first?.hotelName || '';
     } else if (category === 'departure') {
-      const d = document.getElementById('v-dep-date')?.value || '';
-      const p = document.getElementById('v-dep-airport')?.value || '';
-      if (d) document.getElementById(`tr-date-${idx}`).value = d;
-      if (p) document.getElementById(`tr-fromCity-${idx}`).value = p;
+      const date    = document.getElementById('v-dep-date')?.value    || '';
+      const port    = document.getElementById('v-dep-airport')?.value || '';
+      const hotels  = readHotelConfsFromForm();
+      const last    = hotels[hotels.length - 1];
+      document.getElementById(`tr-date-${idx}`).value     = date;
+      document.getElementById(`tr-fromCity-${idx}`).value = last?.city      || '';
+      document.getElementById(`tr-fromArea-${idx}`).value = last?.hotelName || '';
+      document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
+      document.getElementById(`tr-toArea-${idx}`).value   = port;
     }
   }
 
