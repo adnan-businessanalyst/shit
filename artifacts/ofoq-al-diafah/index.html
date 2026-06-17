@@ -7822,8 +7822,8 @@ function addTripRow(category, prefill) {
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">التاريخ</div>
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='departure'?'مدينة الفندق الأخير':'مدينة المغادرة'}</div>
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='departure'?'اسم الفندق الأخير':'منطقة المغادرة'}</div>
-      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='arrival'?'مدينة منفذ الوصول':'مدينة الوصول'}</div>
-      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='arrival'?'اسم منفذ الوصول':'منطقة الوصول'}</div>
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='arrival'?'مدينة منفذ الوصول':category==='departure'?'مدينة منفذ المغادرة':'مدينة الوصول'}</div>
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">${category==='arrival'?'اسم منفذ الوصول':category==='departure'?'اسم منفذ المغادرة':'منطقة الوصول'}</div>
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">الوقت</div>
       <div></div>` : ''}
       ${inp(`tr-date-${idx}`, 'date', '')}
