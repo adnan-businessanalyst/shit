@@ -7517,13 +7517,17 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-to-${idx}`).value = prefill.to || '';
     document.getElementById(`tr-time-${idx}`).value = prefill.time || '';
   } else {
-    // Default date from the matching flight date
+    // Default date and "from" from the matching flight fields
     if (category === 'arrival') {
       const d = document.getElementById('v-arr-date')?.value || '';
+      const p = document.getElementById('v-arr-airport')?.value || '';
       if (d) document.getElementById(`tr-date-${idx}`).value = d;
+      if (p) document.getElementById(`tr-from-${idx}`).value = p;
     } else if (category === 'departure') {
       const d = document.getElementById('v-dep-date')?.value || '';
+      const p = document.getElementById('v-dep-airport')?.value || '';
       if (d) document.getElementById(`tr-date-${idx}`).value = d;
+      if (p) document.getElementById(`tr-from-${idx}`).value = p;
     }
   }
 
