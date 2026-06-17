@@ -7557,10 +7557,8 @@ function addHotelConfRow(prefill) {
         </div>
         <div class="field">
           <label>المدينة</label>
-          <select id="hc-city-${idx}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-            <option value="">— المدينة —</option>
-            ${cityOpts}
-          </select>
+          <input id="hc-city-${idx}" type="text" placeholder="تُملأ من بيانات الفندق" readonly
+            style="background:var(--surface-alt,#f9f6f0);color:var(--ink-muted);cursor:default">
           <div id="hc-avail-${idx}" style="font-size:0.7143rem;margin-top:3px;font-weight:600"></div>
         </div>
         <div class="field">
