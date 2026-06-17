@@ -7638,10 +7638,22 @@ function addHotelConfRow(prefill) {
       document.getElementById(`hc-conf-${idx}`).value = prefill.confNumber || '';
       calcHotelNights(idx, 'reg');
     }
-  } else if (defaultCity) {
+  } else {
     // Pre-fill city from arrival port for both modes; staff can still change it
-    document.getElementById(`hc-city-${idx}`).value = defaultCity;
-    document.getElementById(`hc-adhoc-city-${idx}`).value = defaultCity;
+    if (defaultCity) {
+      document.getElementById(`hc-city-${idx}`).value = defaultCity;
+      document.getElementById(`hc-adhoc-city-${idx}`).value = defaultCity;
+    }
+    // First hotel: pre-fill check-in date from arrival date
+    if (idx === 1) {
+      const arrDate = document.getElementById('v-arr-date')?.value || '';
+      if (arrDate) {
+        document.getElementById(`hc-in-${idx}`).value = arrDate;
+        document.getElementById(`hc-adhoc-in-${idx}`).value = arrDate;
+        calcHotelNights(idx, 'reg');
+        calcHotelNights(idx, 'adhoc');
+      }
+    }
   }
 }
 
