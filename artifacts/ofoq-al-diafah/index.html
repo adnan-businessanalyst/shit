@@ -7370,6 +7370,11 @@ function addHotelConfRow(prefill) {
 
     <!-- Ad hoc hotel fields -->
     <div id="hc-adhoc-${idx}" style="display:${isAdHoc?'block':'none'}">
+      <div style="background:var(--amber-light);border-radius:var(--r-sm);padding:6px 12px;font-size:0.7857rem;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span>💳</span>
+        <span>مدفوع مسبقاً من العميل — لن يُسجَّل في الحسابات المالية</span>
+        <span style="color:var(--ink-muted);margin-inline-start:4px">(Client-prepaid · not recorded in finance)</span>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end">
         <div class="field">
           <label>Hotel Name</label>
