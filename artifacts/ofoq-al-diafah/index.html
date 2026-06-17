@@ -1737,7 +1737,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div style="margin-bottom:18px">
             <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> الوصول</div>
             <div class="form-grid-4">
-              <div class="field"><label class="mandatory">تاريخ الوصول</label><input id="v-arr-date" type="date"></div>
+              <div class="field"><label class="mandatory">تاريخ الوصول</label><input id="v-arr-date" type="date" onchange="const d=this.value; const ci=document.getElementById('hc-in-1'); if(ci&&!ci.value){ci.value=d;calcHotelNights(1,'reg');} const ca=document.getElementById('hc-adhoc-in-1'); if(ca&&!ca.value){ca.value=d;calcHotelNights(1,'adhoc');}"></div>
               <div class="field"><label class="mandatory">رقم الرحلة</label><input id="v-arr-flight" type="text" placeholder="مثال: JT 86"></div>
               <div class="field"><label class="mandatory">منفذ الوصول</label>
                 <select id="v-arr-airport">
