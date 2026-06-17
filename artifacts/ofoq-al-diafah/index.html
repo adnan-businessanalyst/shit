@@ -7905,12 +7905,16 @@ function addTripRow(category, prefill) {
       document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
       document.getElementById(`tr-toArea-${idx}`).value   = port;
     } else if (category === 'departure') {
-      // Departure: travelers departing FROM the port → origin = port of departure
-      const date = document.getElementById('v-dep-date')?.value    || '';
-      const port = document.getElementById('v-dep-airport')?.value || '';
+      // Departure: FROM last hotel → TO port of departure
+      const date  = document.getElementById('v-dep-date')?.value    || '';
+      const port  = document.getElementById('v-dep-airport')?.value || '';
+      const hots  = readHotelConfsFromForm();
+      const last  = hots[hots.length - 1];
       document.getElementById(`tr-date-${idx}`).value     = date;
-      document.getElementById(`tr-fromCity-${idx}`).value = portCity(port);
-      document.getElementById(`tr-fromArea-${idx}`).value = port;
+      document.getElementById(`tr-fromCity-${idx}`).value = last?.city      || '';
+      document.getElementById(`tr-fromArea-${idx}`).value = last?.hotelName || '';
+      document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
+      document.getElementById(`tr-toArea-${idx}`).value   = port;
     }
   }
 
