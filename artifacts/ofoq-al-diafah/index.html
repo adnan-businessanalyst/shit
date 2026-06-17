@@ -2466,11 +2466,22 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <!-- Cities -->
           <div style="grid-column:1/-1">
             <div class="form-section-title" style="margin-bottom:6px">المدن — Cities</div>
-            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">قائمة المدن المستخدمة في تأكيدات الفنادق وحقول النقل — تُعبأ تلقائياً في قوائم الاختيار</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">تُستخدم في تأكيدات الفنادق وحقول النقل (مدينة المغادرة / مدينة الوصول)</div>
             <div id="set-cities-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px"></div>
             <div style="display:flex;gap:6px;max-width:400px">
               <input id="set-cities-new" type="text" placeholder="مثال: مكة المكرمة" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('cities')">
               <button class="btn btn-sm btn-gold" onclick="addLookupItem('cities')">+ إضافة</button>
+            </div>
+          </div>
+
+          <!-- Areas -->
+          <div style="grid-column:1/-1">
+            <div class="form-section-title" style="margin-bottom:6px">المناطق / الأحياء — Areas</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">تُستخدم في حقول النقل (منطقة المغادرة / منطقة الوصول) — يمكن الكتابة بحرية أيضاً</div>
+            <div id="set-areas-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>
+            <div style="display:flex;gap:6px;max-width:400px">
+              <input id="set-areas-new" type="text" placeholder="مثال: العزيزية / فندق هيلتون" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('areas')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('areas')">+ إضافة</button>
             </div>
           </div>
 
@@ -7384,8 +7395,9 @@ function openNewVoucherPage(editId) {
     vAgencySel.innerHTML = '<option value="">— Select client company —</option>' +
       clientCompanies.map(c => `<option value="${c.id}">${c.nameEn}${c.nameLocal?' ('+c.nameLocal+')':''}</option>`).join('');
   }
-  // Populate port dropdowns from lookup list
+  // Populate port dropdowns and transport datalists from lookup lists
   populatePortDropdowns();
+  populateTransportLookups();
   ['v-agency','v-agency-ref','v-leader-name','v-leader-phone','v-phone','v-email','v-notes',
    'v-arr-date','v-arr-flight','v-arr-time','v-dep-date','v-dep-flight','v-dep-time',
    'v-pax-total','v-pax-men','v-pax-women'].forEach(id => {
@@ -7462,6 +7474,16 @@ function populatePortDropdowns() {
     el.innerHTML = `<option value="">— اختر —</option>${opts}`;
     if (cur) el.value = cur;
   });
+}
+
+function populateTransportLookups() {
+  const upsertDatalist = (id, items) => {
+    let dl = document.getElementById(id);
+    if (!dl) { dl = document.createElement('datalist'); dl.id = id; document.body.appendChild(dl); }
+    dl.innerHTML = items.map(v => `<option value="${v}">`).join('');
+  };
+  upsertDatalist('tr-city-datalist', getLookupList('cities'));
+  upsertDatalist('tr-area-datalist', getLookupList('areas'));
 }
 
 function updatePaxCount() {
@@ -7738,10 +7760,10 @@ function addTripRow(category, prefill) {
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">الوقت</div>
       <div></div>` : ''}
       ${inp(`tr-date-${idx}`, 'date', '')}
-      ${inp(`tr-fromCity-${idx}`, 'text', 'مكة / المدينة...')}
-      ${inp(`tr-fromArea-${idx}`, 'text', 'الحي / الفندق...')}
-      ${inp(`tr-toCity-${idx}`, 'text', 'مكة / المدينة...')}
-      ${inp(`tr-toArea-${idx}`, 'text', 'الحي / الفندق...')}
+      <input id="tr-fromCity-${idx}" type="text" list="tr-city-datalist" placeholder="مكة / المدينة..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+      <input id="tr-fromArea-${idx}" type="text" list="tr-area-datalist" placeholder="الحي / الفندق..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+      <input id="tr-toCity-${idx}"   type="text" list="tr-city-datalist" placeholder="مكة / المدينة..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+      <input id="tr-toArea-${idx}"   type="text" list="tr-area-datalist" placeholder="الحي / الفندق..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
       ${inp(`tr-time-${idx}`, 'text', '07:00')}
       <button class="remove-guest" style="margin-bottom:0"
         onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
@@ -14713,6 +14735,7 @@ const LOOKUP_DEFAULTS = {
   refunds:       ['Full Refund','Partial Refund','Credit Note','Non-Refundable','Refund to Agency','Direct to Guest'],
   ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
   cities:        ['مكة المكرمة','المدينة المنورة','جدة','الطائف','الرياض','تبوك','أبها','الدمام','أخرى'],
+  areas:         ['الحرم المكي','العزيزية','المعابدة','النزهة','الشوقية','أجياد','الجعرانة','المطار','الحرم النبوي','قباء','العوالي','المدينة المنورة المركز','أخرى'],
 };
 
 function getLookups() {
@@ -14790,7 +14813,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds','ports','cities'].forEach(k => renderLookupList(k));
+  ['views','types','cancellations','refunds','ports','cities','areas'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
