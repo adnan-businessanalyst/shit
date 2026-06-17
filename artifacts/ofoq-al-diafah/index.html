@@ -2461,6 +2461,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
           </div>
 
+          <!-- Cities -->
+          <div style="grid-column:1/-1">
+            <div class="form-section-title" style="margin-bottom:6px">المدن — Cities</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">قائمة المدن المستخدمة في تأكيدات الفنادق وحقول النقل — تُعبأ تلقائياً في قوائم الاختيار</div>
+            <div id="set-cities-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px"></div>
+            <div style="display:flex;gap:6px;max-width:400px">
+              <input id="set-cities-new" type="text" placeholder="مثال: مكة المكرمة" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('cities')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('cities')">+ إضافة</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -7274,7 +7285,7 @@ function nvpValidateStep(step) {
     const women = document.getElementById('v-pax-women')?.value;
     if (!women || women === '') errors.push('نساء — Women count is required');
     const agencyRef = document.getElementById('v-agency-ref')?.value.trim();
-    if (!agencyRef) warnings.push('رقم المجموعة (Group Reference) is missing');
+    if (!agencyRef) errors.push('رقم المجموعة — Group Reference is required');
     const leaderPhone = document.getElementById('v-leader-phone')?.value.trim();
     if (!leaderPhone) warnings.push('هاتف القائد (Leader Phone) is missing');
   }
@@ -7480,6 +7491,7 @@ function addHotelConfRow(prefill) {
   }).join('');
 
   const isAdHoc = prefill?.adHoc === true;
+  const cityOpts = getLookupList('cities').map(c => `<option value="${c}">${c}</option>`).join('');
 
   const div = document.createElement('div');
   div.className = 'guest-block';
@@ -7519,8 +7531,11 @@ function addHotelConfRow(prefill) {
           </select>
         </div>
         <div class="field">
-          <label>City</label>
-          <input id="hc-city-${idx}" type="text" placeholder="Auto-filled" readonly style="background:var(--cream);color:var(--ink-muted)">
+          <label>المدينة</label>
+          <select id="hc-city-${idx}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+            <option value="">— المدينة —</option>
+            ${cityOpts}
+          </select>
           <div id="hc-avail-${idx}" style="font-size:0.7143rem;margin-top:3px;font-weight:600"></div>
         </div>
         <div class="field">
@@ -7535,7 +7550,7 @@ function addHotelConfRow(prefill) {
       <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
         <div id="hc-nights-${idx}" style="background:var(--gold-light,rgba(184,134,11,0.1));border:1px solid rgba(184,134,11,0.3);border-radius:var(--r-sm);padding:6px 14px;font-size:0.8571rem;font-weight:600;color:var(--gold);white-space:nowrap;min-width:90px;text-align:center">— ليلة</div>
         <div class="field" style="margin:0">
-          <label>رقم التأكيد — Confirmation No.</label>
+          <label>رقم اتفاقية السكن</label>
           <input id="hc-conf-${idx}" type="text" placeholder="e.g. HTL-2026-00123">
         </div>
       </div>
@@ -7554,8 +7569,11 @@ function addHotelConfRow(prefill) {
           <input id="hc-adhoc-name-${idx}" type="text" placeholder="e.g. Hilton Makkah">
         </div>
         <div class="field">
-          <label>City</label>
-          <input id="hc-adhoc-city-${idx}" type="text" placeholder="e.g. Makkah">
+          <label>المدينة</label>
+          <select id="hc-adhoc-city-${idx}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+            <option value="">— المدينة —</option>
+            ${cityOpts}
+          </select>
         </div>
         <div class="field">
           <label>Check-in Date</label>
@@ -7569,7 +7587,7 @@ function addHotelConfRow(prefill) {
       <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
         <div id="hc-adhoc-nights-${idx}" style="background:var(--gold-light,rgba(184,134,11,0.1));border:1px solid rgba(184,134,11,0.3);border-radius:var(--r-sm);padding:6px 14px;font-size:0.8571rem;font-weight:600;color:var(--gold);white-space:nowrap;min-width:90px;text-align:center">— ليلة</div>
         <div class="field" style="margin:0">
-          <label>رقم التأكيد — Confirmation No.</label>
+          <label>رقم اتفاقية السكن</label>
           <input id="hc-adhoc-conf-${idx}" type="text" placeholder="e.g. HTL-2026-00123">
         </div>
       </div>
@@ -7725,8 +7743,16 @@ function addTripRow(category, prefill) {
       <button class="remove-guest" style="margin-bottom:0"
         onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
     </div>
-    <!-- Operations line: transCompany | ourCompany | driver | dphone -->
-    <div style="display:grid;grid-template-columns:1fr 130px 1fr 1fr;gap:8px;align-items:end;border-top:1px solid var(--border);padding-top:8px;margin-bottom:6px">
+    <!-- Operations line: paymentBy | transCompany | ourCompany | driver | dphone -->
+    <div style="display:grid;grid-template-columns:160px 1fr 130px 1fr 1fr;gap:8px;align-items:end;border-top:1px solid var(--border);padding-top:8px;margin-bottom:6px">
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">طريقة الدفع</div>
+        <select id="tr-paymentBy-${idx}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+          <option value="">— اختر —</option>
+          <option value="client">💳 مدفوع من العميل</option>
+          <option value="company">🏢 عبر شركتنا</option>
+        </select>
+      </div>
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">شركة النقل</div>
         ${inp(`tr-transCompany-${idx}`, 'text', 'شركة النقل...')}
@@ -7778,6 +7804,7 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-toCity-${idx}`).value       = prefill.toCity       || prefill.to    || '';
     document.getElementById(`tr-toArea-${idx}`).value       = prefill.toArea       || '';
     document.getElementById(`tr-time-${idx}`).value         = prefill.time         || '';
+    document.getElementById(`tr-paymentBy-${idx}`).value    = prefill.paymentBy    || '';
     document.getElementById(`tr-transCompany-${idx}`).value = prefill.transCompany || '';
     document.getElementById(`tr-ourCompany-${idx}`).value   = prefill.ourCompany   || '';
     document.getElementById(`tr-driver-${idx}`).value       = prefill.driver       || '';
@@ -7830,6 +7857,7 @@ function collectTransport() {
         toCity,
         toArea,
         time:         document.getElementById(`tr-time-${idx}`)?.value.trim()         || '',
+        paymentBy:    document.getElementById(`tr-paymentBy-${idx}`)?.value           || '',
         transCompany: document.getElementById(`tr-transCompany-${idx}`)?.value.trim() || '',
         ourCompany:   document.getElementById(`tr-ourCompany-${idx}`)?.value          || '',
         driver:       document.getElementById(`tr-driver-${idx}`)?.value.trim()       || '',
@@ -14680,6 +14708,7 @@ const LOOKUP_DEFAULTS = {
   cancellations: ['Guest Request','Agency Request','No Show','Overbooking','Force Majeure','Medical Emergency','Visa Rejection','Flight Cancellation'],
   refunds:       ['Full Refund','Partial Refund','Credit Note','Non-Refundable','Refund to Agency','Direct to Guest'],
   ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
+  cities:        ['مكة المكرمة','المدينة المنورة','جدة','الطائف','الرياض','تبوك','أبها','الدمام','أخرى'],
 };
 
 function getLookups() {
@@ -14757,7 +14786,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds','ports'].forEach(k => renderLookupList(k));
+  ['views','types','cancellations','refunds','ports','cities'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
