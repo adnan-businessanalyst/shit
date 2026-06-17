@@ -2150,8 +2150,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <option value="missing">⚠ ناقص</option>
             </select>
           </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">التصريح</div>
+            <select id="tr-rep-permit" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">الكل</option>
+              <option value="present">✅ متوفر</option>
+              <option value="missing">⚠ ناقص</option>
+            </select>
+          </div>
           <div style="display:flex;align-items:flex-end">
-            <button class="btn" onclick="document.getElementById('tr-rep-from').value='';document.getElementById('tr-rep-to').value='';document.getElementById('tr-rep-cat').value='';document.getElementById('tr-rep-driver').value='';document.getElementById('tr-rep-dphone').value='';document.getElementById('tr-rep-plate').value='';document.getElementById('tr-rep-vehicle').value='';renderTransportReport();" style="width:100%">إعادة ضبط</button>
+            <button class="btn" onclick="['tr-rep-from','tr-rep-to','tr-rep-cat','tr-rep-driver','tr-rep-dphone','tr-rep-plate','tr-rep-vehicle','tr-rep-permit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderTransportReport();" style="width:100%">إعادة ضبط</button>
           </div>
 
         </div>
@@ -2168,6 +2176,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <tr style="background:var(--cream-dark);text-align:start">
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المرجع</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الشركة</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">مرجع العميل</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">عدد الركاب</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الجنسيات</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المسار</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التاريخ</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">من</th>
@@ -2177,6 +2188,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">هاتف</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المركبة</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اللوحة</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التصريح</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم التأكيد</th>
               </tr>
             </thead>
@@ -7680,7 +7692,7 @@ function addTripRow(category, prefill) {
         onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
     </div>
     <!-- Driver / vehicle details line -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end;border-top:1px solid var(--border);padding-top:8px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end;border-top:1px solid var(--border);padding-top:8px">
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">اسم السائق</div>
         ${inp(`tr-driver-${idx}`, 'text', 'السائق...')}
@@ -7696,6 +7708,10 @@ function addTripRow(category, prefill) {
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">لوحة الترخيص</div>
         ${inp(`tr-plate-${idx}`, 'text', 'أ ب ج 1234')}
+      </div>
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">رقم التصريح</div>
+        ${inp(`tr-permit-${idx}`, 'text', 'PRM-...')}
       </div>
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">رقم التأكيد</div>
@@ -7714,6 +7730,7 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-dphone-${idx}`).value  = prefill.dphone  || '';
     document.getElementById(`tr-vehicle-${idx}`).value = prefill.vehicle || '';
     document.getElementById(`tr-plate-${idx}`).value   = prefill.plate   || '';
+    document.getElementById(`tr-permit-${idx}`).value  = prefill.permit  || '';
     document.getElementById(`tr-conf-${idx}`).value    = prefill.conf    || '';
   } else {
     // Default date and "from" from the matching flight fields
@@ -7759,6 +7776,7 @@ function collectTransport() {
         dphone:  document.getElementById(`tr-dphone-${idx}`)?.value.trim() || '',
         vehicle: document.getElementById(`tr-vehicle-${idx}`)?.value.trim() || '',
         plate:   document.getElementById(`tr-plate-${idx}`)?.value.trim() || '',
+        permit:  document.getElementById(`tr-permit-${idx}`)?.value.trim() || '',
         conf:    document.getElementById(`tr-conf-${idx}`)?.value.trim() || '',
       });
     });
@@ -13884,23 +13902,39 @@ function getTransportReportRows() {
   const catLabel = { arrival:'🛬 وصول', visits:'🕌 زيارات', internal:'🔄 داخلي', departure:'🛫 مغادرة' };
   const rows = [];
   vouchers.forEach(v => {
+    // Build nationality dict from guests
+    const natMap = {};
+    (v.guests || []).forEach(g => {
+      if (g.nationality && g.nationality.trim()) {
+        const k = g.nationality.trim();
+        natMap[k] = (natMap[k] || 0) + 1;
+      }
+    });
+    const natStr = Object.entries(natMap).sort((a,b)=>b[1]-a[1])
+      .map(([k,n])=>`${k}: ${n}`).join(' | ');
+
     (v.transport || []).forEach(t => {
       rows.push({
-        ref:     v.voucherRef || v.id,
-        agency:  v.agency || '—',
-        status:  v.status || '',
-        cat:     t.category || '',
+        ref:      v.voucherRef || v.ref || v.id,
+        agency:   v.agency     || '—',
+        agencyRef: v.agencyRef || '',
+        paxTotal: v.paxTotal   || 0,
+        natStr:   natStr       || '',
+        natMap,
+        status:   v.status     || '',
+        cat:      t.category   || '',
         catLabel: catLabel[t.category] || t.category || '—',
-        date:    t.date || '',
-        from:    t.from || '',
-        to:      t.to   || '',
-        time:    t.time || '',
-        driver:  t.driver  || '',
-        dphone:  t.dphone  || '',
-        vehicle: t.vehicle || '',
-        plate:   t.plate   || '',
-        conf:    t.conf    || '',
-        vId:     v.id,
+        date:     t.date       || '',
+        from:     t.from       || '',
+        to:       t.to         || '',
+        time:     t.time       || '',
+        driver:   t.driver     || '',
+        dphone:   t.dphone     || '',
+        vehicle:  t.vehicle    || '',
+        plate:    t.plate      || '',
+        permit:   t.permit     || '',
+        conf:     t.conf       || '',
+        vId:      v.id,
       });
     });
   });
@@ -13915,6 +13949,7 @@ function renderTransportReport() {
   const dphoneF   = document.getElementById('tr-rep-dphone')?.value  || '';
   const plateF    = document.getElementById('tr-rep-plate')?.value   || '';
   const vehicleF  = document.getElementById('tr-rep-vehicle')?.value || '';
+  const permitF   = document.getElementById('tr-rep-permit')?.value  || '';
 
   const fld = (val, filter) => {
     if (!filter) return true;
@@ -13930,6 +13965,7 @@ function renderTransportReport() {
     if (!fld(r.dphone,  dphoneF))  return false;
     if (!fld(r.plate,   plateF))   return false;
     if (!fld(r.vehicle, vehicleF)) return false;
+    if (!fld(r.permit,  permitF))  return false;
     return true;
   });
 
@@ -13937,12 +13973,13 @@ function renderTransportReport() {
   rows.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
   // Summary chips
-  const total     = rows.length;
-  const missing   = f => rows.filter(r => !r[f] || !r[f].trim()).length;
-  const mDriver   = missing('driver');
-  const mPhone    = missing('dphone');
-  const mPlate    = missing('plate');
-  const mVehicle  = missing('vehicle');
+  const total    = rows.length;
+  const missing  = f => rows.filter(r => !r[f] || (typeof r[f]==='string'&&!r[f].trim()) || r[f]===0).length;
+  const mDriver  = missing('driver');
+  const mPhone   = missing('dphone');
+  const mPlate   = missing('plate');
+  const mVehicle = missing('vehicle');
+  const mPermit  = missing('permit');
   const chipStyle = (n, warn) => `display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:0.7857rem;font-weight:600;background:${n>0&&warn?'var(--amber-light)':'var(--cream-dark)'};color:${n>0&&warn?'var(--amber)':'var(--ink-muted)'}`;
   const summEl = document.getElementById('tr-rep-summary');
   if (summEl) summEl.innerHTML = [
@@ -13951,13 +13988,22 @@ function renderTransportReport() {
     `<span style="${chipStyle(mPhone,true)}">⚠ هاتف ناقص: ${mPhone}</span>`,
     `<span style="${chipStyle(mPlate,true)}">⚠ لوحة ناقصة: ${mPlate}</span>`,
     `<span style="${chipStyle(mVehicle,true)}">⚠ مركبة ناقصة: ${mVehicle}</span>`,
+    `<span style="${chipStyle(mPermit,true)}">⚠ تصريح ناقص: ${mPermit}</span>`,
   ].join('');
 
   const subtitle = document.getElementById('tr-report-subtitle');
   if (subtitle) subtitle.textContent = `${total} رحلة${fromVal||toVal ? ' · مفلترة حسب التاريخ' : ''}`;
 
-  const miss = v => !v || !v.trim();
+  const miss = v => !v || (typeof v==='string'&&!v.trim());
   const cell = (v, warn) => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap${warn&&miss(v)?';color:var(--red)':''}">${v || (warn ? '<span style="color:var(--red);font-size:0.7857rem">⚠ ناقص</span>' : '—')}</td>`;
+
+  // Nationality dict cell — renders as compact tag list
+  const natCell = natMap => {
+    const entries = Object.entries(natMap).sort((a,b)=>b[1]-a[1]);
+    if (!entries.length) return `<td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--ink-muted);font-size:0.7857rem">—</td>`;
+    const tags = entries.map(([k,n])=>`<span style="display:inline-flex;align-items:center;gap:3px;background:var(--cream-dark);border-radius:4px;padding:2px 6px;font-size:0.7143rem;margin:1px">${k} <strong>${n}</strong></span>`).join('');
+    return `<td style="padding:9px 12px;border-bottom:1px solid var(--border);min-width:140px"><div style="display:flex;flex-wrap:wrap;gap:2px">${tags}</div></td>`;
+  };
 
   const tbody = document.getElementById('tr-rep-body');
   const empty = document.getElementById('tr-rep-empty');
@@ -13974,6 +14020,9 @@ function renderTransportReport() {
     <tr style="background:${i%2===0?'transparent':'var(--cream)'}">
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.ref}</td>
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--ink-muted)">${r.agencyRef||'—'}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;font-weight:600">${r.paxTotal||'—'}</td>
+      ${natCell(r.natMap)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
       ${cell(r.from, false)}
@@ -13983,6 +14032,7 @@ function renderTransportReport() {
       ${cell(r.dphone,  true)}
       ${cell(r.vehicle, true)}
       ${cell(r.plate,   true)}
+      ${cell(r.permit,  true)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.conf||'—'}</td>
     </tr>
   `).join('');
@@ -13990,11 +14040,13 @@ function renderTransportReport() {
 
 function exportTransportReportCSV() {
   const rows = getTransportReportRows();
-  const headers = ['المرجع','الشركة','المسار','التاريخ','من','إلى','الوقت','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','رقم التأكيد'];
+  const headers = ['المرجع','الشركة','مرجع العميل','عدد الركاب','الجنسيات','المسار','التاريخ','من','إلى','الوقت','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','رقم التصريح','رقم التأكيد'];
   const lines = [headers.join(',')];
   rows.forEach(r => {
-    lines.push([r.ref, r.agency, r.catLabel, r.date, r.from, r.to, r.time, r.driver, r.dphone, r.vehicle, r.plate, r.conf]
-      .map(v => `"${(v||'').replace(/"/g,'""')}"`)
+    // Nationality dict as "Nat1:N1; Nat2:N2"
+    const natFlat = Object.entries(r.natMap||{}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${k}:${n}`).join('; ');
+    lines.push([r.ref, r.agency, r.agencyRef, r.paxTotal||'', natFlat, r.catLabel, r.date, r.from, r.to, r.time, r.driver, r.dphone, r.vehicle, r.plate, r.permit, r.conf]
+      .map(v => `"${(String(v||'')).replace(/"/g,'""')}"`)
       .join(','));
   });
   const blob = new Blob(['\uFEFF'+lines.join('\n')], { type: 'text/csv;charset=utf-8' });
