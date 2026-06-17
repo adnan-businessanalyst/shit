@@ -1202,6 +1202,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span data-i18n="nav.opsReports">Operations</span>
     </div>
+    <div class="nav-item" data-page="transport-report" onclick="navigate(this,'transport-report')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><circle cx="6.5" cy="19" r="1.5"/><circle cx="17.5" cy="19" r="1.5"/><path d="M1 12h22"/></svg>
+      <span>تقرير النقل</span>
+    </div>
     <div class="nav-item" data-page="financial" onclick="navigate(this,'financial')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       <span data-i18n="nav.financial">Financial</span>
@@ -1584,10 +1588,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="topbar-title" data-i18n="pages.vouchers.title">B2B Bookings</div>
         <div class="topbar-sub" id="voucher-subtitle"></div>
       </div>
-      <button class="btn btn-gold" onclick="openNewVoucherPage()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span data-i18n="pages.vouchers.addBtn">New Voucher</span>
-      </button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="navigate(document.querySelector('[data-page=transport-report]'),'transport-report')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><path d="M1 12h22"/></svg>
+          <span>تقرير النقل</span>
+        </button>
+        <button class="btn btn-gold" onclick="openNewVoucherPage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="pages.vouchers.addBtn">New Voucher</span>
+        </button>
+      </div>
     </div>
     <div class="content">
       <div class="tab-bar">
@@ -2066,6 +2076,119 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   </div>
 
   <!-- ── FINANCIAL (P&L) ── -->
+  <!-- ══════════════════════════════════════════════════ Transport Report -->
+  <div id="page-transport-report" class="page">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">تقرير النقل — Transport Report</div>
+        <div class="topbar-sub" id="tr-report-subtitle">جميع رحلات النقل من الحجوزات</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" onclick="exportTransportReportCSV()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>تصدير CSV</span>
+        </button>
+        <button class="btn" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>طباعة</span>
+        </button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- Filters -->
+      <div class="card" style="margin-bottom:18px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;align-items:end">
+
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">من تاريخ</div>
+            <input id="tr-rep-from" type="date" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">إلى تاريخ</div>
+            <input id="tr-rep-to" type="date" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">نوع المسار</div>
+            <select id="tr-rep-cat" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">جميع المسارات</option>
+              <option value="arrival">🛬 مسار الوصول</option>
+              <option value="visits">🕌 مسار الزيارات</option>
+              <option value="internal">🔄 مسار داخلي</option>
+              <option value="departure">🛫 مسار المغادرة</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">اسم السائق</div>
+            <select id="tr-rep-driver" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">الكل</option>
+              <option value="present">✅ مُدخَل</option>
+              <option value="missing">⚠ ناقص</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">هاتف السائق</div>
+            <select id="tr-rep-dphone" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">الكل</option>
+              <option value="present">✅ مُدخَل</option>
+              <option value="missing">⚠ ناقص</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">لوحة الترخيص</div>
+            <select id="tr-rep-plate" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">الكل</option>
+              <option value="present">✅ مُدخَلة</option>
+              <option value="missing">⚠ ناقصة</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">نوع المركبة</div>
+            <select id="tr-rep-vehicle" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <option value="">الكل</option>
+              <option value="present">✅ مُدخَل</option>
+              <option value="missing">⚠ ناقص</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button class="btn" onclick="document.getElementById('tr-rep-from').value='';document.getElementById('tr-rep-to').value='';document.getElementById('tr-rep-cat').value='';document.getElementById('tr-rep-driver').value='';document.getElementById('tr-rep-dphone').value='';document.getElementById('tr-rep-plate').value='';document.getElementById('tr-rep-vehicle').value='';renderTransportReport();" style="width:100%">إعادة ضبط</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Summary chips -->
+      <div id="tr-rep-summary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+
+      <!-- Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:0.8571rem">
+            <thead>
+              <tr style="background:var(--cream-dark);text-align:start">
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المرجع</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الشركة</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المسار</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التاريخ</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">من</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">إلى</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الوقت</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">السائق</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">هاتف</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المركبة</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اللوحة</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم التأكيد</th>
+              </tr>
+            </thead>
+            <tbody id="tr-rep-body"></tbody>
+          </table>
+        </div>
+        <div id="tr-rep-empty" style="display:none;padding:40px;text-align:center;color:var(--ink-muted)">لا توجد رحلات نقل تطابق المرشّحات المختارة</div>
+      </div>
+
+    </div>
+  </div>
+
   <div id="page-financial" class="page">
     <div class="topbar">
       <div>
@@ -4252,6 +4375,7 @@ function navigate(el, page) {
   if (page === 'notifications') renderNotifications();
   if (page === 'reports') renderReports();
   if (page === 'ops-reports') renderOpsReports();
+  if (page === 'transport-report') renderTransportReport();
   if (page === 'financial') renderFinancial();
   if (page === 'settings') renderSettings();
   if (page === 'visitors') renderVisitors();
@@ -13755,6 +13879,129 @@ function renderReports() {
 /* ═══════════════════════════════════════════════════════
    OPERATIONS REPORTS
 ═══════════════════════════════════════════════════════ */
+/* ─── Transport Report ──────────────────────────────── */
+function getTransportReportRows() {
+  const catLabel = { arrival:'🛬 وصول', visits:'🕌 زيارات', internal:'🔄 داخلي', departure:'🛫 مغادرة' };
+  const rows = [];
+  vouchers.forEach(v => {
+    (v.transport || []).forEach(t => {
+      rows.push({
+        ref:     v.voucherRef || v.id,
+        agency:  v.agency || '—',
+        status:  v.status || '',
+        cat:     t.category || '',
+        catLabel: catLabel[t.category] || t.category || '—',
+        date:    t.date || '',
+        from:    t.from || '',
+        to:      t.to   || '',
+        time:    t.time || '',
+        driver:  t.driver  || '',
+        dphone:  t.dphone  || '',
+        vehicle: t.vehicle || '',
+        plate:   t.plate   || '',
+        conf:    t.conf    || '',
+        vId:     v.id,
+      });
+    });
+  });
+  return rows;
+}
+
+function renderTransportReport() {
+  const fromVal   = document.getElementById('tr-rep-from')?.value    || '';
+  const toVal     = document.getElementById('tr-rep-to')?.value      || '';
+  const catVal    = document.getElementById('tr-rep-cat')?.value     || '';
+  const driverF   = document.getElementById('tr-rep-driver')?.value  || '';
+  const dphoneF   = document.getElementById('tr-rep-dphone')?.value  || '';
+  const plateF    = document.getElementById('tr-rep-plate')?.value   || '';
+  const vehicleF  = document.getElementById('tr-rep-vehicle')?.value || '';
+
+  const fld = (val, filter) => {
+    if (!filter) return true;
+    const has = val && val.trim() !== '';
+    return filter === 'present' ? has : !has;
+  };
+
+  let rows = getTransportReportRows().filter(r => {
+    if (fromVal  && r.date && r.date < fromVal)  return false;
+    if (toVal    && r.date && r.date > toVal)    return false;
+    if (catVal   && r.cat !== catVal)            return false;
+    if (!fld(r.driver,  driverF))  return false;
+    if (!fld(r.dphone,  dphoneF))  return false;
+    if (!fld(r.plate,   plateF))   return false;
+    if (!fld(r.vehicle, vehicleF)) return false;
+    return true;
+  });
+
+  // Sort by date asc
+  rows.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+  // Summary chips
+  const total     = rows.length;
+  const missing   = f => rows.filter(r => !r[f] || !r[f].trim()).length;
+  const mDriver   = missing('driver');
+  const mPhone    = missing('dphone');
+  const mPlate    = missing('plate');
+  const mVehicle  = missing('vehicle');
+  const chipStyle = (n, warn) => `display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:0.7857rem;font-weight:600;background:${n>0&&warn?'var(--amber-light)':'var(--cream-dark)'};color:${n>0&&warn?'var(--amber)':'var(--ink-muted)'}`;
+  const summEl = document.getElementById('tr-rep-summary');
+  if (summEl) summEl.innerHTML = [
+    `<span style="${chipStyle(0,false)}">${total} رحلة</span>`,
+    `<span style="${chipStyle(mDriver,true)}">⚠ سائق ناقص: ${mDriver}</span>`,
+    `<span style="${chipStyle(mPhone,true)}">⚠ هاتف ناقص: ${mPhone}</span>`,
+    `<span style="${chipStyle(mPlate,true)}">⚠ لوحة ناقصة: ${mPlate}</span>`,
+    `<span style="${chipStyle(mVehicle,true)}">⚠ مركبة ناقصة: ${mVehicle}</span>`,
+  ].join('');
+
+  const subtitle = document.getElementById('tr-report-subtitle');
+  if (subtitle) subtitle.textContent = `${total} رحلة${fromVal||toVal ? ' · مفلترة حسب التاريخ' : ''}`;
+
+  const miss = v => !v || !v.trim();
+  const cell = (v, warn) => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap${warn&&miss(v)?';color:var(--red)':''}">${v || (warn ? '<span style="color:var(--red);font-size:0.7857rem">⚠ ناقص</span>' : '—')}</td>`;
+
+  const tbody = document.getElementById('tr-rep-body');
+  const empty = document.getElementById('tr-rep-empty');
+  if (!tbody) return;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr style="background:${i%2===0?'transparent':'var(--cream)'}">
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.ref}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
+      ${cell(r.from, false)}
+      ${cell(r.to,   false)}
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.time||'—'}</td>
+      ${cell(r.driver,  true)}
+      ${cell(r.dphone,  true)}
+      ${cell(r.vehicle, true)}
+      ${cell(r.plate,   true)}
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.conf||'—'}</td>
+    </tr>
+  `).join('');
+}
+
+function exportTransportReportCSV() {
+  const rows = getTransportReportRows();
+  const headers = ['المرجع','الشركة','المسار','التاريخ','من','إلى','الوقت','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','رقم التأكيد'];
+  const lines = [headers.join(',')];
+  rows.forEach(r => {
+    lines.push([r.ref, r.agency, r.catLabel, r.date, r.from, r.to, r.time, r.driver, r.dphone, r.vehicle, r.plate, r.conf]
+      .map(v => `"${(v||'').replace(/"/g,'""')}"`)
+      .join(','));
+  });
+  const blob = new Blob(['\uFEFF'+lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `transport-report-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+
 function renderOpsReports() {
   const period = document.getElementById('ops-period')?.value || 'all';
   const periodLabels = {all:'All Time', month:'This Month', quarter:'This Quarter', year:'This Year'};
