@@ -7344,7 +7344,7 @@ function addHotelConfRow(prefill) {
       <div style="background:var(--amber-light);border-radius:var(--r-sm);padding:8px 12px;font-size:0.7857rem;color:var(--amber);margin-bottom:10px">
         ⚠ No hotel inventory found. <a onclick="navigate(document.querySelector('[data-page=inventory]'),'inventory')" style="cursor:pointer;text-decoration:underline;font-weight:600">Add rooms in Inventory</a> first to enable hotel selection.
       </div>` : ''}
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end;margin-bottom:10px">
         <div class="field">
           <label>Hotel</label>
           <select id="hc-hotel-${idx}" onchange="onHotelConfSelect(${idx})" ${hotelsWithInventory.length===0?'disabled':''}>
@@ -7359,11 +7359,18 @@ function addHotelConfRow(prefill) {
         </div>
         <div class="field">
           <label>Check-in Date</label>
-          <input id="hc-in-${idx}" type="date">
+          <input id="hc-in-${idx}" type="date" onchange="calcHotelNights(${idx},'reg')">
         </div>
         <div class="field">
           <label>Check-out Date</label>
-          <input id="hc-out-${idx}" type="date">
+          <input id="hc-out-${idx}" type="date" onchange="calcHotelNights(${idx},'reg')">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
+        <div id="hc-nights-${idx}" style="background:var(--gold-light,rgba(184,134,11,0.1));border:1px solid rgba(184,134,11,0.3);border-radius:var(--r-sm);padding:6px 14px;font-size:0.8571rem;font-weight:600;color:var(--gold);white-space:nowrap;min-width:90px;text-align:center">— ليلة</div>
+        <div class="field" style="margin:0">
+          <label>رقم التأكيد — Confirmation No.</label>
+          <input id="hc-conf-${idx}" type="text" placeholder="e.g. HTL-2026-00123">
         </div>
       </div>
     </div>
@@ -7375,7 +7382,7 @@ function addHotelConfRow(prefill) {
         <span>مدفوع مسبقاً من العميل — لن يُسجَّل في الحسابات المالية</span>
         <span style="color:var(--ink-muted);margin-inline-start:4px">(Client-prepaid · not recorded in finance)</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end;margin-bottom:10px">
         <div class="field">
           <label>Hotel Name</label>
           <input id="hc-adhoc-name-${idx}" type="text" placeholder="e.g. Hilton Makkah">
@@ -7386,11 +7393,18 @@ function addHotelConfRow(prefill) {
         </div>
         <div class="field">
           <label>Check-in Date</label>
-          <input id="hc-adhoc-in-${idx}" type="date">
+          <input id="hc-adhoc-in-${idx}" type="date" onchange="calcHotelNights(${idx},'adhoc')">
         </div>
         <div class="field">
           <label>Check-out Date</label>
-          <input id="hc-adhoc-out-${idx}" type="date">
+          <input id="hc-adhoc-out-${idx}" type="date" onchange="calcHotelNights(${idx},'adhoc')">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
+        <div id="hc-adhoc-nights-${idx}" style="background:var(--gold-light,rgba(184,134,11,0.1));border:1px solid rgba(184,134,11,0.3);border-radius:var(--r-sm);padding:6px 14px;font-size:0.8571rem;font-weight:600;color:var(--gold);white-space:nowrap;min-width:90px;text-align:center">— ليلة</div>
+        <div class="field" style="margin:0">
+          <label>رقم التأكيد — Confirmation No.</label>
+          <input id="hc-adhoc-conf-${idx}" type="text" placeholder="e.g. HTL-2026-00123">
         </div>
       </div>
     </div>
@@ -7407,11 +7421,15 @@ function addHotelConfRow(prefill) {
       document.getElementById(`hc-adhoc-city-${idx}`).value = prefill.city || '';
       document.getElementById(`hc-adhoc-in-${idx}`).value = prefill.checkIn || '';
       document.getElementById(`hc-adhoc-out-${idx}`).value = prefill.checkOut || '';
+      document.getElementById(`hc-adhoc-conf-${idx}`).value = prefill.confNumber || '';
+      calcHotelNights(idx, 'adhoc');
     } else {
       document.getElementById(`hc-hotel-${idx}`).value = prefill.hotelId || '';
       document.getElementById(`hc-city-${idx}`).value = prefill.city || '';
       document.getElementById(`hc-in-${idx}`).value = prefill.checkIn || '';
       document.getElementById(`hc-out-${idx}`).value = prefill.checkOut || '';
+      document.getElementById(`hc-conf-${idx}`).value = prefill.confNumber || '';
+      calcHotelNights(idx, 'reg');
     }
   } else if (defaultCity) {
     // Pre-fill city from arrival port for both modes; staff can still change it
@@ -7447,6 +7465,25 @@ function onHotelConfSelect(idx) {
   }
 }
 
+function calcHotelNights(idx, mode) {
+  const isAdhoc = mode === 'adhoc';
+  const inId  = isAdhoc ? `hc-adhoc-in-${idx}`     : `hc-in-${idx}`;
+  const outId = isAdhoc ? `hc-adhoc-out-${idx}`    : `hc-out-${idx}`;
+  const elId  = isAdhoc ? `hc-adhoc-nights-${idx}` : `hc-nights-${idx}`;
+  const inVal  = document.getElementById(inId)?.value;
+  const outVal = document.getElementById(outId)?.value;
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (inVal && outVal) {
+    const nights = Math.max(0, Math.ceil((new Date(outVal) - new Date(inVal)) / 86400000));
+    el.textContent = nights === 1 ? '1 ليلة' : `${nights} ليالٍ`;
+    el.style.color = nights > 0 ? 'var(--gold)' : 'var(--red)';
+  } else {
+    el.textContent = '— ليلة';
+    el.style.color = 'var(--gold)';
+  }
+}
+
 function collectHotelConfs() {
   const confs = [];
   document.querySelectorAll('[id^=hc-row-]').forEach(row => {
@@ -7459,9 +7496,10 @@ function collectHotelConfs() {
         adHoc: true,
         hotelId: '',
         hotelName: name,
-        city: document.getElementById(`hc-adhoc-city-${idx}`)?.value.trim() || '',
-        checkIn: document.getElementById(`hc-adhoc-in-${idx}`)?.value || '',
+        city:     document.getElementById(`hc-adhoc-city-${idx}`)?.value.trim() || '',
+        checkIn:  document.getElementById(`hc-adhoc-in-${idx}`)?.value || '',
         checkOut: document.getElementById(`hc-adhoc-out-${idx}`)?.value || '',
+        confNumber: document.getElementById(`hc-adhoc-conf-${idx}`)?.value.trim() || '',
       });
     } else {
       const hotelId = document.getElementById(`hc-hotel-${idx}`)?.value;
@@ -7471,9 +7509,10 @@ function collectHotelConfs() {
         adHoc: false,
         hotelId,
         hotelName: h ? h.name : '',
-        city: h ? h.city : (document.getElementById(`hc-city-${idx}`)?.value || ''),
-        checkIn: document.getElementById(`hc-in-${idx}`)?.value || '',
+        city:     h ? h.city : (document.getElementById(`hc-city-${idx}`)?.value || ''),
+        checkIn:  document.getElementById(`hc-in-${idx}`)?.value || '',
         checkOut: document.getElementById(`hc-out-${idx}`)?.value || '',
+        confNumber: document.getElementById(`hc-conf-${idx}`)?.value.trim() || '',
       });
     }
   });
