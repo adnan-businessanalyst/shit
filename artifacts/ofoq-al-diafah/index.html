@@ -7044,19 +7044,49 @@ function nvpBack() {
 }
 
 function nvpValidateStep(step) {
+  const warnings = [];
+
   if (step === 1) {
     const agency = document.getElementById('v-agency-select')?.value || document.getElementById('v-agency')?.value.trim();
-    if (!agency) { toast('Please select a client company', false); return false; }
+    if (!agency) warnings.push('Client company is not selected');
     const pax = Number(document.getElementById('v-pax-total')?.value);
-    if (!pax || pax < 1) { toast('Please enter total PAX count', false); return false; }
-    return true;
+    if (!pax || pax < 1) warnings.push('Total PAX count is missing');
+    const agencyRef = document.getElementById('v-agency-ref')?.value.trim();
+    if (!agencyRef) warnings.push('Group Reference (رقم المجموعة) is missing');
+    const leaderPhone = document.getElementById('v-leader-phone')?.value.trim();
+    if (!leaderPhone) warnings.push('Leader Phone (هاتف القائد) is missing');
   }
+
   if (step === 2) {
-    if (!document.getElementById('v-arr-date')?.value) { toast('Please enter arrival date', false); return false; }
-    if (!document.getElementById('v-dep-date')?.value) { toast('Please enter departure date', false); return false; }
-    return true;
+    if (!document.getElementById('v-arr-date')?.value) warnings.push('Arrival date is missing');
+    if (!document.getElementById('v-arr-flight')?.value?.trim()) warnings.push('Arrival flight number is missing');
+    if (!document.getElementById('v-dep-date')?.value) warnings.push('Departure date is missing');
+    if (!document.getElementById('v-dep-flight')?.value?.trim()) warnings.push('Departure flight number is missing');
   }
-  // Steps 3 & 4 are optional — no required fields
+
+  // Show or clear the inline warning banner for this step
+  const warnId = `nvp-incomplete-warn-${step}`;
+  let warnEl = document.getElementById(warnId);
+  if (warnings.length > 0) {
+    if (!warnEl) {
+      warnEl = document.createElement('div');
+      warnEl.id = warnId;
+      const panel = document.getElementById(`nvp-step-${step}`);
+      if (panel) panel.insertBefore(warnEl, panel.firstChild);
+    }
+    warnEl.innerHTML = `
+      <div style="background:#FEF9C3;border:1px solid #D4A017;border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px">
+        <div style="font-weight:600;color:#7A5000;margin-bottom:6px;font-size:0.9rem">⚠ Some recommended fields are empty — the voucher may be incomplete:</div>
+        <ul style="margin:0 0 8px;padding-inline-start:18px;color:#5A3A00;line-height:1.85;font-size:0.8571rem">
+          ${warnings.map(w => `<li>${w}</li>`).join('')}
+        </ul>
+        <div style="font-size:0.8214rem;color:#7A5000">You can still continue and fill in the missing details later by editing the voucher.</div>
+      </div>`;
+  } else if (warnEl) {
+    warnEl.remove();
+  }
+
+  // Always allow proceeding — steps are optional
   return true;
 }
 
