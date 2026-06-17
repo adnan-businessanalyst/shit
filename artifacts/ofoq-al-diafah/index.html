@@ -265,6 +265,7 @@ tbody tr:hover td { background: var(--cream); }
   border-bottom: 1px solid var(--border);
 }
 .required::after { content: ' recommended'; color: var(--gold-dark); font-size: 0.7rem; font-weight: 400; }
+.mandatory::after { content: ' *'; color: var(--red); font-size: 0.75rem; font-weight: 700; }
 .checkbox-label {
   display: flex; align-items: center; gap: 10px;
   font-size: 0.9286rem; cursor: pointer; padding: 8px 0;
@@ -1673,10 +1674,11 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </div>
           <div class="form-grid-3">
             <div class="field" style="grid-column:span 2">
-              <label class="required" style="display:flex;align-items:center;justify-content:space-between">
+              <label class="mandatory" style="display:flex;align-items:center;justify-content:space-between">
                 <span>شركة العميل</span>
                 <button type="button" onclick="openQuickAddAgency()" style="font-size:0.75rem;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:600">＋ إضافة وكالة جديدة</button>
               </label>
+
               <select id="v-agency-select" onchange="onVoucherClientSelect()">
                 <option value="">— اختر شركة العميل —</option>
               </select>
@@ -1695,9 +1697,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             <div><div class="card-title">المعتمرون (PAX)</div></div>
           </div>
           <div class="form-grid-3">
-            <div class="field"><label class="required">إجمالي المعتمرين</label><input id="v-pax-total" type="number" min="1" placeholder="مثال: 24" oninput="updatePaxCount()"></div>
-            <div class="field"><label class="required">رجال</label><input id="v-pax-men" type="number" min="0" placeholder="مثال: 4" oninput="updatePaxCount()"></div>
-            <div class="field"><label class="required">نساء</label><input id="v-pax-women" type="number" min="0" placeholder="مثال: 20" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="mandatory">إجمالي المعتمرين</label><input id="v-pax-total" type="number" min="1" placeholder="مثال: 24" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="mandatory">رجال</label><input id="v-pax-men" type="number" min="0" placeholder="مثال: 4" oninput="updatePaxCount()"></div>
+            <div class="field"><label class="mandatory">نساء</label><input id="v-pax-women" type="number" min="0" placeholder="مثال: 20" oninput="updatePaxCount()"></div>
           </div>
           <div id="pax-warning" style="display:none;background:var(--amber-light);color:var(--amber);border-radius:var(--r-sm);padding:8px 12px;font-size:0.8571rem;margin-top:12px"></div>
           <div id="guests-container" style="display:none"></div>
@@ -1713,29 +1715,29 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div style="margin-bottom:18px">
             <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> الوصول</div>
             <div class="form-grid-4">
-              <div class="field"><label class="required">تاريخ الوصول</label><input id="v-arr-date" type="date"></div>
-              <div class="field"><label class="required">رقم الرحلة</label><input id="v-arr-flight" type="text" placeholder="مثال: JT 86"></div>
-              <div class="field"><label class="required">منفذ الوصول</label>
+              <div class="field"><label class="mandatory">تاريخ الوصول</label><input id="v-arr-date" type="date"></div>
+              <div class="field"><label class="mandatory">رقم الرحلة</label><input id="v-arr-flight" type="text" placeholder="مثال: JT 86"></div>
+              <div class="field"><label class="mandatory">منفذ الوصول</label>
                 <select id="v-arr-airport">
                   <option value="">— اختر —</option>
                   <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
-              <div class="field"><label class="required">وقت الوصول</label><input id="v-arr-time" type="time"></div>
+              <div class="field"><label class="mandatory">وقت الوصول</label><input id="v-arr-time" type="time"></div>
             </div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:18px">
             <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✈</span> المغادرة</div>
             <div class="form-grid-4">
-              <div class="field"><label class="required">تاريخ المغادرة</label><input id="v-dep-date" type="date"></div>
-              <div class="field"><label class="required">رقم الرحلة</label><input id="v-dep-flight" type="text" placeholder="مثال: JT 87"></div>
-              <div class="field"><label class="required">منفذ المغادرة</label>
+              <div class="field"><label class="mandatory">تاريخ المغادرة</label><input id="v-dep-date" type="date"></div>
+              <div class="field"><label class="mandatory">رقم الرحلة</label><input id="v-dep-flight" type="text" placeholder="مثال: JT 87"></div>
+              <div class="field"><label class="mandatory">منفذ المغادرة</label>
                 <select id="v-dep-airport">
                   <option value="">— اختر —</option>
                   <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
-              <div class="field"><label class="required">وقت المغادرة</label><input id="v-dep-time" type="time"></div>
+              <div class="field"><label class="mandatory">وقت المغادرة</label><input id="v-dep-time" type="time"></div>
             </div>
           </div>
         </div>
@@ -7059,10 +7061,14 @@ function nvpValidateStep(step) {
   }
 
   if (step === 2) {
-    if (!document.getElementById('v-arr-date')?.value) warnings.push('Arrival date is missing');
-    if (!document.getElementById('v-arr-flight')?.value?.trim()) warnings.push('Arrival flight number is missing');
-    if (!document.getElementById('v-dep-date')?.value) warnings.push('Departure date is missing');
-    if (!document.getElementById('v-dep-flight')?.value?.trim()) warnings.push('Departure flight number is missing');
+    if (!document.getElementById('v-arr-date')?.value) errors.push('تاريخ الوصول — Arrival date is required');
+    if (!document.getElementById('v-arr-flight')?.value?.trim()) errors.push('رقم الرحلة (وصول) — Arrival flight number is required');
+    if (!document.getElementById('v-arr-airport')?.value) errors.push('منفذ الوصول — Port of entry is required');
+    if (!document.getElementById('v-arr-time')?.value) errors.push('وقت الوصول — Arrival time is required');
+    if (!document.getElementById('v-dep-date')?.value) errors.push('تاريخ المغادرة — Departure date is required');
+    if (!document.getElementById('v-dep-flight')?.value?.trim()) errors.push('رقم الرحلة (مغادرة) — Departure flight number is required');
+    if (!document.getElementById('v-dep-airport')?.value) errors.push('منفذ المغادرة — Port of exit is required');
+    if (!document.getElementById('v-dep-time')?.value) errors.push('وقت المغادرة — Departure time is required');
   }
 
   // Show or clear the inline banner for this step
