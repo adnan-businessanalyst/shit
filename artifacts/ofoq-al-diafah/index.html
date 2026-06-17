@@ -7507,15 +7507,12 @@ function addHotelConfRow(prefill) {
   hotelConfCount++;
   const idx = hotelConfCount;
 
-  const hotelsWithInventory = hotels.filter(h =>
-    rooms.some(r => r.hotel === h.name || r.hotelId === h.id)
-  );
-  const allHotels = hotelsWithInventory.length ? hotelsWithInventory : hotels;
-
-  const hotelOptions = allHotels.map(h => {
+  // Show ALL hotels in the dropdown; availability info shown only when rooms exist
+  const hotelOptions = hotels.map(h => {
     const availCount = rooms.filter(r => (r.hotel===h.name||r.hotelId===h.id) && r.status==='Available').length;
     const totalCount = rooms.filter(r => r.hotel===h.name||r.hotelId===h.id).length;
-    return `<option value="${h.id}" data-name="${h.name}" data-city="${h.city}">${h.name} — ${h.city} (${availCount}/${totalCount} available)</option>`;
+    const availLabel = totalCount > 0 ? ` (${availCount}/${totalCount} available)` : '';
+    return `<option value="${h.id}" data-name="${h.name}" data-city="${h.city}">${h.name}${h.city?' — '+h.city:''}${availLabel}</option>`;
   }).join('');
 
   const isAdHoc = prefill?.adHoc === true;
@@ -7546,14 +7543,14 @@ function addHotelConfRow(prefill) {
 
     <!-- Registered hotel fields -->
     <div id="hc-registered-${idx}" style="display:${isAdHoc?'none':'block'}">
-      ${hotelsWithInventory.length === 0 ? `
+      ${hotels.length === 0 ? `
       <div style="background:var(--amber-light);border-radius:var(--r-sm);padding:8px 12px;font-size:0.7857rem;color:var(--amber);margin-bottom:10px">
-        ⚠ No hotel inventory found. <a onclick="navigate(document.querySelector('[data-page=inventory]'),'inventory')" style="cursor:pointer;text-decoration:underline;font-weight:600">Add rooms in Inventory</a> first to enable hotel selection.
+        ⚠ No hotels found. <a onclick="navigate(document.querySelector('[data-page=hotels]'),'hotels')" style="cursor:pointer;text-decoration:underline;font-weight:600">Add hotels</a> first, or use Ad Hoc mode.
       </div>` : ''}
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:end;margin-bottom:10px">
         <div class="field">
           <label>Hotel</label>
-          <select id="hc-hotel-${idx}" onchange="onHotelConfSelect(${idx})" ${hotelsWithInventory.length===0?'disabled':''}>
+          <select id="hc-hotel-${idx}" onchange="onHotelConfSelect(${idx})" ${hotels.length===0?'disabled':''}>
             <option value="">— Select hotel —</option>
             ${hotelOptions}
           </select>
