@@ -7392,6 +7392,10 @@ function addHotelConfRow(prefill) {
   `;
   document.getElementById('hotel-conf-container').appendChild(div);
 
+  // Derive default city from arrival port (e.g. "Jeddah (JED)" → "Jeddah")
+  const arrPort = document.getElementById('v-arr-airport')?.value || '';
+  const defaultCity = arrPort ? arrPort.replace(/\s*\(.*\)\s*$/, '').trim() : '';
+
   if (prefill) {
     if (isAdHoc) {
       document.getElementById(`hc-adhoc-name-${idx}`).value = prefill.hotelName || '';
@@ -7404,6 +7408,10 @@ function addHotelConfRow(prefill) {
       document.getElementById(`hc-in-${idx}`).value = prefill.checkIn || '';
       document.getElementById(`hc-out-${idx}`).value = prefill.checkOut || '';
     }
+  } else if (defaultCity) {
+    // Pre-fill city from arrival port for both modes; staff can still change it
+    document.getElementById(`hc-city-${idx}`).value = defaultCity;
+    document.getElementById(`hc-adhoc-city-${idx}`).value = defaultCity;
   }
 }
 
