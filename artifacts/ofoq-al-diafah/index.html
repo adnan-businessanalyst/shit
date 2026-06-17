@@ -1720,7 +1720,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <div class="field"><label class="mandatory">منفذ الوصول</label>
                 <select id="v-arr-airport">
                   <option value="">— اختر —</option>
-                  <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
               <div class="field"><label class="mandatory">وقت الوصول</label><input id="v-arr-time" type="time"></div>
@@ -1734,7 +1733,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <div class="field"><label class="mandatory">منفذ المغادرة</label>
                 <select id="v-dep-airport">
                   <option value="">— اختر —</option>
-                  <option>Jeddah (JED)</option><option>Madinah (MED)</option><option>Riyadh (RUH)</option><option>Taif (TIF)</option><option>Other</option>
                 </select>
               </div>
               <div class="field"><label class="mandatory">وقت المغادرة</label><input id="v-dep-time" type="time"></div>
@@ -2284,6 +2282,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             <div style="display:flex;gap:6px">
               <input id="set-refund-new" type="text" placeholder="Add refund type..." style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('refunds')">
               <button class="btn btn-sm btn-gold" onclick="addLookupItem('refunds')">+ Add</button>
+            </div>
+          </div>
+
+          <!-- Ports of Entry / Exit -->
+          <div style="grid-column:1/-1">
+            <div class="form-section-title" style="margin-bottom:6px">منافذ الدخول والخروج — Ports of Entry / Exit</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">Used in the voucher flight step for منفذ الوصول and منفذ المغادرة dropdowns</div>
+            <div id="set-ports-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>
+            <div style="display:flex;gap:6px;max-width:400px">
+              <input id="set-ports-new" type="text" placeholder="e.g. Jeddah (JED)" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('ports')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('ports')">+ Add</button>
             </div>
           </div>
 
@@ -7196,6 +7205,8 @@ function openNewVoucherPage(editId) {
     vAgencySel.innerHTML = '<option value="">— Select client company —</option>' +
       clientCompanies.map(c => `<option value="${c.id}">${c.nameEn}${c.nameLocal?' ('+c.nameLocal+')':''}</option>`).join('');
   }
+  // Populate port dropdowns from lookup list
+  populatePortDropdowns();
   ['v-agency','v-agency-ref','v-leader-phone','v-phone','v-email','v-notes',
    'v-arr-date','v-arr-flight','v-arr-time','v-dep-date','v-dep-flight','v-dep-time',
    'v-pax-total','v-pax-men','v-pax-women'].forEach(id => {
@@ -7259,6 +7270,18 @@ function openNewVoucherPage(editId) {
   // Reset to step 1
   nvpCurrentStep = 1;
   setTimeout(() => nvpGoStep(1), 50);
+}
+
+function populatePortDropdowns() {
+  const ports = getLookupList('ports');
+  const opts = ports.map(p => `<option value="${p}">${p}</option>`).join('');
+  ['v-arr-airport','v-dep-airport'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = `<option value="">— اختر —</option>${opts}`;
+    if (cur) el.value = cur;
+  });
 }
 
 function updatePaxCount() {
@@ -14168,6 +14191,7 @@ const LOOKUP_DEFAULTS = {
   types:         ['Standard','Deluxe','Suite','Family','Presidential','Studio'],
   cancellations: ['Guest Request','Agency Request','No Show','Overbooking','Force Majeure','Medical Emergency','Visa Rejection','Flight Cancellation'],
   refunds:       ['Full Refund','Partial Refund','Credit Note','Non-Refundable','Refund to Agency','Direct to Guest'],
+  ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
 };
 
 function getLookups() {
@@ -14245,7 +14269,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds'].forEach(k => renderLookupList(k));
+  ['views','types','cancellations','refunds','ports'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
