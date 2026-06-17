@@ -1765,11 +1765,55 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- STEP 4: Transport -->
       <div id="nvp-step-4" style="display:none">
         <div class="card">
-          <div class="card-header" style="margin-bottom:4px">
-            <div><div class="card-title">🚌 جدول النقل</div><div class="card-sub">جدول النقل اليومي</div></div>
-            <button class="btn btn-sm" onclick="addTransportRow()">+ إضافة صف</button>
+          <div class="card-title" style="margin-bottom:16px">🚌 جدول النقل</div>
+
+          <!-- Arrival Route (once) -->
+          <div style="margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div>
+                <div style="font-size:0.9286rem;font-weight:600;color:var(--green)">🛬 مسار الوصول</div>
+                <div style="font-size:0.7857rem;color:var(--ink-muted)">Arrival Route — once</div>
+              </div>
+              <button class="btn btn-sm" id="tr-arrival-add-btn" onclick="addTripRow('arrival')">+ إضافة</button>
+            </div>
+            <div id="tr-arrival-container"></div>
           </div>
-          <div id="transport-container"></div>
+
+          <!-- Visits Route (multiple) -->
+          <div style="margin-bottom:20px;border-top:1px solid var(--border);padding-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div>
+                <div style="font-size:0.9286rem;font-weight:600;color:var(--blue)">🕌 مسار الزيارات</div>
+                <div style="font-size:0.7857rem;color:var(--ink-muted)">Visits Route — multiple</div>
+              </div>
+              <button class="btn btn-sm" onclick="addTripRow('visits')">+ إضافة</button>
+            </div>
+            <div id="tr-visits-container"></div>
+          </div>
+
+          <!-- Internal Route (multiple) -->
+          <div style="margin-bottom:20px;border-top:1px solid var(--border);padding-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div>
+                <div style="font-size:0.9286rem;font-weight:600;color:var(--gold-dark)">🔄 مسار داخلي</div>
+                <div style="font-size:0.7857rem;color:var(--ink-muted)">Internal Route — multiple</div>
+              </div>
+              <button class="btn btn-sm" onclick="addTripRow('internal')">+ إضافة</button>
+            </div>
+            <div id="tr-internal-container"></div>
+          </div>
+
+          <!-- Departure Route (once) -->
+          <div style="border-top:1px solid var(--border);padding-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div>
+                <div style="font-size:0.9286rem;font-weight:600;color:var(--red)">🛫 مسار المغادرة</div>
+                <div style="font-size:0.7857rem;color:var(--ink-muted)">Departure Route — once</div>
+              </div>
+              <button class="btn btn-sm" id="tr-departure-add-btn" onclick="addTripRow('departure')">+ إضافة</button>
+            </div>
+            <div id="tr-departure-container"></div>
+          </div>
         </div>
 
         <!-- Summary before saving -->
@@ -7167,7 +7211,13 @@ function openNewVoucherPage(editId) {
   document.getElementById('hotel-conf-container').innerHTML = '';
   document.getElementById('room-assignment-container').innerHTML = '';
   document.getElementById('meals-container').innerHTML = '';
-  document.getElementById('transport-container').innerHTML = '';
+  ['arrival','visits','internal','departure'].forEach(cat => {
+    const c = document.getElementById(`tr-${cat}-container`);
+    if (c) c.innerHTML = '';
+  });
+  ['tr-arrival-add-btn','tr-departure-add-btn'].forEach(id => {
+    const b = document.getElementById(id); if (b) b.style.display = '';
+  });
   document.getElementById('pax-warning').style.display = 'none';
 
   if (editing) {
@@ -7394,46 +7444,75 @@ function collectHotelConfs() {
   return confs;
 }
 
-function addTransportRow(prefill) {
+function addTripRow(category, prefill) {
   transportCount++;
   const idx = transportCount;
+  const isOnce = category === 'arrival' || category === 'departure';
+  const containerId = `tr-${category}-container`;
+  const addBtnId = isOnce ? `tr-${category}-add-btn` : null;
+
+  const inp = (id, type, ph) =>
+    `<input id="${id}" type="${type}" placeholder="${ph}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">`;
+
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // For "once" categories, only allow one row
+  if (isOnce && container.querySelector('[id^=tr-row-]')) return;
+
   const div = document.createElement('div');
   div.id = `tr-row-${idx}`;
-  div.style.cssText = 'display:grid;grid-template-columns:140px 1fr 1fr 100px auto;gap:10px;align-items:end;margin-bottom:8px';
+  div.dataset.category = category;
+  div.style.cssText = 'display:grid;grid-template-columns:150px 1fr 1fr 110px auto;gap:10px;align-items:center;margin-bottom:8px';
   div.innerHTML = `
-    ${idx === 1 ? `<div style="font-size:0.7857rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.6px">Date</div>
-      <div style="font-size:0.7857rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.6px">From</div>
-      <div style="font-size:0.7857rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.6px">To</div>
-      <div style="font-size:0.7857rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.6px">Time</div>
-      <div></div>` : ''}
-    <input id="tr-date-${idx}" type="date" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-    <input id="tr-from-${idx}" type="text" placeholder="From" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-    <input id="tr-to-${idx}" type="text" placeholder="To" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-    <input id="tr-time-${idx}" type="text" placeholder="e.g. 07.00" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-    <button class="remove-guest" onclick="document.getElementById('tr-row-${idx}').remove()" style="margin-bottom:0">×</button>
+    ${container.children.length === 0 ? `
+    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">التاريخ</div>
+    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">من</div>
+    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">إلى</div>
+    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">الوقت</div>
+    <div></div>` : ''}
+    ${inp(`tr-date-${idx}`, 'date', '')}
+    ${inp(`tr-from-${idx}`, 'text', 'من...')}
+    ${inp(`tr-to-${idx}`, 'text', 'إلى...')}
+    ${inp(`tr-time-${idx}`, 'text', '07:00')}
+    <button class="remove-guest" style="margin-bottom:0"
+      onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
   `;
-  document.getElementById('transport-container').appendChild(div);
+  container.appendChild(div);
+
   if (prefill) {
     document.getElementById(`tr-date-${idx}`).value = prefill.date || '';
     document.getElementById(`tr-from-${idx}`).value = prefill.from || '';
     document.getElementById(`tr-to-${idx}`).value = prefill.to || '';
     document.getElementById(`tr-time-${idx}`).value = prefill.time || '';
   }
+
+  // Hide the add button for "once" categories after adding
+  if (addBtnId) document.getElementById(addBtnId).style.display = 'none';
+}
+
+// Legacy shim so existing prefill calls still work
+function addTransportRow(prefill) {
+  addTripRow(prefill?.category || 'visits', prefill);
 }
 
 function collectTransport() {
   const rows = [];
-  document.querySelectorAll('[id^=tr-row-]').forEach(row => {
-    const idx = row.id.split('-').pop();
-    const date = document.getElementById(`tr-date-${idx}`)?.value;
-    const from = document.getElementById(`tr-from-${idx}`)?.value.trim();
-    const to = document.getElementById(`tr-to-${idx}`)?.value.trim();
-    if (!from && !to) return;
-    rows.push({
-      date: date || '',
-      from: from || '',
-      to: to || '',
-      time: document.getElementById(`tr-time-${idx}`)?.value.trim() || '',
+  ['arrival','visits','internal','departure'].forEach(cat => {
+    const container = document.getElementById(`tr-${cat}-container`);
+    if (!container) return;
+    container.querySelectorAll('[id^=tr-row-]').forEach(row => {
+      const idx = row.id.split('-').pop();
+      const from = document.getElementById(`tr-from-${idx}`)?.value.trim();
+      const to   = document.getElementById(`tr-to-${idx}`)?.value.trim();
+      if (!from && !to) return;
+      rows.push({
+        category: cat,
+        date: document.getElementById(`tr-date-${idx}`)?.value || '',
+        from: from || '',
+        to:   to   || '',
+        time: document.getElementById(`tr-time-${idx}`)?.value.trim() || '',
+      });
     });
   });
   return rows;
