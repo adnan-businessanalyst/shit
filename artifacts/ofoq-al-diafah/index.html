@@ -7499,28 +7499,59 @@ function addTripRow(category, prefill) {
   const div = document.createElement('div');
   div.id = `tr-row-${idx}`;
   div.dataset.category = category;
-  div.style.cssText = 'display:grid;grid-template-columns:150px 1fr 1fr 110px auto;gap:10px;align-items:center;margin-bottom:8px';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;background:var(--surface)';
   div.innerHTML = `
-    ${container.children.length === 0 ? `
-    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">التاريخ</div>
-    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">من</div>
-    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">إلى</div>
-    <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">الوقت</div>
-    <div></div>` : ''}
-    ${inp(`tr-date-${idx}`, 'date', '')}
-    ${inp(`tr-from-${idx}`, 'text', 'من...')}
-    ${inp(`tr-to-${idx}`, 'text', 'إلى...')}
-    ${inp(`tr-time-${idx}`, 'text', '07:00')}
-    <button class="remove-guest" style="margin-bottom:0"
-      onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
+    <!-- Route line -->
+    <div style="display:grid;grid-template-columns:150px 1fr 1fr 110px auto;gap:10px;align-items:center;margin-bottom:8px">
+      ${container.children.length === 0 ? `
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">التاريخ</div>
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">من</div>
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">إلى</div>
+      <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.5px">الوقت</div>
+      <div></div>` : ''}
+      ${inp(`tr-date-${idx}`, 'date', '')}
+      ${inp(`tr-from-${idx}`, 'text', 'من...')}
+      ${inp(`tr-to-${idx}`, 'text', 'إلى...')}
+      ${inp(`tr-time-${idx}`, 'text', '07:00')}
+      <button class="remove-guest" style="margin-bottom:0"
+        onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
+    </div>
+    <!-- Driver / vehicle details line -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end;border-top:1px solid var(--border);padding-top:8px">
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">اسم السائق</div>
+        ${inp(`tr-driver-${idx}`, 'text', 'السائق...')}
+      </div>
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">هاتف السائق</div>
+        ${inp(`tr-dphone-${idx}`, 'tel', '+966...')}
+      </div>
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">نوع المركبة</div>
+        ${inp(`tr-vehicle-${idx}`, 'text', 'باص / حافلة...')}
+      </div>
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">لوحة الترخيص</div>
+        ${inp(`tr-plate-${idx}`, 'text', 'أ ب ج 1234')}
+      </div>
+      <div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">رقم التأكيد</div>
+        ${inp(`tr-conf-${idx}`, 'text', 'TRN-...')}
+      </div>
+    </div>
   `;
   container.appendChild(div);
 
   if (prefill) {
-    document.getElementById(`tr-date-${idx}`).value = prefill.date || '';
-    document.getElementById(`tr-from-${idx}`).value = prefill.from || '';
-    document.getElementById(`tr-to-${idx}`).value = prefill.to || '';
-    document.getElementById(`tr-time-${idx}`).value = prefill.time || '';
+    document.getElementById(`tr-date-${idx}`).value    = prefill.date    || '';
+    document.getElementById(`tr-from-${idx}`).value    = prefill.from    || '';
+    document.getElementById(`tr-to-${idx}`).value      = prefill.to      || '';
+    document.getElementById(`tr-time-${idx}`).value    = prefill.time    || '';
+    document.getElementById(`tr-driver-${idx}`).value  = prefill.driver  || '';
+    document.getElementById(`tr-dphone-${idx}`).value  = prefill.dphone  || '';
+    document.getElementById(`tr-vehicle-${idx}`).value = prefill.vehicle || '';
+    document.getElementById(`tr-plate-${idx}`).value   = prefill.plate   || '';
+    document.getElementById(`tr-conf-${idx}`).value    = prefill.conf    || '';
   } else {
     // Default date and "from" from the matching flight fields
     if (category === 'arrival') {
@@ -7557,10 +7588,15 @@ function collectTransport() {
       if (!from && !to) return;
       rows.push({
         category: cat,
-        date: document.getElementById(`tr-date-${idx}`)?.value || '',
-        from: from || '',
-        to:   to   || '',
-        time: document.getElementById(`tr-time-${idx}`)?.value.trim() || '',
+        date:    document.getElementById(`tr-date-${idx}`)?.value || '',
+        from:    from || '',
+        to:      to   || '',
+        time:    document.getElementById(`tr-time-${idx}`)?.value.trim() || '',
+        driver:  document.getElementById(`tr-driver-${idx}`)?.value.trim() || '',
+        dphone:  document.getElementById(`tr-dphone-${idx}`)?.value.trim() || '',
+        vehicle: document.getElementById(`tr-vehicle-${idx}`)?.value.trim() || '',
+        plate:   document.getElementById(`tr-plate-${idx}`)?.value.trim() || '',
+        conf:    document.getElementById(`tr-conf-${idx}`)?.value.trim() || '',
       });
     });
   });
