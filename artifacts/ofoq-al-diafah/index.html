@@ -1633,6 +1633,22 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="tab-panel active" id="vou-panel-vouchers">
         <!-- Hotel category stats -->
         <div id="vou-cat-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px"></div>
+
+        <!-- Transport Stats -->
+        <div style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">إحصائيات النقل / Transport Stats</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="font-size:0.7857rem;color:var(--ink-muted)">من</div>
+              <input type="date" id="ts-from" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <div style="font-size:0.7857rem;color:var(--ink-muted)">إلى</div>
+              <input type="date" id="ts-to" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <button class="btn btn-xs" onclick="document.getElementById('ts-from').value='';document.getElementById('ts-to').value='';renderTransportStats()">إعادة ضبط</button>
+            </div>
+          </div>
+          <div id="vou-transport-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"></div>
+        </div>
+
         <div class="action-bar">
           <select id="vou-filter" onchange="renderVouchers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
             <option value="">جميع الحالات</option>
@@ -8602,8 +8618,64 @@ function renderVoucherCategoryStats() {
   `;
 }
 
+function renderTransportStats() {
+  const el = document.getElementById('vou-transport-stats');
+  if (!el) return;
+  const fromVal = document.getElementById('ts-from')?.value || '';
+  const toVal   = document.getElementById('ts-to')?.value   || '';
+
+  const counts = { arrival:0, visits:0, internal:0, departure:0 };
+  vouchers.forEach(v => {
+    (v.transport || []).forEach(t => {
+      const cat  = t.category || '';
+      const date = t.date || '';
+      if (fromVal && date && date < fromVal) return;
+      if (toVal   && date && date > toVal)   return;
+      if (counts[cat] !== undefined) counts[cat]++;
+    });
+  });
+  const total = counts.arrival + counts.visits + counts.internal + counts.departure;
+
+  const cats = [
+    { key:'arrival',   label:'الوصول',        en:'Arrivals',        icon:'🛬', bg:'#e8f0ff', col:'#2563eb' },
+    { key:'visits',    label:'الزيارات',       en:'Visit Routes',    icon:'🕌', bg:'#fef9e7', col:'#d4a843' },
+    { key:'internal',  label:'الداخلي',        en:'Internal Routes', icon:'🔄', bg:'#f0fdf4', col:'#16a34a' },
+    { key:'departure', label:'المغادرة',       en:'Departure Routes',icon:'🛫', bg:'#fff0f0', col:'#dc2626' },
+  ];
+
+  el.innerHTML = cats.map(c => `
+    <div onclick="goTransportReportFiltered('${c.key}','${fromVal}','${toVal}')"
+      style="background:${c.bg};border:1.5px solid ${c.col}22;border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:box-shadow 0.15s;user-select:none"
+      onmouseover="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.10)'" onmouseout="this.style.boxShadow='none'">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <span style="font-size:1.4rem">${c.icon}</span>
+        <span style="font-size:0.7143rem;font-weight:700;padding:2px 8px;border-radius:999px;background:${c.col}18;color:${c.col}">${c.en}</span>
+      </div>
+      <div style="font-size:2rem;font-weight:800;color:${c.col};line-height:1;margin-bottom:4px">${counts[c.key]}</div>
+      <div style="font-size:0.8571rem;color:var(--ink-muted)">${c.label}</div>
+    </div>
+  `).join('') + `
+    <div style="background:var(--ink);border-radius:var(--r);padding:16px 18px">
+      <div style="font-size:0.7143rem;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.5px;margin-bottom:10px">TOTAL</div>
+      <div style="font-size:2rem;font-weight:800;color:var(--gold);line-height:1;margin-bottom:4px">${total}</div>
+      <div style="font-size:0.8571rem;color:rgba(255,255,255,0.55)">إجمالي رحلات النقل</div>
+    </div>
+  `;
+}
+
+function goTransportReportFiltered(cat, from, to) {
+  const catEl  = document.getElementById('tr-rep-cat');
+  const fromEl = document.getElementById('tr-rep-from');
+  const toEl   = document.getElementById('tr-rep-to');
+  if (catEl)  catEl.value  = cat;
+  if (fromEl) { fromEl.value = from; document.getElementById('tr-rep-from-h').textContent = fmtHijri(from) || ''; }
+  if (toEl)   { toEl.value   = to;   document.getElementById('tr-rep-to-h').textContent   = fmtHijri(to)   || ''; }
+  navigate(document.querySelector('[data-page=transport-report]'), 'transport-report');
+}
+
 function renderVouchers() {
   renderVoucherCategoryStats();
+  renderTransportStats();
   const f = document.getElementById('vou-filter').value;
   let list = f ? vouchers.filter(v=>v.status===f) : vouchers;
   list = [...list].reverse();
