@@ -2288,7 +2288,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </select>
           </div>
           <div style="display:flex;align-items:flex-end">
-            <button class="btn" onclick="['tr-rep-day','tr-rep-cat','tr-rep-driver','tr-rep-dphone','tr-rep-plate','tr-rep-vehicle','tr-rep-permit','tr-rep-fromCity','tr-rep-toCity','tr-rep-ourCompany'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('tr-rep-day-h').textContent='';renderTransportReport();" style="width:100%">إعادة ضبط</button>
+            <button class="btn btn-gold" onclick="(function(){const t=new Date().toISOString().slice(0,10);const d=document.getElementById('tr-rep-day');if(d){d.value=t;document.getElementById('tr-rep-day-h').textContent=fmtHijri(t)||'';}renderTransportReport();})();" style="width:100%">Today</button>
           </div>
 
         </div>
