@@ -2462,10 +2462,11 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div style="grid-column:1/-1">
             <div class="form-section-title" style="margin-bottom:6px">منافذ الدخول والخروج — Ports of Entry / Exit</div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">Used in the voucher flight step for منفذ الوصول and منفذ المغادرة dropdowns</div>
-            <div id="set-ports-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>
-            <div style="display:flex;gap:6px;max-width:400px">
-              <input id="set-ports-new" type="text" placeholder="e.g. Jeddah (JED)" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('ports')">
-              <button class="btn btn-sm btn-gold" onclick="addLookupItem('ports')">+ Add</button>
+            <div id="set-ports-list" style="margin-bottom:8px"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;max-width:640px">
+              <input id="set-ports-new" type="text" placeholder="e.g. Jeddah (JED)" style="flex:2;min-width:160px;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addPortItem()">
+              <input id="set-ports-city-new" type="text" placeholder="المدينة مثال: جدة" style="flex:2;min-width:140px;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addPortItem()">
+              <button class="btn btn-sm btn-gold" onclick="addPortItem()">+ Add</button>
             </div>
           </div>
 
@@ -14974,6 +14975,7 @@ const LOOKUP_DEFAULTS = {
   cancellations: ['Guest Request','Agency Request','No Show','Overbooking','Force Majeure','Medical Emergency','Visa Rejection','Flight Cancellation'],
   refunds:       ['Full Refund','Partial Refund','Credit Note','Non-Refundable','Refund to Agency','Direct to Guest'],
   ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
+  portCityMap:   {'Jeddah (JED)':'جدة','Madinah (MED)':'المدينة المنورة','Riyadh (RUH)':'الرياض','Taif (TIF)':'الطائف','Dammam (DMM)':'الدمام'},
   cities:        ['مكة المكرمة','المدينة المنورة','جدة','الطائف','الرياض','تبوك','أبها','الدمام','أخرى'],
   areas:         ['الحرم المكي','العزيزية','المعابدة','النزهة','الشوقية','أجياد','الجعرانة','المطار','الحرم النبوي','قباء','العوالي','المدينة المنورة المركز','أخرى'],
   transportCompanies: [],
@@ -14990,9 +14992,16 @@ function getLookupList(key) {
   return lk[key] || [...LOOKUP_DEFAULTS[key]];
 }
 
+function getPortCityMap() {
+  const lk = getLookups();
+  const stored = lk.portCityMap;
+  if (stored && typeof stored === 'object' && !Array.isArray(stored)) return stored;
+  return { ...LOOKUP_DEFAULTS.portCityMap };
+}
 function renderLookupList(key) {
   const el = document.getElementById(`set-${key}-list`);
   if (!el) return;
+  if (key === 'ports') { renderPortsList(); return; }
   const items = getLookupList(key);
   if (!items.length) { el.innerHTML = `<div style="font-size:0.8571rem;color:var(--ink-muted);padding:4px 0">No items yet</div>`; return; }
   el.innerHTML = items.map((item, i) => `
@@ -15001,7 +15010,46 @@ function renderLookupList(key) {
       <button class="btn btn-xs btn-red" onclick="removeLookupItem('${key}',${i})" style="flex-shrink:0">×</button>
     </div>`).join('');
 }
+function renderPortsList() {
+  const el = document.getElementById('set-ports-list');
+  if (!el) return;
+  const ports = getLookupList('ports');
+  const cityMap = getPortCityMap();
+  if (!ports.length) { el.innerHTML = `<div style="font-size:0.8571rem;color:var(--ink-muted);padding:4px 0">No ports yet</div>`; return; }
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px;margin-bottom:4px">` +
+    ports.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="flex:1;font-size:0.9286rem;padding:6px 10px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm)">${p}${cityMap[p] ? `<span style="color:var(--ink-muted);font-size:0.8em;margin-right:8px"> — ${cityMap[p]}</span>` : ''}</div>
+        <button class="btn btn-xs btn-red" onclick="removePortItem(${i})" style="flex-shrink:0">×</button>
+      </div>`).join('') + `</div>`;
+}
 
+function addPortItem() {
+  const nameEl = document.getElementById('set-ports-new');
+  const cityEl = document.getElementById('set-ports-city-new');
+  const name = nameEl?.value.trim();
+  const city = cityEl?.value.trim();
+  if (!name) return;
+  const lk = getLookups();
+  if (!lk.ports) lk.ports = [...LOOKUP_DEFAULTS.ports];
+  if (lk.ports.includes(name)) { toast(`"${name}" already exists`, false); return; }
+  lk.ports.push(name);
+  if (!lk.portCityMap || typeof lk.portCityMap !== 'object') lk.portCityMap = { ...LOOKUP_DEFAULTS.portCityMap };
+  if (city) lk.portCityMap[name] = city;
+  saveLookups(lk);
+  if (nameEl) nameEl.value = '';
+  if (cityEl) cityEl.value = '';
+  renderPortsList();
+  toast(`"${name}" added`);
+}
+function removePortItem(idx) {
+  const lk = getLookups();
+  if (!lk.ports) lk.ports = [...LOOKUP_DEFAULTS.ports];
+  const removed = lk.ports.splice(idx, 1)[0];
+  if (removed && lk.portCityMap) delete lk.portCityMap[removed];
+  saveLookups(lk);
+  renderPortsList();
+}
 const LOOKUP_INPUT_IDS = {
   views: 'set-view-new', types: 'set-type-new',
   cancellations: 'set-cancellation-new', refunds: 'set-refund-new',
