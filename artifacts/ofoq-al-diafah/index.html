@@ -14205,7 +14205,7 @@ function getTransportReportRows() {
         fromArea,
         toCity,
         toArea,
-        time:         t.time        || '',
+        time:         t.time || (t.category==='arrival' ? (v.arrTime||'') : t.category==='departure' ? (v.depTime||'') : ''),
         transCompany: t.transCompany|| '',
         ourCompany:   v.ourCompany  || t.ourCompany || '',
         driver:       t.driver      || '',
