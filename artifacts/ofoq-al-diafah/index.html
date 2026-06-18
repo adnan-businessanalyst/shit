@@ -10737,12 +10737,16 @@ function shareVoucherWhatsApp(id) {
 function sendTransportWhatsApp1(vId, tIdx) {
   const v = vouchers.find(x => x.id === vId);
   if (!v) return;
-  const t = (v.transportRows || [])[tIdx];
+  const t = (v.transport || v.transportRows || [])[tIdx];
   if (!t) return;
   const s = loadSettings();
 
-  const itinerary = [[t.fromCity, t.fromPort].filter(Boolean).join(' '), [t.toCity, t.toPort].filter(Boolean).join(' ')].filter(Boolean).join(' ← ') || '—';
-  const company   = t.ourCompany || s.companyName || 'أفق الضيافة';
+  const fromCity  = t.fromCity || t.from || '';
+  const fromPort  = t.fromPort || t.fromArea || '';
+  const toCity    = t.toCity   || t.to   || '';
+  const toPort    = t.toPort   || t.toArea || '';
+  const itinerary = [[fromCity, fromPort].filter(Boolean).join(' '), [toCity, toPort].filter(Boolean).join(' ')].filter(Boolean).join(' ← ') || '—';
+  const company   = t.ourCompany || v.ourCompany || s.companyName || 'أفق الضيافة';
 
   const lines = [
     `🚌 *أمر نقل — ${v.ref}*`,
@@ -10775,13 +10779,15 @@ function sendTransportWhatsApp1(vId, tIdx) {
 function sendTransportWhatsApp2(vId, tIdx) {
   const v = vouchers.find(x => x.id === vId);
   if (!v) return;
-  const t = (v.transportRows || [])[tIdx];
+  const t = (v.transport || v.transportRows || [])[tIdx];
   if (!t) return;
   const s = loadSettings();
 
-  const dest    = [t.toCity, t.toPort].filter(Boolean).join(' · ') || '—';
-  const pickup  = t.fromPort || t.fromCity || t.from || '—';
-  const org     = t.ourCompany || s.companyName || 'أفق الضيافة';
+  const toCity  = t.toCity  || t.to   || '';
+  const toPort  = t.toPort  || t.toArea || '';
+  const dest    = [toCity, toPort].filter(Boolean).join(' · ') || '—';
+  const pickup  = t.fromPort || t.fromArea || t.fromCity || t.from || '—';
+  const org     = t.ourCompany || v.ourCompany || s.companyName || 'أفق الضيافة';
 
   const lines = [
     `🚌 *أمر نقل — ${v.ref}*`,
