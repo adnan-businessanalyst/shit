@@ -8384,7 +8384,7 @@ function renderVouchers() {
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           ${(v.status==='Pending'||v.status.startsWith('Tentative'))?`<button class="btn btn-xs" onclick="openNewVoucherPage('${v.id}')">Edit</button>`:''}
-          <button class="btn btn-xs" onclick="viewVoucherDetail('${v.id}')">View</button>
+          <button class="btn btn-xs" onclick="printVoucher('${v.id}')">View</button>
           <button class="btn btn-xs btn-gold" onclick="quickPayVoucher('${v.id}')" title="تسجيل الدفع">💳 دفع</button>
           <button class="btn btn-xs btn-red" onclick="deleteVoucher('${v.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
@@ -9447,61 +9447,179 @@ function printVoucher(id) {
   const v = vouchers.find(x=>x.id===id);
   if (!v) return;
   const s = loadSettings();
-  const hotels = (v.hotelConfs||[]).map(h=>`<tr><td>${h.hotelName||h.city||'—'}</td><td>${h.city||''}</td><td>${fmtDate(h.checkIn)}</td><td>${fmtDate(h.checkOut)}</td></tr>`).join('');
-  const meals = (v.resMeals||v.meals||[]).map(m=>`<li>${m.type} × ${m.countPerPerson||m.count||1} per person</li>`).join('');
-  const transport = (v.transport||[]).map(t=>`<tr><td>${fmtDate(t.date)}</td><td>${t.from}</td><td>${t.to}</td><td>${t.time||''}</td></tr>`).join('');
 
-  const win = window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>Voucher ${v.ref}</title>
-  <style>
-    body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;color:#010101}
-    .header{text-align:center;border-bottom:3px solid #BE9C5C;padding-bottom:20px;margin-bottom:20px}
-    .co-name{font-size:1.7143rem;font-weight:700;color:#BE9C5C}
-    .co-ar{font-size:1.2857rem;color:#010101;margin-top:4px}
-    .voucher-ref{font-size:1.5714rem;font-weight:700;background:#010101;color:#BE9C5C;padding:8px 20px;border-radius:6px;display:inline-block;margin:12px 0}
-    .status-badge{background:#1A6B3C;color:#fff;padding:4px 12px;border-radius:999px;font-size:0.8571rem;font-weight:700}
-    table{width:100%;border-collapse:collapse;margin:10px 0}
-    th{background:#f5f0ef;text-align:left;padding:8px 10px;font-size:0.8571rem;text-transform:uppercase;letter-spacing:0.5px;color:#666}
-    td{padding:8px 10px;border-bottom:1px solid #eee;font-size:0.9286rem}
-    .section-title{font-size:0.9286rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#BE9C5C;margin:20px 0 8px;border-left:3px solid #BE9C5C;padding-left:8px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .field{margin-bottom:8px}.field label{font-size:0.7857rem;color:#999;display:block}.field span{font-size:0.9286rem;font-weight:600}
-    .footer{margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;font-size:0.7857rem;color:#999}
-    @media print{body{padding:10px}}
-  </style>
-  </head><body>
-  <div class="header">
-    ${s.companyLogo ? `<img src="${s.companyLogo}" style="max-height:60px;margin-bottom:8px">` : ''}<div class="co-name">${s.companyName||'Ofoq Al Diafah'}</div>
+  // ── Section 4: Hotels ──────────────────────────────────
+  const hotelSections = (v.hotelConfs||[]).map((h, i) => {
+    const nights = (h.checkIn && h.checkOut)
+      ? Math.round((new Date(h.checkOut)-new Date(h.checkIn))/(1000*60*60*24))
+      : '—';
+    return `
+      <div class="sub-section">
+        <div class="sub-title">Hotel ${i+1}</div>
+        <div class="kv-grid">
+          <div class="kv"><span class="kv-label">Hotel Name</span><span class="kv-val">${h.hotelName||'—'}</span></div>
+          <div class="kv"><span class="kv-label">City</span><span class="kv-val">${h.city||'—'}</span></div>
+          <div class="kv"><span class="kv-label">Check-in</span><span class="kv-val">${fmtDate(h.checkIn)||'—'}</span></div>
+          <div class="kv"><span class="kv-label">Check-out</span><span class="kv-val">${fmtDate(h.checkOut)||'—'}</span></div>
+          <div class="kv"><span class="kv-label">Nights</span><span class="kv-val">${nights}</span></div>
+          ${h.roomType?`<div class="kv"><span class="kv-label">Room Type</span><span class="kv-val">${h.roomType}</span></div>`:''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // ── Section 5: Transport itinerary ────────────────────
+  const trRows = (v.transportRows||[]);
+  const transportRows = trRows.map(t => `
+    <tr>
+      <td>${fmtDate(t.date)||'—'}</td>
+      <td>${[t.fromCity, t.fromPort].filter(Boolean).join(' · ')||'—'}</td>
+      <td>${[t.toCity, t.toPort].filter(Boolean).join(' · ')||'—'}</td>
+      <td>${t.time||'—'}</td>
+      <td>${t.vehicle||'—'}</td>
+      <td>${t.transCompany||t.ourCompany||'—'}</td>
+    </tr>`).join('');
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voucher ${v.ref}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;max-width:860px;margin:0 auto;padding:36px 32px;color:#111;font-size:13px;line-height:1.5}
+  /* ── Header ── */
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #BE9C5C;padding-bottom:18px;margin-bottom:22px}
+  .hd-left .co{font-size:22px;font-weight:700;color:#BE9C5C;letter-spacing:.5px}
+  .hd-left .co-ar{font-size:14px;color:#555;margin-top:2px}
+  .hd-left .co-info{font-size:11px;color:#888;margin-top:6px}
+  .hd-right{text-align:right}
+  .ref-box{background:#111;color:#BE9C5C;font-size:17px;font-weight:700;padding:7px 18px;border-radius:5px;display:inline-block;letter-spacing:.5px}
+  .issued{font-size:11px;color:#888;margin-top:6px}
+  /* ── Section ── */
+  .sec{margin-bottom:22px}
+  .sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#BE9C5C;background:#fdf8f2;border-left:4px solid #BE9C5C;padding:6px 10px;margin-bottom:10px}
+  .sub-section{margin-bottom:12px;padding-left:8px;border-left:2px solid #e8e0d5}
+  .sub-title{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+  /* ── KV grid ── */
+  .kv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 16px}
+  .kv{display:flex;flex-direction:column}
+  .kv-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+  .kv-val{font-size:13px;font-weight:600;color:#111}
+  /* ── Table ── */
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#f5f0ea;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#777;border-bottom:2px solid #e0d5c8}
+  td{padding:7px 10px;border-bottom:1px solid #eee;color:#222}
+  tr:last-child td{border-bottom:none}
+  /* ── PAX summary ── */
+  .pax-row{display:flex;gap:24px;align-items:center;margin-top:4px}
+  .pax-box{background:#f5f0ea;border-radius:6px;padding:10px 20px;text-align:center}
+  .pax-num{font-size:24px;font-weight:700;color:#BE9C5C}
+  .pax-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  /* ── Footer ── */
+  .footer{margin-top:32px;padding-top:14px;border-top:1px solid #e0d5c8;display:flex;justify-content:space-between;font-size:10px;color:#aaa}
+  @media print{
+    body{padding:14px 16px}
+    @page{margin:12mm}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hd">
+  <div class="hd-left">
+    ${s.companyLogo?`<img src="${s.companyLogo}" style="max-height:52px;margin-bottom:6px;display:block">`:''}
+    <div class="co">${s.companyName||'Ofoq Al Diafah'}</div>
     <div class="co-ar">أفق الضيافة</div>
-    <div style="font-size:0.7857rem;color:#999;margin-top:4px">${s.companyAddress||''} · ${s.companyPhone||''}</div>
+    <div class="co-info">${[s.companyAddress,s.companyPhone,s.companyEmail].filter(Boolean).join(' · ')}</div>
   </div>
-  <div style="text-align:center;margin-bottom:20px">
-    <div class="voucher-ref">${v.ref}</div>
-    <div style="margin-top:8px"><span class="status-badge">✓ CONFIRMED</span></div>
+  <div class="hd-right">
+    <div class="ref-box">${v.ref}</div>
+    <div class="issued">Issued: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="margin-top:6px;font-size:11px;font-weight:600;color:${v.status==='Confirmed'?'#1A6B3C':'#9a6a00'}">${v.status}</div>
   </div>
-  <div class="section-title">Group Information</div>
-  <div class="grid">
-    <div class="field"><label>Agency</label><span>${v.agency}</span></div>
-    <div class="field"><label>Group Reference</label><span>${v.agencyRef||'—'}</span></div>
-    <div class="field"><label>Leader Phone</label><span>${v.leaderPhone||'—'}</span></div>
-    <div class="field"><label>Total PAX</label><span>${v.paxTotal||0} (${v.paxMen||0}M / ${v.paxWomen||0}F)</span></div>
+</div>
+
+<!-- SECTION 1: Group Information -->
+<div class="sec">
+  <div class="sec-title">Section 1 — Group Information</div>
+  <div class="kv-grid">
+    <div class="kv"><span class="kv-label">Agent Name</span><span class="kv-val">${v.agency||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Group Number</span><span class="kv-val">${v.agencyRef||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Total Mutamers (PAX)</span><span class="kv-val">${v.paxTotal||0}</span></div>
+    ${v.leaderPhone?`<div class="kv"><span class="kv-label">Leader Phone</span><span class="kv-val">${v.leaderPhone}</span></div>`:''}
+    ${v.nationality?`<div class="kv"><span class="kv-label">Nationality</span><span class="kv-val">${v.nationality}</span></div>`:''}
   </div>
-  <div class="section-title">Flights</div>
-  <table><thead><tr><th>Direction</th><th>Flight</th><th>Date</th><th>Airport</th><th>Time</th></tr></thead>
-  <tbody>
-    <tr><td>✈ Arrival</td><td>${v.arrFlight||'—'}</td><td>${fmtDate(v.arrDate)}</td><td>${v.arrAirport||'—'}</td><td>${v.arrTime||'—'}</td></tr>
-    <tr><td>✈ Departure</td><td>${v.depFlight||'—'}</td><td>${fmtDate(v.depDate)}</td><td>${v.depAirport||'—'}</td><td>${v.depTime||'—'}</td></tr>
-  </tbody></table>
-  ${hotels?`<div class="section-title">Hotels</div><table><thead><tr><th>Hotel</th><th>City</th><th>Check-in</th><th>Check-out</th></tr></thead><tbody>${hotels}</tbody></table>`:''}
-  ${meals?`<div class="section-title">Meals</div><ul style="font-size:0.9286rem">${meals}</ul>`:''}
-  ${transport?`<div class="section-title">Transport</div><table><thead><tr><th>Date</th><th>From</th><th>To</th><th>Time</th></tr></thead><tbody>${transport}</tbody></table>`:''}
-  <div class="footer">
-    Issued by ${s.companyName||'Ofoq Al Diafah'} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}
-    ${s.companyPhone?'· '+s.companyPhone:''}
+</div>
+
+<!-- SECTION 2: Arrival Details -->
+<div class="sec">
+  <div class="sec-title">Section 2 — Arrival Details</div>
+  <div class="kv-grid">
+    <div class="kv"><span class="kv-label">Flight Number</span><span class="kv-val">${v.arrFlight||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Arrival Date</span><span class="kv-val">${fmtDate(v.arrDate)||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Arrival Time</span><span class="kv-val">${v.arrTime||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Airport / Port</span><span class="kv-val">${v.arrAirport||'—'}</span></div>
   </div>
-  <script>window.print();<\/script>
-  </body></html>`);
+</div>
+
+<!-- SECTION 3: Departure Details -->
+<div class="sec">
+  <div class="sec-title">Section 3 — Departure Details</div>
+  <div class="kv-grid">
+    <div class="kv"><span class="kv-label">Flight Number</span><span class="kv-val">${v.depFlight||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Departure Date</span><span class="kv-val">${fmtDate(v.depDate)||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Departure Time</span><span class="kv-val">${v.depTime||'—'}</span></div>
+    <div class="kv"><span class="kv-label">Airport / Port</span><span class="kv-val">${v.depAirport||'—'}</span></div>
+  </div>
+</div>
+
+<!-- SECTION 4: Confirmed Hotel Information -->
+<div class="sec">
+  <div class="sec-title">Section 4 — Confirmed Hotel Information</div>
+  ${hotelSections || '<p style="color:#999;font-size:12px;padding-left:8px">No hotel information recorded.</p>'}
+</div>
+
+<!-- SECTION 5: Transportation Details -->
+<div class="sec">
+  <div class="sec-title">Section 5 — Transportation Details (Itinerary)</div>
+  ${transportRows ? `
+  <table>
+    <thead><tr>
+      <th>Date</th><th>From</th><th>To</th><th>Time</th><th>Vehicle</th><th>Company</th>
+    </tr></thead>
+    <tbody>${transportRows}</tbody>
+  </table>` : '<p style="color:#999;font-size:12px;padding-left:8px">No transportation details recorded.</p>'}
+</div>
+
+<!-- SECTION 6: PAX Breakdown -->
+<div class="sec">
+  <div class="sec-title">Section 6 — Pilgrim Count</div>
+  <div class="pax-row">
+    <div class="pax-box">
+      <div class="pax-num">${v.paxMen||0}</div>
+      <div class="pax-lbl">Total Males</div>
+    </div>
+    <div class="pax-box">
+      <div class="pax-num">${v.paxWomen||0}</div>
+      <div class="pax-lbl">Total Females</div>
+    </div>
+    <div class="pax-box" style="background:#111">
+      <div class="pax-num" style="color:#BE9C5C">${v.paxTotal||0}</div>
+      <div class="pax-lbl" style="color:#888">Grand Total</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>Issued by ${s.companyName||'Ofoq Al Diafah'}${s.companyPhone?' · '+s.companyPhone:''}</span>
+  <span>Voucher Ref: ${v.ref}</span>
+</div>
+
+<script>window.print();<\/script>
+</body></html>`);
   win.document.close();
 }
 
