@@ -165,7 +165,7 @@ body.sidebar-min #sidebar-min-btn svg { transform: scaleX(-1); }
   height: 60px; background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center;
-  padding: 0 215px 0 28px; gap: 14px;
+  padding: 0 215px 0 132px; gap: 14px;
   position: sticky; top: 0; z-index: 5;
 }
 .topbar-title { font-size: 1.1429rem; font-weight: 500; flex: 1; color: var(--ink); }
@@ -468,7 +468,7 @@ body:has(#page-transport-report.active) {
 [dir="rtl"] #sidebar { left: auto; right: 0; }
 [dir="rtl"] #main { margin-left: 0; margin-right: 240px; }
 [dir="rtl"] #font-controls { right: auto; left: 64px; }
-[dir="rtl"] .topbar { padding: 0 28px 0 215px; }
+[dir="rtl"] .topbar { padding: 0 132px 0 215px; }
 [dir="rtl"] #global-notif-btn { right: auto; left: 18px; }
 [dir="rtl"] #sticky-ticket-btn { right: auto; left: 24px; }
 [dir="rtl"] #sticky-ticket-tooltip { right: auto; left: 86px; }
@@ -478,8 +478,8 @@ body:has(#page-transport-report.active) {
 /* ─── In-app nav bar ────────────────────────────────────── */
 #app-nav-bar {
   position: fixed;
-  top: 10px;
-  left: 258px;
+  top: 13px;          /* vertically centred in the 60 px topbar */
+  left: 252px;        /* 12 px clear of the 240 px sidebar edge  */
   z-index: 21;
   display: flex;
   gap: 2px;
@@ -489,9 +489,9 @@ body:has(#page-transport-report.active) {
   padding: 3px 6px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.10);
 }
-[dir="rtl"] #app-nav-bar { left: auto; right: 258px; }
-body.sidebar-min #app-nav-bar { left: 68px; }
-[dir="rtl"] body.sidebar-min #app-nav-bar { left: auto; right: 68px; }
+[dir="rtl"] #app-nav-bar { left: auto; right: 252px; }
+body.sidebar-min #app-nav-bar { left: 62px; }
+[dir="rtl"] body.sidebar-min #app-nav-bar { left: auto; right: 62px; }
 #app-nav-bar button {
   width: 28px; height: 28px;
   border: none; background: none; border-radius: 999px;
@@ -501,6 +501,9 @@ body.sidebar-min #app-nav-bar { left: 68px; }
 }
 #app-nav-bar button:hover:not(:disabled) { background: var(--cream-dark); color: var(--ink); }
 #app-nav-bar button:disabled { opacity: 0.3; cursor: default; }
+/* Flip chevrons in RTL so ‹ means back and › means forward visually */
+[dir="rtl"] #nav-btn-back svg,
+[dir="rtl"] #nav-btn-fwd  svg { transform: scaleX(-1); }
 @media print { #app-nav-bar { display: none !important; } }
 @media (max-width: 768px) { #app-nav-bar { display: none !important; } }
 
