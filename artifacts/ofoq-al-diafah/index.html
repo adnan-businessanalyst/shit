@@ -8426,18 +8426,17 @@ function viewVoucherDetail(id) {
   // ── Step pipeline ─────────────────────────────────────────
   const stepDefs = [
     { key:'create',  icon:'📋', label:'Voucher Created',      sub:'Group details & itinerary' },
-    { key:'avail',   icon:'🏨', label:'Availability Confirmed', sub:'Rooms, meals & bus tours' },
     { key:'payment', icon:'💳', label:'Payment Received',      sub:'Receipt attached' },
     { key:'share',   icon:'✉',  label:'Voucher Shared',        sub:'Sent to client' },
   ];
   const stepsHtml = stepDefs.map((st, i) => {
-    const done    = !cancelled && (stepIdx >= i || (i===3 && v.sharedAt));
+    const done    = !cancelled && (stepIdx >= i || (i===2 && v.sharedAt));
     const current = !cancelled && stepIdx === i - 1 && i > 0;
     const bg    = done ? 'var(--gold)' : current ? 'var(--gold-light)' : 'var(--cream-dark)';
     const color = done ? '#010101'     : current ? 'var(--gold-dark)'  : 'var(--ink-muted)';
     const border= done ? 'var(--gold)' : current ? 'var(--gold)'       : 'var(--border)';
     return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;position:relative">
-      ${i<3?`<div style="position:absolute;top:18px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:${done&&stepIdx>i?'var(--gold)':'var(--border)'};z-index:0"></div>`:''}
+      ${i<2?`<div style="position:absolute;top:18px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:${done&&stepIdx>i?'var(--gold)':'var(--border)'};z-index:0"></div>`:''}
       <div style="width:36px;height:36px;border-radius:50%;background:${bg};border:2px solid ${border};display:flex;align-items:center;justify-content:center;font-size:1.1429rem;position:relative;z-index:1">${done&&!cancelled?'✓':st.icon}</div>
       <div style="font-size:0.7857rem;font-weight:${done?'600':'400'};color:${color};text-align:center;margin-top:6px;line-height:1.3">${st.label}</div>
       <div style="font-size:0.7143rem;color:var(--ink-muted);text-align:center;margin-top:2px">${st.sub}</div>
@@ -8576,19 +8575,10 @@ function viewVoucherDetail(id) {
 
   if (!cancelled) {
     if (s === 'Tentative – Pending Reservation') {
-      // Reservation is ready if inline builder has any items saved
-      const hasInlineRes = (v.resRooms?.length || v.resMeals?.length || v.resTours?.length);
       btns += `<button class="btn btn-xs btn-red" onclick="cancelVoucher('${v.id}')">Cancel Voucher</button>`;
-      btns += `<button class="btn btn-gold" onclick="openInlineReservation('${v.id}')">
-        🏨 ${hasInlineRes ? 'Edit' : 'Build'} Reservation (Rooms · Meals · Tours)
+      btns += `<button class="btn btn-green" onclick="advanceVoucherStatus('${v.id}','Tentative – Pending Payment')">
+        ✓ Request Payment
       </button>`;
-      if (hasInlineRes) {
-        btns += `<button class="btn btn-green" onclick="advanceVoucherStatus('${v.id}','Tentative – Pending Payment')">
-          ✓ Availability Confirmed — Request Payment
-        </button>`;
-      } else {
-        btns += `<button class="btn" style="opacity:0.45;cursor:not-allowed" disabled title="Build the reservation first">✓ Availability Confirmed (build reservation first)</button>`;
-      }
     } else if (s === 'Tentative – Pending Payment') {
       btns += `<button class="btn btn-xs btn-red" onclick="cancelVoucher('${v.id}')">Cancel Voucher</button>`;
       btns += `<button class="btn btn-sm" onclick="openPaymentModal('${v.id}')">💳 ${v.paymentReceipt?'Update':'Attach'} Payment Receipt</button>`;
