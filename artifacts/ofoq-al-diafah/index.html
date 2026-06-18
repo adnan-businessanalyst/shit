@@ -2226,6 +2226,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">شركتنا</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التصريح</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم التأكيد</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap"></th>
               </tr>
             </thead>
             <tbody id="tr-rep-body"></tbody>
@@ -14166,7 +14167,7 @@ function getTransportReportRows() {
       }
     });
 
-    (v.transport || []).forEach(t => {
+    (v.transport || []).forEach((t, tIdx) => {
       // Backward compat: old data uses `from`/`to`, new uses fromCity/fromArea/toCity/toArea
       const fromCity = t.fromCity || t.from || '';
       const fromArea = t.fromArea || '';
@@ -14197,6 +14198,7 @@ function getTransportReportRows() {
         permit:       t.permit      || '',
         conf:         t.conf        || '',
         vId:          v.id,
+        tIdx,
       });
     });
   });
@@ -14276,6 +14278,12 @@ function renderTransportReport() {
   const missingCell = v => !v || (typeof v==='string' && !v.trim());
   const cell = (v, warn) => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap${warn&&missingCell(v)?';color:var(--red)':''}">${v || (warn ? '<span style="color:var(--red);font-size:0.7857rem">⚠ ناقص</span>' : '—')}</td>`;
   const plainCell = v => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${v||'—'}</td>`;
+  const editCell = (val, field, vId, tIdx) => {
+    const id = `tr-edit-${vId}-${tIdx}-${field}`;
+    const safeVal = (val||'').replace(/"/g,'&quot;');
+    const missing = !val || !String(val).trim();
+    return `<td style="padding:5px 8px;border-bottom:1px solid var(--border)"><input id="${id}" type="text" value="${safeVal}" placeholder="—" onkeydown="if(event.key==='Enter')saveTransportRowEdit('${vId}',${tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid ${missing?'var(--red)':'var(--border)'};border-radius:var(--r-sm);background:transparent;color:var(--ink);width:110px"></td>`;
+  };
 
   const natCell = natMap => {
     const entries = Object.entries(natMap).sort((a,b)=>b[1]-a[1]);
@@ -14311,15 +14319,36 @@ function renderTransportReport() {
       ${plainCell(r.toArea)}
       ${plainCell(r.time)}
       ${cell(r.transCompany, false)}
-      ${cell(r.driver,  true)}
-      ${cell(r.dphone,  true)}
-      ${cell(r.vehicle, true)}
-      ${cell(r.plate,   true)}
+      ${editCell(r.driver,  'driver',  r.vId, r.tIdx)}
+      ${editCell(r.dphone,  'dphone',  r.vId, r.tIdx)}
+      ${editCell(r.vehicle, 'vehicle', r.vId, r.tIdx)}
+      ${editCell(r.plate,   'plate',   r.vId, r.tIdx)}
       ${plainCell(r.ourCompany)}
       ${cell(r.permit,  true)}
       ${plainCell(r.conf)}
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap">
+        <button class="btn btn-xs btn-gold" onclick="saveTransportRowEdit('${r.vId}',${r.tIdx})" title="حفظ التعديلات">💾</button>
+      </td>
     </tr>
   `).join('');
+}
+
+function saveTransportRowEdit(vId, tIdx) {
+  const v = vouchers.find(x => x.id === vId);
+  if (!v || !v.transport || !v.transport[tIdx]) return;
+  const t = v.transport[tIdx];
+  const pfx = `tr-edit-${vId}-${tIdx}`;
+  const driver  = document.getElementById(pfx+'-driver')?.value.trim();
+  const dphone  = document.getElementById(pfx+'-dphone')?.value.trim();
+  const vehicle = document.getElementById(pfx+'-vehicle')?.value.trim();
+  const plate   = document.getElementById(pfx+'-plate')?.value.trim();
+  if (driver  !== undefined) t.driver  = driver;
+  if (dphone  !== undefined) t.dphone  = dphone;
+  if (vehicle !== undefined) t.vehicle = vehicle;
+  if (plate   !== undefined) t.plate   = plate;
+  persist();
+  renderTransportReport();
+  toast('تم حفظ بيانات السائق ✓');
 }
 
 function exportTransportReportCSV() {
