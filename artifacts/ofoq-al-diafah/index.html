@@ -8462,8 +8462,11 @@ function viewVoucherDetail(id) {
         <span style="font-weight:600">${dest}</span>
         ${t.time?`<span style="color:var(--ink-muted);margin-right:auto">${t.time}</span>`:'<span style="margin-right:auto"></span>'}
         ${t.vehicle?`<span class="badge" style="background:var(--cream-dark)">${t.vehicle}</span>`:''}
-        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp('${v.id}',${tIdx})" title="إرسال واتساب">
-          💬 واتساب
+        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp1('${v.id}',${tIdx})" title="رسالة واتساب 1" style="font-size:0.7143rem">
+          💬 رسالة 1
+        </button>
+        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp2('${v.id}',${tIdx})" title="رسالة واتساب 2" style="font-size:0.7143rem;opacity:0.85">
+          💬 رسالة 2
         </button>
       </div>
       ${t.permit?`<div style="margin-top:4px;font-size:0.7857rem;color:var(--ink-muted)">امر التفويج: <strong>${t.permit}</strong></div>`:''}
@@ -10745,7 +10748,45 @@ function shareVoucherWhatsApp(id) {
   toast('Opening WhatsApp...');
 }
 
-function sendTransportWhatsApp(vId, tIdx) {
+function sendTransportWhatsApp1(vId, tIdx) {
+  const v = vouchers.find(x => x.id === vId);
+  if (!v) return;
+  const t = (v.transportRows || [])[tIdx];
+  if (!t) return;
+  const s = loadSettings();
+
+  const itinerary = [[t.fromCity, t.fromPort].filter(Boolean).join(' '), [t.toCity, t.toPort].filter(Boolean).join(' ')].filter(Boolean).join(' ← ') || '—';
+  const company   = t.ourCompany || s.companyName || 'أفق الضيافة';
+
+  const lines = [
+    `🚌 *أمر نقل — ${v.ref}*`,
+    ``,
+    `اسم العميل: ${v.agency || '—'}`,
+    `رقم الحجز: ${v.agencyRef || v.ref || '—'}`,
+    `خطة السير: ${itinerary}`,
+    `المورد: ${t.transCompany || '—'}`,
+    `الرقم المرجعي: ${t.conf || '—'}`,
+    `الجنسية: ${v.nationality || '—'}`,
+    `التاريخ: ${fmtDate(t.date) || '—'}`,
+    `الوقت: ${t.time || '—'}`,
+    `السائق: ${t.driver || '—'}`,
+    `رقم الهوية: —`,
+    `رقم الهاتف: ${t.dphone || '—'}`,
+    `عدد الركاب: ${v.paxTotal || '—'}`,
+    `نوع المركبة: ${t.vehicle || '—'}`,
+    `رقم اللوحة: ${t.plate || '—'}`,
+    `اسم الشركة: ${company}`,
+    `امر التفويج: ${t.permit || '—'}`,
+  ];
+
+  const msg = encodeURIComponent(lines.join('\n'));
+  const phone = (t.dphone || v.leaderPhone || '').replace(/\D/g, '');
+  const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url, '_blank');
+  toast('فتح واتساب — رسالة 1...');
+}
+
+function sendTransportWhatsApp2(vId, tIdx) {
   const v = vouchers.find(x => x.id === vId);
   if (!v) return;
   const t = (v.transportRows || [])[tIdx];
@@ -10775,7 +10816,7 @@ function sendTransportWhatsApp(vId, tIdx) {
   const phone = (v.leaderPhone || '').replace(/\D/g, '');
   const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
   window.open(url, '_blank');
-  toast('فتح واتساب...');
+  toast('فتح واتساب — رسالة 2...');
 }
 
 function confirmVoucher(id) {
