@@ -2138,11 +2138,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
           <div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">من تاريخ</div>
-            <input id="tr-rep-from" type="date" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            <input id="tr-rep-from" type="date" onchange="renderTransportReport()" oninput="document.getElementById('tr-rep-from-h').textContent=fmtHijri(this.value)||'';renderTransportReport();" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            <div id="tr-rep-from-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:3px;direction:rtl;min-height:1.1em"></div>
           </div>
           <div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">إلى تاريخ</div>
-            <input id="tr-rep-to" type="date" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            <input id="tr-rep-to" type="date" onchange="renderTransportReport()" oninput="document.getElementById('tr-rep-to-h').textContent=fmtHijri(this.value)||'';renderTransportReport();" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            <div id="tr-rep-to-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:3px;direction:rtl;min-height:1.1em"></div>
           </div>
           <div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">نوع المسار</div>
@@ -4546,8 +4548,50 @@ function applyRoleUI() {
    UTILITIES
 ═══════════════════════════════════════════════════════ */
 function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
-function fmtDate(d) { if(!d) return '—'; const dt=new Date(d); return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDate(d) { if(!d) return '—'; const dt=new Date(d+'T12:00:00'); return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
 function today() { return new Date().toISOString().split('T')[0]; }
+
+/* ── Hijri (Islamic lunar) calendar conversion ─────────────────────
+   Uses the tabular Islamic calendar algorithm (Gregorian → JDN → Hijri).
+   Accurate to within 1-2 days of the observed crescent moon.           */
+function toHijri(isoDate) {
+  if (!isoDate) return null;
+  const d = new Date((isoDate+'').slice(0,10) + 'T12:00:00');
+  if (isNaN(d)) return null;
+  const gY = d.getFullYear(), gM = d.getMonth()+1, gD = d.getDate();
+  const a = Math.floor((14-gM)/12), y = gY+4800-a, m = gM+12*a-3;
+  const jdn = gD + Math.floor((153*m+2)/5) + 365*y + Math.floor(y/4)
+    - Math.floor(y/100) + Math.floor(y/400) - 32045;
+  const l  = jdn - 1948440 + 10632;
+  const n  = Math.floor((l-1)/10631);
+  const l2 = l - 10631*n + 354;
+  const j  = Math.floor((10985-l2)/5316)*Math.floor((50*l2)/17719)
+    + Math.floor(l2/5670)*Math.floor((43*l2)/15238);
+  const l3 = l2 - Math.floor((30-j)/15)*Math.floor((17719*j)/50)
+    - Math.floor(j/16)*Math.floor((15238*j)/43) + 29;
+  const hM = Math.floor((24*l3)/709);
+  const hD = l3 - Math.floor((709*hM)/24);
+  const hY = 30*n + j - 30;
+  return { y:hY, m:hM, d:hD };
+}
+const HIJRI_MONTHS = ['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+function fmtHijri(isoDate) {
+  const h = toHijri(isoDate);
+  if (!h) return '';
+  return `${h.d} ${HIJRI_MONTHS[h.m-1]||''} ${h.y} هـ`;
+}
+/** Returns Gregorian date with Hijri on a second line — for HTML display contexts. */
+function fmtDateDual(isoDate) {
+  if (!isoDate) return '—';
+  const hijri = fmtHijri(isoDate);
+  return fmtDate(isoDate) + (hijri ? `<span style="display:block;font-size:0.7857rem;color:var(--gold-dark);direction:rtl;margin-top:1px">${hijri}</span>` : '');
+}
+/** Returns "DD Mon YYYY | D Month YYYY هـ" — for plain-text contexts (WhatsApp, print). */
+function fmtDateBilingual(isoDate) {
+  if (!isoDate) return '—';
+  const h = fmtHijri(isoDate);
+  return fmtDate(isoDate) + (h ? ' | ' + h : '');
+}
 function toast(msg, ok=true) {
   const t=document.getElementById('toast');
   document.getElementById('toast-msg').textContent=msg;
@@ -4837,8 +4881,10 @@ const DEFAULT_DASH = [
 let dashEditMode = false;
 
 function renderDashboard() {
-  document.getElementById('dash-date').textContent =
-    new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const _todayISO = today();
+  document.getElementById('dash-date').innerHTML =
+    new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) +
+    ` &nbsp;·&nbsp; <span style="color:var(--gold-dark);font-weight:600;direction:rtl">${fmtHijri(_todayISO)}</span>`;
 
   const cfg = getDashConfig() || DEFAULT_DASH;
   const grid = document.getElementById('dash-widget-grid');
@@ -8551,6 +8597,7 @@ function viewVoucherDetail(id) {
     `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.8571rem">
       <span>🏨 ${h.hotelName||h.city||'—'}</span>
       <span style="color:var(--ink-muted)">${fmtDate(h.checkIn)} – ${fmtDate(h.checkOut)}</span>
+      <div style="font-size:0.7143rem;color:var(--gold-dark);direction:rtl;margin-top:2px">${fmtHijri(h.checkIn)} – ${fmtHijri(h.checkOut)}</div>
     </div>`
   ).join('');
 
@@ -8559,7 +8606,7 @@ function viewVoucherDetail(id) {
     const pickup = [t.fromCity, t.fromPort].filter(Boolean).join(' · ') || t.from || '—';
     return `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px;font-size:0.8571rem;background:var(--surface)">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="color:var(--ink-muted);min-width:90px">${fmtDate(t.date)||'—'}</span>
+        <span style="color:var(--ink-muted)"><span style="display:block">${fmtDate(t.date)||'—'}</span><span style="font-size:0.7143rem;color:var(--gold-dark);direction:rtl">${fmtHijri(t.date)}</span></span>
         <span style="font-weight:600">${pickup}</span>
         <span style="color:var(--ink-muted)">→</span>
         <span style="font-weight:600">${dest}</span>
@@ -8641,6 +8688,7 @@ function viewVoucherDetail(id) {
             onkeydown="if(event.key==='Enter')saveFlightEdit('${v.id}')">
         </div>
         <div style="font-size:0.8571rem;color:var(--ink-muted)">${fmtDate(v.arrDate)}${v.arrTime?' · '+v.arrTime:''}${v.arrAirport?' · '+v.arrAirport:''}</div>
+        <div style="font-size:0.7143rem;color:var(--gold-dark);direction:rtl;margin-top:2px">${fmtHijri(v.arrDate)}</div>
       </div>
       <div style="background:var(--red-light);border-radius:var(--r-sm);padding:12px 14px">
         <div style="font-size:0.7143rem;font-weight:700;color:var(--red);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px">✈ Departure</div>
@@ -8650,6 +8698,7 @@ function viewVoucherDetail(id) {
             onkeydown="if(event.key==='Enter')saveFlightEdit('${v.id}')">
         </div>
         <div style="font-size:0.8571rem;color:var(--ink-muted)">${fmtDate(v.depDate)}${v.depTime?' · '+v.depTime:''}${v.depAirport?' · '+v.depAirport:''}</div>
+        <div style="font-size:0.7143rem;color:var(--gold-dark);direction:rtl;margin-top:2px">${fmtHijri(v.depDate)}</div>
       </div>
     </div>
     <div style="margin-bottom:16px">
@@ -9576,8 +9625,8 @@ function printVoucher(id) {
         <div class="kv-grid">
           ${hkv('Hotel Name','اسم الفندق', h.hotelName||'—')}
           ${hkv('City','المدينة', h.city||'—')}
-          ${hkv('Check-in','تاريخ الوصول', fmtDate(h.checkIn)||'—')}
-          ${hkv('Check-out','تاريخ المغادرة', fmtDate(h.checkOut)||'—')}
+          ${hkv('Check-in','تاريخ الوصول', fmtDateBilingual(h.checkIn))}
+          ${hkv('Check-out','تاريخ المغادرة', fmtDateBilingual(h.checkOut))}
           ${hkv('Nights','عدد الليالي', nights)}
           ${h.roomType ? hkv('Room Type','نوع الغرفة', h.roomType) : ''}
         </div>
@@ -9588,7 +9637,7 @@ function printVoucher(id) {
   const trRows = (v.transportRows||[]);
   const transportRows = trRows.map(t => `
     <tr>
-      <td>${fmtDate(t.date)||'—'}</td>
+      <td>${fmtDateBilingual(t.date)}</td>
       <td>${[t.fromCity, t.fromPort].filter(Boolean).join(' · ')||'—'}</td>
       <td>${[t.toCity, t.toPort].filter(Boolean).join(' · ')||'—'}</td>
       <td>${t.time||'—'}</td>
@@ -9692,7 +9741,7 @@ function printVoucher(id) {
   <div class="sec-title"><span class="en">Section 2 — Arrival Details</span><span class="ar">تفاصيل الوصول — القسم ٢</span></div>
   <div class="kv-grid">
     ${kv('Flight Number','رقم الرحلة', v.arrFlight||'—')}
-    ${kv('Arrival Date','تاريخ الوصول', fmtDate(v.arrDate)||'—')}
+    ${kv('Arrival Date','تاريخ الوصول', fmtDateBilingual(v.arrDate))}
     ${kv('Arrival Time','وقت الوصول', v.arrTime||'—')}
     ${kv('Airport / Port','المطار / المنفذ', v.arrAirport||'—')}
   </div>
@@ -9703,7 +9752,7 @@ function printVoucher(id) {
   <div class="sec-title"><span class="en">Section 3 — Departure Details</span><span class="ar">تفاصيل المغادرة — القسم ٣</span></div>
   <div class="kv-grid">
     ${kv('Flight Number','رقم الرحلة', v.depFlight||'—')}
-    ${kv('Departure Date','تاريخ المغادرة', fmtDate(v.depDate)||'—')}
+    ${kv('Departure Date','تاريخ المغادرة', fmtDateBilingual(v.depDate))}
     ${kv('Departure Time','وقت المغادرة', v.depTime||'—')}
     ${kv('Airport / Port','المطار / المنفذ', v.depAirport||'—')}
   </div>
@@ -13546,7 +13595,8 @@ function enterApp() {
   applyRoleUI();
   checkOnboarding();
   checkBackupReminder();
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('dash-date').innerHTML = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) +
+    ` &nbsp;·&nbsp; <span style="color:var(--gold-dark);font-weight:600;direction:rtl">${fmtHijri(today())}</span>`;
   updateLogCount('inv');
   updateLogCount('vou');
 }
@@ -14719,7 +14769,7 @@ function renderTransportReport() {
       ${col('natMap',      natEditCell(r.natMap, r.paxTotal, r.vId, r.tIdx))}
       ${col('catLabel',    `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>`)}
       ${col('flightNo',    (r.cat==='arrival'||r.cat==='departure') ? editCell(r.flightNo,'flightNo',r.vId,r.tIdx) : `<td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--ink-muted);font-size:0.85em">N/A</td>`)}
-      ${col('date',        `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>`)}
+      ${col('date',        `<td style="padding:9px 12px;border-bottom:1px solid var(--border)">${fmtDateDual(r.date)}</td>`)}
       ${col('fromCity',    plainCell(r.fromCity))}
       ${col('fromPort',    plainCell(r.fromPort))}
       ${col('toCity',      plainCell(r.toCity))}
