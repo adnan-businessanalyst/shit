@@ -2501,6 +2501,17 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
           </div>
 
+          <!-- Our Companies -->
+          <div style="grid-column:1/-1">
+            <div class="form-section-title" style="margin-bottom:6px">شركتنا — Our Companies</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:10px">تظهر في قائمة "شركتنا" عند إدخال تفاصيل النقل وفي تقرير النقل</div>
+            <div id="set-ourCompanies-list" style="margin-bottom:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>
+            <div style="display:flex;gap:6px;max-width:400px">
+              <input id="set-ourCompanies-new" type="text" placeholder="مثال: Ofoq Hospitality" style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('ourCompanies')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('ourCompanies')">+ إضافة</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -7878,9 +7889,8 @@ function addTripRow(category, prefill) {
       <div>
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">شركتنا</div>
         <select id="tr-ourCompany-${idx}" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-          <option value="">—</option>
-          <option value="أفق">أفق</option>
-          <option value="معاد">معاد</option>
+          <option value="">— اختر الشركة —</option>
+          ${getLookupList('ourCompanies').map(c=>`<option value="${c}">${c}</option>`).join('')}
         </select>
       </div>
       <div>
@@ -14323,7 +14333,7 @@ function renderTransportReport() {
       ${editCell(r.dphone,  'dphone',  r.vId, r.tIdx)}
       ${editCell(r.vehicle, 'vehicle', r.vId, r.tIdx)}
       ${editCell(r.plate,   'plate',   r.vId, r.tIdx)}
-      ${plainCell(r.ourCompany)}
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)"><select id="tr-edit-${r.vId}-${r.tIdx}-ourCompany" onchange="saveTransportRowEdit('${r.vId}',${r.tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink);max-width:150px"><option value="">—</option>${getLookupList('ourCompanies').map(c=>`<option value="${c}"${r.ourCompany===c?' selected':''}>${c}</option>`).join('')}</select></td>
       ${cell(r.permit,  true)}
       ${plainCell(r.conf)}
       <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap">
@@ -14338,14 +14348,16 @@ function saveTransportRowEdit(vId, tIdx) {
   if (!v || !v.transport || !v.transport[tIdx]) return;
   const t = v.transport[tIdx];
   const pfx = `tr-edit-${vId}-${tIdx}`;
-  const driver  = document.getElementById(pfx+'-driver')?.value.trim();
-  const dphone  = document.getElementById(pfx+'-dphone')?.value.trim();
-  const vehicle = document.getElementById(pfx+'-vehicle')?.value.trim();
-  const plate   = document.getElementById(pfx+'-plate')?.value.trim();
-  if (driver  !== undefined) t.driver  = driver;
-  if (dphone  !== undefined) t.dphone  = dphone;
-  if (vehicle !== undefined) t.vehicle = vehicle;
-  if (plate   !== undefined) t.plate   = plate;
+  const driver     = document.getElementById(pfx+'-driver')?.value.trim();
+  const dphone     = document.getElementById(pfx+'-dphone')?.value.trim();
+  const vehicle    = document.getElementById(pfx+'-vehicle')?.value.trim();
+  const plate      = document.getElementById(pfx+'-plate')?.value.trim();
+  const ourCompany = document.getElementById(pfx+'-ourCompany')?.value;
+  if (driver     !== undefined) t.driver     = driver;
+  if (dphone     !== undefined) t.dphone     = dphone;
+  if (vehicle    !== undefined) t.vehicle    = vehicle;
+  if (plate      !== undefined) t.plate      = plate;
+  if (ourCompany !== undefined) t.ourCompany = ourCompany;
   persist();
   renderTransportReport();
   toast('تم حفظ بيانات السائق ✓');
@@ -14909,6 +14921,7 @@ const LOOKUP_DEFAULTS = {
   cities:        ['مكة المكرمة','المدينة المنورة','جدة','الطائف','الرياض','تبوك','أبها','الدمام','أخرى'],
   areas:         ['الحرم المكي','العزيزية','المعابدة','النزهة','الشوقية','أجياد','الجعرانة','المطار','الحرم النبوي','قباء','العوالي','المدينة المنورة المركز','أخرى'],
   transportCompanies: [],
+  ourCompanies: ['Maad', 'Ofoq Hospitality'],
 };
 
 function getLookups() {
@@ -14986,7 +14999,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds','ports','cities','areas','transportCompanies'].forEach(k => renderLookupList(k));
+  ['views','types','cancellations','refunds','ports','cities','areas','transportCompanies','ourCompanies'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
