@@ -9448,21 +9448,27 @@ function printVoucher(id) {
   if (!v) return;
   const s = loadSettings();
 
-  // ── Section 4: Hotels ──────────────────────────────────
+  // ── Section 4: Hotels (bilingual) ─────────────────────
   const hotelSections = (v.hotelConfs||[]).map((h, i) => {
     const nights = (h.checkIn && h.checkOut)
       ? Math.round((new Date(h.checkOut)-new Date(h.checkIn))/(1000*60*60*24))
       : '—';
+    // kv helper not yet defined here, inline it
+    const hkv = (en, ar, val) =>
+      `<div class="kv"><span class="kv-en">${en}</span><span class="kv-ar">${ar}</span><span class="kv-val">${val}</span></div>`;
     return `
       <div class="sub-section">
-        <div class="sub-title">Hotel ${i+1}</div>
+        <div class="sub-title">
+          <span class="en">Hotel ${i+1}</span>
+          <span class="ar">الفندق ${['الأول','الثاني','الثالث','الرابع','الخامس'][i]||i+1}</span>
+        </div>
         <div class="kv-grid">
-          <div class="kv"><span class="kv-label">Hotel Name</span><span class="kv-val">${h.hotelName||'—'}</span></div>
-          <div class="kv"><span class="kv-label">City</span><span class="kv-val">${h.city||'—'}</span></div>
-          <div class="kv"><span class="kv-label">Check-in</span><span class="kv-val">${fmtDate(h.checkIn)||'—'}</span></div>
-          <div class="kv"><span class="kv-label">Check-out</span><span class="kv-val">${fmtDate(h.checkOut)||'—'}</span></div>
-          <div class="kv"><span class="kv-label">Nights</span><span class="kv-val">${nights}</span></div>
-          ${h.roomType?`<div class="kv"><span class="kv-label">Room Type</span><span class="kv-val">${h.roomType}</span></div>`:''}
+          ${hkv('Hotel Name','اسم الفندق', h.hotelName||'—')}
+          ${hkv('City','المدينة', h.city||'—')}
+          ${hkv('Check-in','تاريخ الوصول', fmtDate(h.checkIn)||'—')}
+          ${hkv('Check-out','تاريخ المغادرة', fmtDate(h.checkOut)||'—')}
+          ${hkv('Nights','عدد الليالي', nights)}
+          ${h.roomType ? hkv('Room Type','نوع الغرفة', h.roomType) : ''}
         </div>
       </div>`;
   }).join('');
@@ -9479,45 +9485,61 @@ function printVoucher(id) {
       <td>${t.transCompany||t.ourCompany||'—'}</td>
     </tr>`).join('');
 
+  // helper: bilingual KV cell
+  const kv = (en, ar, val) =>
+    `<div class="kv"><span class="kv-en">${en}</span><span class="kv-ar">${ar}</span><span class="kv-val">${val}</span></div>`;
+
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Voucher ${v.ref}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;max-width:860px;margin:0 auto;padding:36px 32px;color:#111;font-size:13px;line-height:1.5}
+  body{font-family:'Cairo','Segoe UI',Arial,sans-serif;max-width:870px;margin:0 auto;padding:36px 32px;color:#111;font-size:13px;line-height:1.55}
   /* ── Header ── */
-  .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #BE9C5C;padding-bottom:18px;margin-bottom:22px}
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #BE9C5C;padding-bottom:18px;margin-bottom:24px}
   .hd-left .co{font-size:22px;font-weight:700;color:#BE9C5C;letter-spacing:.5px}
-  .hd-left .co-ar{font-size:14px;color:#555;margin-top:2px}
+  .hd-left .co-ar{font-size:15px;color:#444;margin-top:3px;font-weight:600;direction:rtl}
   .hd-left .co-info{font-size:11px;color:#888;margin-top:6px}
   .hd-right{text-align:right}
   .ref-box{background:#111;color:#BE9C5C;font-size:17px;font-weight:700;padding:7px 18px;border-radius:5px;display:inline-block;letter-spacing:.5px}
   .issued{font-size:11px;color:#888;margin-top:6px}
   /* ── Section ── */
-  .sec{margin-bottom:22px}
-  .sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#BE9C5C;background:#fdf8f2;border-left:4px solid #BE9C5C;padding:6px 10px;margin-bottom:10px}
-  .sub-section{margin-bottom:12px;padding-left:8px;border-left:2px solid #e8e0d5}
-  .sub-title{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+  .sec{margin-bottom:24px}
+  .sec-title{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;color:#BE9C5C;background:#fdf8f2;border-left:4px solid #BE9C5C;padding:7px 12px;margin-bottom:12px}
+  .sec-title .en{font-size:11px;text-transform:uppercase;letter-spacing:1px}
+  .sec-title .ar{font-size:13px;font-weight:700;direction:rtl}
+  .sub-section{margin-bottom:14px;padding:10px 12px;border:1px solid #ede6db;border-radius:5px;background:#fdfaf6}
+  .sub-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .sub-title .en{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.6px}
+  .sub-title .ar{font-size:12px;font-weight:700;color:#666;direction:rtl}
   /* ── KV grid ── */
-  .kv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 16px}
-  .kv{display:flex;flex-direction:column}
-  .kv-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
-  .kv-val{font-size:13px;font-weight:600;color:#111}
+  .kv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px}
+  .kv{display:flex;flex-direction:column;gap:1px}
+  .kv-en{font-size:9.5px;color:#aaa;text-transform:uppercase;letter-spacing:.5px}
+  .kv-ar{font-size:10.5px;color:#BE9C5C;font-weight:600;direction:rtl;text-align:right}
+  .kv-val{font-size:13px;font-weight:700;color:#111;margin-top:1px}
   /* ── Table ── */
   table{width:100%;border-collapse:collapse;font-size:12px}
-  th{background:#f5f0ea;text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#777;border-bottom:2px solid #e0d5c8}
-  td{padding:7px 10px;border-bottom:1px solid #eee;color:#222}
+  thead tr{background:#f5f0ea}
+  th{padding:7px 10px;font-size:9.5px;color:#777;border-bottom:2px solid #e0d5c8;font-weight:700}
+  th .th-en{text-transform:uppercase;letter-spacing:.5px;display:block}
+  th .th-ar{color:#BE9C5C;font-size:11px;font-weight:600;direction:rtl;display:block;margin-top:1px}
+  td{padding:7px 10px;border-bottom:1px solid #eee;color:#222;vertical-align:top}
   tr:last-child td{border-bottom:none}
   /* ── PAX summary ── */
-  .pax-row{display:flex;gap:24px;align-items:center;margin-top:4px}
-  .pax-box{background:#f5f0ea;border-radius:6px;padding:10px 20px;text-align:center}
-  .pax-num{font-size:24px;font-weight:700;color:#BE9C5C}
-  .pax-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .pax-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:4px}
+  .pax-box{background:#f5f0ea;border-radius:8px;padding:14px 24px;text-align:center;min-width:120px}
+  .pax-num{font-size:28px;font-weight:700;color:#BE9C5C}
+  .pax-en{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+  .pax-ar{font-size:11px;color:#BE9C5C;font-weight:600;direction:rtl;margin-top:2px}
   /* ── Footer ── */
-  .footer{margin-top:32px;padding-top:14px;border-top:1px solid #e0d5c8;display:flex;justify-content:space-between;font-size:10px;color:#aaa}
+  .footer{margin-top:32px;padding-top:14px;border-top:1px solid #e0d5c8;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#aaa}
+  .footer .ar{direction:rtl;font-size:11px}
   @media print{
     body{padding:14px 16px}
     @page{margin:12mm}
@@ -9536,78 +9558,86 @@ function printVoucher(id) {
   </div>
   <div class="hd-right">
     <div class="ref-box">${v.ref}</div>
-    <div class="issued">Issued: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
-    <div style="margin-top:6px;font-size:11px;font-weight:600;color:${v.status==='Confirmed'?'#1A6B3C':'#9a6a00'}">${v.status}</div>
+    <div class="issued">Issued / تاريخ الإصدار: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:${v.status==='Confirmed'?'#1A6B3C':'#9a6a00'}">${v.status}</div>
   </div>
 </div>
 
 <!-- SECTION 1: Group Information -->
 <div class="sec">
-  <div class="sec-title">Section 1 — Group Information</div>
+  <div class="sec-title"><span class="en">Section 1 — Group Information</span><span class="ar">معلومات المجموعة — القسم ١</span></div>
   <div class="kv-grid">
-    <div class="kv"><span class="kv-label">Agent Name</span><span class="kv-val">${v.agency||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Group Number</span><span class="kv-val">${v.agencyRef||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Total Mutamers (PAX)</span><span class="kv-val">${v.paxTotal||0}</span></div>
-    ${v.leaderPhone?`<div class="kv"><span class="kv-label">Leader Phone</span><span class="kv-val">${v.leaderPhone}</span></div>`:''}
-    ${v.nationality?`<div class="kv"><span class="kv-label">Nationality</span><span class="kv-val">${v.nationality}</span></div>`:''}
+    ${kv('Agent Name','اسم الوكيل', v.agency||'—')}
+    ${kv('Group Number','رقم المجموعة', v.agencyRef||'—')}
+    ${kv('Total Mutamers (PAX)','إجمالي المعتمرين', v.paxTotal||0)}
+    ${v.leaderPhone ? kv('Leader Phone','هاتف المسؤول', v.leaderPhone) : ''}
+    ${v.nationality  ? kv('Nationality','الجنسية', v.nationality)        : ''}
   </div>
 </div>
 
 <!-- SECTION 2: Arrival Details -->
 <div class="sec">
-  <div class="sec-title">Section 2 — Arrival Details</div>
+  <div class="sec-title"><span class="en">Section 2 — Arrival Details</span><span class="ar">تفاصيل الوصول — القسم ٢</span></div>
   <div class="kv-grid">
-    <div class="kv"><span class="kv-label">Flight Number</span><span class="kv-val">${v.arrFlight||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Arrival Date</span><span class="kv-val">${fmtDate(v.arrDate)||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Arrival Time</span><span class="kv-val">${v.arrTime||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Airport / Port</span><span class="kv-val">${v.arrAirport||'—'}</span></div>
+    ${kv('Flight Number','رقم الرحلة', v.arrFlight||'—')}
+    ${kv('Arrival Date','تاريخ الوصول', fmtDate(v.arrDate)||'—')}
+    ${kv('Arrival Time','وقت الوصول', v.arrTime||'—')}
+    ${kv('Airport / Port','المطار / المنفذ', v.arrAirport||'—')}
   </div>
 </div>
 
 <!-- SECTION 3: Departure Details -->
 <div class="sec">
-  <div class="sec-title">Section 3 — Departure Details</div>
+  <div class="sec-title"><span class="en">Section 3 — Departure Details</span><span class="ar">تفاصيل المغادرة — القسم ٣</span></div>
   <div class="kv-grid">
-    <div class="kv"><span class="kv-label">Flight Number</span><span class="kv-val">${v.depFlight||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Departure Date</span><span class="kv-val">${fmtDate(v.depDate)||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Departure Time</span><span class="kv-val">${v.depTime||'—'}</span></div>
-    <div class="kv"><span class="kv-label">Airport / Port</span><span class="kv-val">${v.depAirport||'—'}</span></div>
+    ${kv('Flight Number','رقم الرحلة', v.depFlight||'—')}
+    ${kv('Departure Date','تاريخ المغادرة', fmtDate(v.depDate)||'—')}
+    ${kv('Departure Time','وقت المغادرة', v.depTime||'—')}
+    ${kv('Airport / Port','المطار / المنفذ', v.depAirport||'—')}
   </div>
 </div>
 
 <!-- SECTION 4: Confirmed Hotel Information -->
 <div class="sec">
-  <div class="sec-title">Section 4 — Confirmed Hotel Information</div>
-  ${hotelSections || '<p style="color:#999;font-size:12px;padding-left:8px">No hotel information recorded.</p>'}
+  <div class="sec-title"><span class="en">Section 4 — Confirmed Hotel Information</span><span class="ar">معلومات الفندق المؤكدة — القسم ٤</span></div>
+  ${hotelSections || '<p style="color:#999;font-size:12px;padding:0 4px">No hotel information recorded. / لا توجد معلومات فندقية.</p>'}
 </div>
 
 <!-- SECTION 5: Transportation Details -->
 <div class="sec">
-  <div class="sec-title">Section 5 — Transportation Details (Itinerary)</div>
+  <div class="sec-title"><span class="en">Section 5 — Transportation Details (Itinerary)</span><span class="ar">تفاصيل المواصلات — القسم ٥</span></div>
   ${transportRows ? `
   <table>
     <thead><tr>
-      <th>Date</th><th>From</th><th>To</th><th>Time</th><th>Vehicle</th><th>Company</th>
+      <th><span class="th-en">Date</span><span class="th-ar">التاريخ</span></th>
+      <th><span class="th-en">From</span><span class="th-ar">من</span></th>
+      <th><span class="th-en">To</span><span class="th-ar">إلى</span></th>
+      <th><span class="th-en">Time</span><span class="th-ar">الوقت</span></th>
+      <th><span class="th-en">Vehicle</span><span class="th-ar">المركبة</span></th>
+      <th><span class="th-en">Company</span><span class="th-ar">الشركة</span></th>
     </tr></thead>
     <tbody>${transportRows}</tbody>
-  </table>` : '<p style="color:#999;font-size:12px;padding-left:8px">No transportation details recorded.</p>'}
+  </table>` : '<p style="color:#999;font-size:12px;padding:0 4px">No transportation details recorded. / لا توجد تفاصيل مواصلات.</p>'}
 </div>
 
 <!-- SECTION 6: PAX Breakdown -->
 <div class="sec">
-  <div class="sec-title">Section 6 — Pilgrim Count</div>
+  <div class="sec-title"><span class="en">Section 6 — Pilgrim Count</span><span class="ar">إحصاء الحجاج — القسم ٦</span></div>
   <div class="pax-row">
     <div class="pax-box">
       <div class="pax-num">${v.paxMen||0}</div>
-      <div class="pax-lbl">Total Males</div>
+      <div class="pax-en">Total Males</div>
+      <div class="pax-ar">إجمالي الذكور</div>
     </div>
     <div class="pax-box">
       <div class="pax-num">${v.paxWomen||0}</div>
-      <div class="pax-lbl">Total Females</div>
+      <div class="pax-en">Total Females</div>
+      <div class="pax-ar">إجمالي الإناث</div>
     </div>
     <div class="pax-box" style="background:#111">
       <div class="pax-num" style="color:#BE9C5C">${v.paxTotal||0}</div>
-      <div class="pax-lbl" style="color:#888">Grand Total</div>
+      <div class="pax-en" style="color:#888">Grand Total</div>
+      <div class="pax-ar" style="color:#BE9C5C">الإجمالي الكلي</div>
     </div>
   </div>
 </div>
@@ -9615,7 +9645,7 @@ function printVoucher(id) {
 <!-- FOOTER -->
 <div class="footer">
   <span>Issued by ${s.companyName||'Ofoq Al Diafah'}${s.companyPhone?' · '+s.companyPhone:''}</span>
-  <span>Voucher Ref: ${v.ref}</span>
+  <span class="ar">صادر عن أفق الضيافة · مرجع الباقة: ${v.ref}</span>
 </div>
 
 <script>window.print();<\/script>
