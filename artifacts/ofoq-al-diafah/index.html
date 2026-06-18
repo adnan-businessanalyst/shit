@@ -14321,7 +14321,7 @@ function renderTransportReport() {
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;font-weight:600">${r.paxTotal||'—'}</td>
       ${natCell(r.natMap)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:${r.flightNo?'600':'400'};color:${r.flightNo?'var(--gold-dark)':'var(--ink-muted)'}">${r.flightNo||'—'}</td>
+      ${editCell(r.flightNo, 'flightNo', r.vId, r.tIdx)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
       ${plainCell(r.fromCity)}
       ${plainCell(r.fromArea)}
@@ -14355,6 +14355,7 @@ function saveTransportRowEdit(vId, tIdx) {
   const ourCompany = document.getElementById(pfx+'-ourCompany')?.value;
   const permit     = document.getElementById(pfx+'-permit')?.value.trim();
   const conf       = document.getElementById(pfx+'-conf')?.value.trim();
+  const flightNo   = document.getElementById(pfx+'-flightNo')?.value.trim();
   if (driver     !== undefined) t.driver     = driver;
   if (dphone     !== undefined) t.dphone     = dphone;
   if (vehicle    !== undefined) t.vehicle    = vehicle;
@@ -14362,6 +14363,10 @@ function saveTransportRowEdit(vId, tIdx) {
   if (ourCompany !== undefined) t.ourCompany = ourCompany;
   if (permit     !== undefined) t.permit     = permit;
   if (conf       !== undefined) t.conf       = conf;
+  if (flightNo   !== undefined) {
+    if (t.category === 'arrival')   v.arrFlight = flightNo;
+    else if (t.category === 'departure') v.depFlight = flightNo;
+  }
   persist();
   renderTransportReport();
   toast('تم حفظ بيانات السائق ✓');
