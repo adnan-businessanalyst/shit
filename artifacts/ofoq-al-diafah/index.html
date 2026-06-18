@@ -7944,27 +7944,27 @@ function addTripRow(category, prefill) {
     const portCity = port => (port || '').replace(/\s*\(.*\)\s*$/, '').trim();
 
     if (category === 'arrival') {
-      // Arrival: FROM first hotel → TO port of entry
+      // Arrival: FROM airport (port) → TO first hotel
       const date  = document.getElementById('v-arr-date')?.value    || '';
       const port  = document.getElementById('v-arr-airport')?.value || '';
       const hots  = readHotelConfsFromForm();
       const first = hots[0];
       document.getElementById(`tr-date-${idx}`).value     = date;
-      document.getElementById(`tr-fromCity-${idx}`).value = first?.city      || '';
-      document.getElementById(`tr-fromArea-${idx}`).value = first?.hotelName || '';
-      document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
-      document.getElementById(`tr-toArea-${idx}`).value   = port;
+      document.getElementById(`tr-fromCity-${idx}`).value = portCity(port);
+      document.getElementById(`tr-fromArea-${idx}`).value = port;
+      document.getElementById(`tr-toCity-${idx}`).value   = first?.city      || '';
+      document.getElementById(`tr-toArea-${idx}`).value   = first?.hotelName || '';
     } else if (category === 'departure') {
-      // Departure: FROM last hotel → TO port of departure
+      // Departure: FROM airport (port) → TO last hotel
       const date  = document.getElementById('v-dep-date')?.value    || '';
       const port  = document.getElementById('v-dep-airport')?.value || '';
       const hots  = readHotelConfsFromForm();
       const last  = hots[hots.length - 1];
       document.getElementById(`tr-date-${idx}`).value     = date;
-      document.getElementById(`tr-fromCity-${idx}`).value = last?.city      || '';
-      document.getElementById(`tr-fromArea-${idx}`).value = last?.hotelName || '';
-      document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
-      document.getElementById(`tr-toArea-${idx}`).value   = port;
+      document.getElementById(`tr-fromCity-${idx}`).value = portCity(port);
+      document.getElementById(`tr-fromArea-${idx}`).value = port;
+      document.getElementById(`tr-toCity-${idx}`).value   = last?.city      || '';
+      document.getElementById(`tr-toArea-${idx}`).value   = last?.hotelName || '';
     }
   }
 
