@@ -14176,6 +14176,7 @@ function getTransportReportRows() {
         natMap[k] = (natMap[k] || 0) + 1;
       }
     });
+    const resolvedNatMap = v.natMapOverride || natMap;
 
     (v.transport || []).forEach((t, tIdx) => {
       // Backward compat: old data uses `from`/`to`, new uses fromCity/fromArea/toCity/toArea
@@ -14188,7 +14189,7 @@ function getTransportReportRows() {
         agency:       v.agency      || '—',
         agencyRef:    v.agencyRef   || '',
         paxTotal:     v.paxTotal    || 0,
-        natMap,
+        natMap:       resolvedNatMap,
         status:       v.status      || '',
         cat:          t.category    || '',
         catLabel:     catLabel[t.category] || t.category || '—',
@@ -14301,6 +14302,21 @@ function renderTransportReport() {
     const tags = entries.map(([k,n])=>`<span style="display:inline-flex;align-items:center;gap:3px;background:var(--cream-dark);border-radius:4px;padding:2px 6px;font-size:0.7143rem;margin:1px">${k} <strong>${n}</strong></span>`).join('');
     return `<td style="padding:9px 12px;border-bottom:1px solid var(--border);min-width:150px"><div style="display:flex;flex-wrap:wrap;gap:2px">${tags}</div></td>`;
   };
+  const natEditCell = (natMap, paxTotal, vId, tIdx) => {
+    const entries = Object.entries(natMap).sort((a,b)=>b[1]-a[1]);
+    const natTotal = entries.reduce((s,[,n])=>s+n, 0);
+    const mismatch = paxTotal && natTotal !== paxTotal;
+    const textVal = entries.map(([k,n])=>`${k}:${n}`).join(', ');
+    const safeVal = textVal.replace(/"/g,'&quot;');
+    const id = `tr-nat-${vId}-${tIdx}`;
+    return `<td style="padding:5px 8px;border-bottom:1px solid var(--border);min-width:160px">
+      <input id="${id}" type="text" value="${safeVal}" placeholder="e.g. Indonesian:10, Turkish:5"
+        title="${mismatch?'⚠ المجموع '+natTotal+' لا يساوي إجمالي الركاب '+paxTotal:''}"
+        onkeydown="if(event.key==='Enter')saveNatEdit('${vId}',${tIdx})"
+        style="font-family:inherit;font-size:0.8rem;padding:4px 7px;border:1px solid ${mismatch?'var(--amber)':'var(--border)'};border-radius:var(--r-sm);background:transparent;color:var(--ink);width:180px">
+      ${mismatch?`<div style="font-size:0.7rem;color:var(--amber);margin-top:2px">⚠ ${natTotal}/${paxTotal}</div>`:''}
+    </td>`;
+  };
 
   const tbody = document.getElementById('tr-rep-body');
   const empty = document.getElementById('tr-rep-empty');
@@ -14319,7 +14335,7 @@ function renderTransportReport() {
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>
       ${plainCell(r.agencyRef)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;font-weight:600">${r.paxTotal||'—'}</td>
-      ${natCell(r.natMap)}
+      ${natEditCell(r.natMap, r.paxTotal, r.vId, r.tIdx)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
       ${editCell(r.flightNo, 'flightNo', r.vId, r.tIdx)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
@@ -14341,6 +14357,29 @@ function renderTransportReport() {
       </td>
     </tr>
   `).join('');
+}
+
+function saveNatEdit(vId, tIdx) {
+  const v = vouchers.find(x => x.id === vId);
+  if (!v) return;
+  const input = document.getElementById(`tr-nat-${vId}-${tIdx}`);
+  if (!input) return;
+  const raw = input.value.trim();
+  const natMap = {};
+  raw.split(',').forEach(part => {
+    const m = part.trim().match(/^(.+?)\s*:\s*(\d+)$/);
+    if (m && m[1].trim()) natMap[m[1].trim()] = parseInt(m[2], 10);
+  });
+  const total = Object.values(natMap).reduce((s,n)=>s+n, 0);
+  v.natMapOverride = Object.keys(natMap).length ? natMap : undefined;
+  persist();
+  const pax = v.paxTotal || 0;
+  if (pax && total !== pax) {
+    toast(`تم الحفظ — ⚠ المجموع ${total} لا يساوي ${pax} راكب`);
+  } else {
+    toast('تم حفظ الجنسيات ✓');
+  }
+  renderTransportReport();
 }
 
 function saveTransportRowEdit(vId, tIdx) {
