@@ -15363,7 +15363,7 @@ function printTransportReport() {
     natMap:       r => Object.entries(r.natMap || {}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${k}:${n}`).join(', '),
     catLabel:     r => r.catLabel,
     flightNo:     r => r.flightNo,
-    date:         r => fmtDateDual(r.date),
+    date:         r => { const g = fmtDate(r.date)||'—'; const h = fmtHijri(r.date); return `${g}${h?`<br><span style="font-size:7pt;color:#8a6f00">${h}</span>`:''}` },
     fromCity:     r => r.fromCity,
     fromPort:     r => r.fromPort,
     toCity:       r => r.toCity,
@@ -15379,10 +15379,11 @@ function printTransportReport() {
   };
 
   const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const rawHtml = new Set(['date']);
 
   const thead = `<tr>${visCols.map(c=>`<th>${esc(c.label)}</th>`).join('')}</tr>`;
   const tbody = rows.map((r,i) =>
-    `<tr class="${i%2===0?'even':'odd'}">${visCols.map(c=>`<td>${esc(colData[c.key](r))}</td>`).join('')}</tr>`
+    `<tr class="${i%2===0?'even':'odd'}">${visCols.map(c=>`<td>${rawHtml.has(c.key) ? colData[c.key](r) : esc(colData[c.key](r))}</td>`).join('')}</tr>`
   ).join('');
 
   const dateLabel = (fromVal||toVal) ? ` · ${fromVal||''}${fromVal&&toVal?' — ':''}${toVal||''}` : '';
