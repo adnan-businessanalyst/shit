@@ -2100,6 +2100,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="topbar-sub" id="tr-report-subtitle">جميع رحلات النقل من الحجوزات</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
+        <div style="position:relative">
+          <button class="btn" onclick="openTrColPanel()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>الأعمدة</span>
+          </button>
+          <div id="tr-col-panel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,0.18);padding:12px 16px;min-width:200px;max-height:420px;overflow-y:auto"></div>
+        </div>
         <button class="btn" onclick="exportTransportReportCSV()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span>تصدير CSV</span>
@@ -2204,33 +2211,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="card" style="padding:0;overflow:hidden">
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:0.8571rem">
-            <thead>
-              <tr style="background:var(--cream-dark);text-align:start">
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المرجع</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">شركتنا</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اسم العميل</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم المجموعة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم العملية</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">عدد الركاب</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الجنسيات</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المسار</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم الرحلة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التاريخ</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">منفذ المغادرة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">مدينة المغادرة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">منفذ الوصول</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">مدينة الوصول</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الوقت</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">شركة النقل</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">السائق</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">هاتف</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المركبة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اللوحة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التصريح</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم التأكيد</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap"></th>
-              </tr>
-            </thead>
+            <thead id="tr-rep-head"></thead>
             <tbody id="tr-rep-body"></tbody>
           </table>
         </div>
@@ -14248,6 +14229,65 @@ function getTransportReportRows() {
   return rows;
 }
 
+const TR_COLUMNS = [
+  { key:'ref',          label:'المرجع' },
+  { key:'ourCompany',   label:'شركتنا' },
+  { key:'agency',       label:'اسم العميل' },
+  { key:'agencyRef',    label:'رقم المجموعة' },
+  { key:'opNum',        label:'رقم العملية' },
+  { key:'paxTotal',     label:'عدد الركاب' },
+  { key:'natMap',       label:'الجنسيات' },
+  { key:'catLabel',     label:'المسار' },
+  { key:'flightNo',     label:'رقم الرحلة' },
+  { key:'date',         label:'التاريخ' },
+  { key:'fromCity',     label:'منفذ المغادرة' },
+  { key:'fromArea',     label:'مدينة المغادرة' },
+  { key:'toCity',       label:'منفذ الوصول' },
+  { key:'toArea',       label:'مدينة الوصول' },
+  { key:'time',         label:'الوقت' },
+  { key:'transCompany', label:'شركة النقل' },
+  { key:'driver',       label:'السائق' },
+  { key:'dphone',       label:'هاتف' },
+  { key:'vehicle',      label:'المركبة' },
+  { key:'plate',        label:'اللوحة' },
+  { key:'permit',       label:'التصريح' },
+  { key:'conf',         label:'رقم التأكيد' },
+];
+function getTrHiddenCols() {
+  try { return new Set(JSON.parse(Prefs.get('tr_hidden_cols','[]'))); } catch { return new Set(); }
+}
+function saveTrHiddenCols(s) { Prefs.set('tr_hidden_cols', JSON.stringify([...s])); }
+function toggleTrCol(key) {
+  const h = getTrHiddenCols();
+  if (h.has(key)) h.delete(key); else h.add(key);
+  saveTrHiddenCols(h);
+  renderTrColPanel();
+  renderTransportReport();
+}
+function openTrColPanel() {
+  const p = document.getElementById('tr-col-panel');
+  if (!p) return;
+  const isOpen = p.style.display !== 'none';
+  p.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderTrColPanel();
+  if (!isOpen) {
+    const close = e => { if (!p.contains(e.target) && !e.target.closest('#tr-col-panel')) { p.style.display='none'; document.removeEventListener('click', close); } };
+    setTimeout(() => document.addEventListener('click', close), 50);
+  }
+}
+function renderTrColPanel() {
+  const p = document.getElementById('tr-col-panel');
+  if (!p || p.style.display === 'none') return;
+  const h = getTrHiddenCols();
+  p.innerHTML = `
+    <div style="font-size:0.75rem;font-weight:700;color:var(--ink-muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">إظهار / إخفاء الأعمدة</div>
+    ${TR_COLUMNS.map(c=>`<label style="display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:0.875rem"><input type="checkbox" ${h.has(c.key)?'':'checked'} onchange="toggleTrCol('${c.key}')" style="cursor:pointer"> ${c.label}</label>`).join('')}
+    <div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);display:flex;gap:6px">
+      <button class="btn btn-xs" onclick="saveTrHiddenCols(new Set());renderTrColPanel();renderTransportReport();" style="flex:1">إظهار الكل</button>
+      <button class="btn btn-xs" onclick="saveTrHiddenCols(new Set(TR_COLUMNS.map(c=>c.key).filter(k=>k!=='ref')));renderTrColPanel();renderTransportReport();" style="flex:1">إخفاء الكل</button>
+    </div>`;
+}
+
 function renderTransportReport() {
   const fromVal      = document.getElementById('tr-rep-from')?.value       || '';
   const toVal        = document.getElementById('tr-rep-to')?.value         || '';
@@ -14354,6 +14394,12 @@ function renderTransportReport() {
   const empty = document.getElementById('tr-rep-empty');
   if (!tbody) return;
 
+  const hidden = getTrHiddenCols();
+  const col = (key, html) => hidden.has(key) ? '' : html;
+  const _thS = 'padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap';
+  const thead = document.getElementById('tr-rep-head');
+  if (thead) thead.innerHTML = `<tr style="background:var(--cream-dark);text-align:start">${TR_COLUMNS.filter(c=>!hidden.has(c.key)).map(c=>`<th style="${_thS}">${c.label}</th>`).join('')}<th style="${_thS}"></th></tr>`;
+
   if (rows.length === 0) {
     tbody.innerHTML = '';
     if (empty) empty.style.display = 'block';
@@ -14363,28 +14409,28 @@ function renderTransportReport() {
 
   tbody.innerHTML = rows.map((r, i) => `
     <tr style="background:${i%2===0?'transparent':'var(--cream)'}">
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.ref}</td>
-      <td style="padding:5px 8px;border-bottom:1px solid var(--border)"><select id="tr-edit-${r.vId}-${r.tIdx}-ourCompany" onchange="saveTransportRowEdit('${r.vId}',${r.tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink);max-width:150px"><option value="">—</option>${getLookupList('ourCompanies').map(c=>`<option value="${c}"${r.ourCompany===c?' selected':''}>${c}</option>`).join('')}</select></td>
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>
-      ${plainCell(r.agencyRef)}
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.opNum||'—'}</td>
-      ${editCell(r.paxTotal, 'paxTotal', r.vId, r.tIdx)}
-      ${natEditCell(r.natMap, r.paxTotal, r.vId, r.tIdx)}
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
-      ${(r.cat==='arrival'||r.cat==='departure') ? editCell(r.flightNo,'flightNo',r.vId,r.tIdx) : `<td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--ink-muted);font-size:0.85em">N/A</td>`}
-      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
-      ${plainCell(r.fromCity)}
-      ${plainCell(r.fromArea)}
-      ${plainCell(r.toCity)}
-      ${plainCell(r.toArea)}
-      ${plainCell(r.time)}
-      ${cell(r.transCompany, false)}
-      ${editCell(r.driver,  'driver',  r.vId, r.tIdx)}
-      ${editCell(r.dphone,  'dphone',  r.vId, r.tIdx)}
-      ${editCell(r.vehicle, 'vehicle', r.vId, r.tIdx)}
-      ${editCell(r.plate,   'plate',   r.vId, r.tIdx)}
-      ${editCell(r.permit, 'permit', r.vId, r.tIdx)}
-      ${editCell(r.conf,   'conf',   r.vId, r.tIdx)}
+      ${col('ref',         `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.ref}</td>`)}
+      ${col('ourCompany',  `<td style="padding:5px 8px;border-bottom:1px solid var(--border)"><select id="tr-edit-${r.vId}-${r.tIdx}-ourCompany" onchange="saveTransportRowEdit('${r.vId}',${r.tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink);max-width:150px"><option value="">—</option>${getLookupList('ourCompanies').map(c=>`<option value="${c}"${r.ourCompany===c?' selected':''}>${c}</option>`).join('')}</select></td>`)}
+      ${col('agency',      `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>`)}
+      ${col('agencyRef',   plainCell(r.agencyRef))}
+      ${col('opNum',       `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.opNum||'—'}</td>`)}
+      ${col('paxTotal',    editCell(r.paxTotal, 'paxTotal', r.vId, r.tIdx))}
+      ${col('natMap',      natEditCell(r.natMap, r.paxTotal, r.vId, r.tIdx))}
+      ${col('catLabel',    `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>`)}
+      ${col('flightNo',    (r.cat==='arrival'||r.cat==='departure') ? editCell(r.flightNo,'flightNo',r.vId,r.tIdx) : `<td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--ink-muted);font-size:0.85em">N/A</td>`)}
+      ${col('date',        `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>`)}
+      ${col('fromCity',    plainCell(r.fromCity))}
+      ${col('fromArea',    plainCell(r.fromArea))}
+      ${col('toCity',      plainCell(r.toCity))}
+      ${col('toArea',      plainCell(r.toArea))}
+      ${col('time',        plainCell(r.time))}
+      ${col('transCompany',cell(r.transCompany, false))}
+      ${col('driver',      editCell(r.driver,  'driver',  r.vId, r.tIdx))}
+      ${col('dphone',      editCell(r.dphone,  'dphone',  r.vId, r.tIdx))}
+      ${col('vehicle',     editCell(r.vehicle, 'vehicle', r.vId, r.tIdx))}
+      ${col('plate',       editCell(r.plate,   'plate',   r.vId, r.tIdx))}
+      ${col('permit',      editCell(r.permit,  'permit',  r.vId, r.tIdx))}
+      ${col('conf',        editCell(r.conf,    'conf',    r.vId, r.tIdx))}
       <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap">
         <button class="btn btn-xs btn-gold" onclick="saveTransportRowEdit('${r.vId}',${r.tIdx})" title="حفظ التعديلات">💾</button>
       </td>
@@ -14449,15 +14495,35 @@ function saveTransportRowEdit(vId, tIdx) {
 
 function exportTransportReportCSV() {
   const rows = getTransportReportRows();
-  const headers = ['المرجع','اسم العميل','مرجع العميل','عدد الركاب','الجنسيات','المسار','رقم الرحلة','التاريخ','مدينة المغادرة','منطقة المغادرة','مدينة الوصول','منطقة الوصول','الوقت','شركة النقل','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','شركتنا','رقم التصريح','رقم التأكيد'];
-  const lines = [headers.join(',')];
+  const hidden = getTrHiddenCols();
+  const visCols = TR_COLUMNS.filter(c => !hidden.has(c.key));
+  const colData = {
+    ref:          r => r.ref,
+    ourCompany:   r => r.ourCompany,
+    agency:       r => r.agency,
+    agencyRef:    r => r.agencyRef,
+    opNum:        r => r.opNum,
+    paxTotal:     r => r.paxTotal||'',
+    natMap:       r => Object.entries(r.natMap||{}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${k}:${n}`).join('; '),
+    catLabel:     r => r.catLabel,
+    flightNo:     r => r.flightNo,
+    date:         r => r.date,
+    fromCity:     r => r.fromCity,
+    fromArea:     r => r.fromArea,
+    toCity:       r => r.toCity,
+    toArea:       r => r.toArea,
+    time:         r => r.time,
+    transCompany: r => r.transCompany,
+    driver:       r => r.driver,
+    dphone:       r => r.dphone,
+    vehicle:      r => r.vehicle,
+    plate:        r => r.plate,
+    permit:       r => r.permit,
+    conf:         r => r.conf,
+  };
+  const lines = [visCols.map(c => `"${c.label}"`).join(',')];
   rows.forEach(r => {
-    const natFlat = Object.entries(r.natMap||{}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${k}:${n}`).join('; ');
-    lines.push([r.ref, r.agency, r.agencyRef, r.paxTotal||'', natFlat, r.catLabel, r.flightNo, r.date,
-      r.fromCity, r.fromArea, r.toCity, r.toArea, r.time,
-      r.transCompany, r.driver, r.dphone, r.vehicle, r.plate, r.ourCompany, r.permit, r.conf]
-      .map(v => `"${(String(v||'')).replace(/"/g,'""')}"`)
-      .join(','));
+    lines.push(visCols.map(c => `"${String(colData[c.key](r)||'').replace(/"/g,'""')}"`).join(','));
   });
   const blob = new Blob(['\uFEFF'+lines.join('\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
