@@ -1290,6 +1290,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <span data-i18n="nav.visitors">Mutamers</span>
     </div>
     <div class="nav-section-label" data-sec="settings" onclick="toggleNavSec(this,'settings')"><span data-i18n="section.settings">Settings</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+    <div class="nav-item" data-page="date-converter" onclick="navigate(this,'date-converter')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+      <span>Date Converter</span>
+    </div>
     <div class="nav-item" data-page="settings" onclick="navigate(this,'settings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       <span data-i18n="nav.settings">General</span>
@@ -2409,6 +2413,69 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Active users by department -->
       <div id="users-dept-sections"></div>
 
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ Date Converter -->
+  <div id="page-date-converter" class="page">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">محول التاريخ — Date Converter</div>
+        <div class="topbar-sub">تحويل فوري بين التقويم الميلادي والهجري</div>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;max-width:780px">
+
+        <!-- ── Gregorian → Hijri ── -->
+        <div class="card">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:18px;color:var(--ink)">🗓 ميلادي &rarr; هجري</div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:5px">التاريخ الميلادي</div>
+            <input type="date" id="dc-g-in" oninput="dcGregToHijri()"
+              style="width:100%;font-family:inherit;font-size:1rem;padding:9px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+          </div>
+          <div id="dc-g-out" style="min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--cream-dark);border-radius:var(--r-sm);padding:12px;text-align:center">
+            <span style="font-size:0.8rem;color:var(--ink-muted)">اختر تاريخاً ميلادياً</span>
+          </div>
+          <button class="btn btn-xs" onclick="(function(){const t=new Date().toISOString().slice(0,10);document.getElementById('dc-g-in').value=t;dcGregToHijri();})()" style="margin-top:10px;width:100%">Today</button>
+        </div>
+
+        <!-- ── Hijri → Gregorian ── -->
+        <div class="card">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:18px;color:var(--ink)">🌙 هجري &rarr; ميلادي</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div>
+              <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:4px">السنة</div>
+              <input type="number" id="dc-h-y" placeholder="1446" min="1300" max="1600" oninput="dcHijriToGreg()"
+                style="width:100%;font-family:inherit;font-size:0.9rem;padding:7px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            </div>
+            <div>
+              <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:4px">الشهر</div>
+              <select id="dc-h-m" onchange="dcHijriToGreg()"
+                style="width:100%;font-family:inherit;font-size:0.82rem;padding:7px 4px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+                <option value="">—</option>
+                <option value="1">محرم</option><option value="2">صفر</option>
+                <option value="3">ربيع الأول</option><option value="4">ربيع الآخر</option>
+                <option value="5">جمادى الأولى</option><option value="6">جمادى الآخرة</option>
+                <option value="7">رجب</option><option value="8">شعبان</option>
+                <option value="9">رمضان</option><option value="10">شوال</option>
+                <option value="11">ذو القعدة</option><option value="12">ذو الحجة</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:4px">اليوم</div>
+              <input type="number" id="dc-h-d" placeholder="1" min="1" max="30" oninput="dcHijriToGreg()"
+                style="width:100%;font-family:inherit;font-size:0.9rem;padding:7px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            </div>
+          </div>
+          <div id="dc-h-out" style="min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--cream-dark);border-radius:var(--r-sm);padding:12px;text-align:center">
+            <span style="font-size:0.8rem;color:var(--ink-muted)">أدخل تاريخاً هجرياً</span>
+          </div>
+          <button class="btn btn-xs" onclick="(function(){const h=toHijri(new Date().toISOString().slice(0,10));if(!h)return;document.getElementById('dc-h-y').value=h.y;document.getElementById('dc-h-m').value=h.m;document.getElementById('dc-h-d').value=h.d;dcHijriToGreg();})()" style="margin-top:10px;width:100%">Today (Hijri)</button>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -4795,6 +4862,55 @@ function fmtHijri(isoDate) {
   if (!h) return '';
   return `${h.d} ${HIJRI_MONTHS[h.m-1]||''} ${h.y} هـ`;
 }
+/** Converts a Hijri date to an ISO Gregorian string (YYYY-MM-DD). */
+function hijriToGregorian(hY, hM, hD) {
+  hY = parseInt(hY); hM = parseInt(hM); hD = parseInt(hD);
+  if (!hY || !hM || !hD) return null;
+  // Hijri → JDN
+  const jdn = Math.floor((11*hY + 3) / 30) + 354*hY + 30*hM
+    - Math.floor((hM - 1) / 2) + hD + 1948440 - 385;
+  // JDN → Gregorian
+  let l = jdn + 68569;
+  const n = Math.floor(4 * l / 146097);
+  l = l - Math.floor((146097 * n + 3) / 4);
+  const i = Math.floor(4000 * (l + 1) / 1461001);
+  l = l - Math.floor(1461 * i / 4) + 31;
+  const j = Math.floor(80 * l / 2447);
+  const gD = l - Math.floor(2447 * j / 80);
+  l = Math.floor(j / 11);
+  const gM = j + 2 - 12 * l;
+  const gY = 100 * (n - 49) + i + l;
+  return `${gY}-${String(gM).padStart(2,'0')}-${String(gD).padStart(2,'0')}`;
+}
+
+function dcGregToHijri() {
+  const v = document.getElementById('dc-g-in')?.value;
+  const out = document.getElementById('dc-g-out');
+  if (!out) return;
+  if (!v) { out.innerHTML = '<span style="font-size:0.8rem;color:var(--ink-muted)">اختر تاريخاً ميلادياً</span>'; return; }
+  const h = toHijri(v);
+  if (!h) { out.innerHTML = '<span style="color:var(--red);font-size:0.85rem">تاريخ غير صالح</span>'; return; }
+  const greg = new Date(v + 'T12:00:00').toLocaleDateString('ar-SA-u-ca-gregory', {day:'numeric',month:'long',year:'numeric'});
+  out.innerHTML = `
+    <div style="font-size:1.5rem;font-weight:700;color:var(--gold-dark);direction:rtl">${h.d} ${HIJRI_MONTHS[h.m-1]||''} ${h.y} هـ</div>
+    <div style="font-size:0.8rem;color:var(--ink-muted);margin-top:4px">${greg}</div>`;
+}
+
+function dcHijriToGreg() {
+  const hY = document.getElementById('dc-h-y')?.value;
+  const hM = document.getElementById('dc-h-m')?.value;
+  const hD = document.getElementById('dc-h-d')?.value;
+  const out = document.getElementById('dc-h-out');
+  if (!out) return;
+  if (!hY || !hM || !hD) { out.innerHTML = '<span style="font-size:0.8rem;color:var(--ink-muted)">أدخل تاريخاً هجرياً</span>'; return; }
+  const iso = hijriToGregorian(hY, hM, hD);
+  if (!iso) { out.innerHTML = '<span style="color:var(--red);font-size:0.85rem">تاريخ غير صالح</span>'; return; }
+  const greg = new Date(iso + 'T12:00:00').toLocaleDateString('ar-SA', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  out.innerHTML = `
+    <div style="font-size:1.5rem;font-weight:700;color:var(--gold-dark)">${iso}</div>
+    <div style="font-size:0.85rem;color:var(--ink-muted);margin-top:4px;direction:rtl">${greg}</div>`;
+}
+
 /** Returns Gregorian date with Hijri on a second line — for HTML display contexts. */
 function fmtDateDual(isoDate) {
   if (!isoDate) return '—';
