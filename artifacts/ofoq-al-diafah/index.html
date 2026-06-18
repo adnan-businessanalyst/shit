@@ -1282,7 +1282,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     </div>
     <div class="nav-item" data-page="buses" onclick="navigate(this,'buses')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><circle cx="6.5" cy="19" r="1.5"/><circle cx="17.5" cy="19" r="1.5"/><path d="M1 12h22"/></svg>
-      <span data-i18n="nav.buses">Transport Companies</span>
+      <span data-i18n="nav.buses">Transportation Companies</span>
     </div>
   </div>
   <div class="sidebar-footer" style="padding:12px 16px">
@@ -1485,12 +1485,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-buses" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title" data-i18n="pages.buses.title">Transport Companies</div>
+        <div class="topbar-title" data-i18n="pages.buses.title">Transportation Companies</div>
         <div class="topbar-sub" id="buses-subtitle" data-i18n="pages.buses.sub">Manage your transport providers</div>
       </div>
       <button class="btn btn-gold" onclick="openBusModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span data-i18n="pages.buses.addBtn">Add Bus Company</span>
+        <span data-i18n="pages.buses.addBtn">Add Transportation Company</span>
       </button>
     </div>
     <div class="content">
@@ -3444,7 +3444,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 <div class="modal-backdrop" id="modal-bus">
   <div class="modal" style="width:720px;max-width:100%">
     <div class="modal-header">
-      <div class="modal-title" id="bus-modal-title">Add Bus Company</div>
+      <div class="modal-title" id="bus-modal-title">Add Transportation Company</div>
       <button class="modal-close" onclick="closeModal('modal-bus')">×</button>
     </div>
     <div class="modal-body">
@@ -4710,7 +4710,7 @@ const WIDGET_DEFS = {
   pending_hotel_res: { icon:'🏨', label:'Pending Hotel Res.',    cat:'kpi', size:3, desc:'Hotel reservations awaiting completion' },
   pending_bus_res:   { icon:'🚌', label:'Pending Bus Res.',      cat:'kpi', size:3, desc:'Bus reservations awaiting completion' },
   total_hotels:      { icon:'🏙️', label:'Hotels in Directory',  cat:'kpi', size:3, desc:'Hotels added to the directory' },
-  total_bus_cos:     { icon:'🚍', label:'Transport Companies',    cat:'kpi', size:3, desc:'Transport companies in directory' },
+  total_bus_cos:     { icon:'🚍', label:'Transportation Companies', cat:'kpi', size:3, desc:'Transportation companies in directory' },
   unread_notifs:     { icon:'🔔', label:'Unread Notifications',  cat:'kpi', size:3, desc:'Notifications not yet read' },
   total_batches:     { icon:'📦', label:'Inventory Batches',     cat:'kpi', size:3, desc:'Room batches in inventory' },
   // List / chart widgets
@@ -5317,7 +5317,7 @@ function renderBuses() {
   if (!el) return;
 
   if (list.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🚌</div><div class="empty-state-title">No bus companies found</div><div class="empty-state-sub">Click "Add Bus Company" to build your transport directory</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🚌</div><div class="empty-state-title">No transportation companies found</div><div class="empty-state-sub">Click "Add Transportation Company" to build your transport directory</div></div>`;
     return;
   }
 
@@ -5490,7 +5490,7 @@ function openBusModal(id) {
   editingBusId = id || null;
   busFleetCount = 0;
   const b = id ? busCompanies.find(x => x.id === id) : null;
-  document.getElementById('bus-modal-title').textContent = id ? 'Edit Bus Company' : 'Add Bus Company';
+  document.getElementById('bus-modal-title').textContent = id ? 'Edit Transportation Company' : 'Add Transportation Company';
   document.getElementById('bc-id').value = id || '';
   document.getElementById('bc-name').value = b?.name || '';
   document.getElementById('bc-city').value = b?.city || '';
@@ -10120,8 +10120,8 @@ function renderObStep() {
   }
   else if (_obStep === 4) {
     body.innerHTML = `
-      <div style="font-size:1.0714rem;font-weight:700;margin-bottom:4px">Step 4 — First Bus Company</div>
-      <div style="font-size:0.9286rem;color:var(--ink-muted);margin-bottom:20px">Add your primary transport partner. You can add more in Settings → Transport Companies.</div>
+      <div style="font-size:1.0714rem;font-weight:700;margin-bottom:4px">Step 4 — First Transportation Company</div>
+      <div style="font-size:0.9286rem;color:var(--ink-muted);margin-bottom:20px">Add your primary transport partner. You can add more in Settings → Transportation Companies.</div>
       <div class="form-grid">
         <div class="field"><label class="required">Company Name</label><input id="ob-bus-name" type="text" placeholder="e.g. Al Rawdah Transport Co."></div>
         <div class="field"><label class="required">City</label>
@@ -16585,7 +16585,7 @@ function toggleDarkMode() {
       'nav.clients': 'Clients',
       'nav.providers': 'Third-Party Providers',
       'nav.hotels': 'Hotels',
-      'nav.buses': 'Transport Companies',
+      'nav.buses': 'Transportation Companies',
       'nav.signOut': 'Sign Out',
       'section.inventory': 'Inventory',
       'section.bookings': 'Bookings',
@@ -16622,9 +16622,9 @@ function toggleDarkMode() {
       'pages.providers.title': 'Third-Party Providers',
       'pages.providers.sub': 'Service & supply providers',
       'pages.providers.addBtn': 'Add Provider',
-      'pages.buses.title': 'Transport Companies',
+      'pages.buses.title': 'Transportation Companies',
       'pages.buses.sub': 'Manage your transport providers',
-      'pages.buses.addBtn': 'Add Bus Company',
+      'pages.buses.addBtn': 'Add Transportation Company',
       'pages.tours.title': 'Tours Inventory',
       'pages.tours.sub': 'Bus tour packages and pricing',
       'pages.tours.addBtn': 'Add Tour Package',
