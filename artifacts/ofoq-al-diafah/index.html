@@ -9483,6 +9483,7 @@ function printVoucher(id) {
       <td>${t.time||'—'}</td>
       <td>${t.vehicle||'—'}</td>
       <td>${t.transCompany||t.ourCompany||'—'}</td>
+      <td>${t.permit||'—'}</td>
     </tr>`).join('');
 
   // helper: bilingual KV cell
@@ -9615,6 +9616,7 @@ function printVoucher(id) {
       <th><span class="th-en">Time</span><span class="th-ar">الوقت</span></th>
       <th><span class="th-en">Vehicle</span><span class="th-ar">المركبة</span></th>
       <th><span class="th-en">Company</span><span class="th-ar">الشركة</span></th>
+      <th><span class="th-en">Pilgrim Dispatch Order</span><span class="th-ar">امر التفويج</span></th>
     </tr></thead>
     <tbody>${transportRows}</tbody>
   </table>` : '<p style="color:#999;font-size:12px;padding:0 4px">No transportation details recorded. / لا توجد تفاصيل مواصلات.</p>'}
