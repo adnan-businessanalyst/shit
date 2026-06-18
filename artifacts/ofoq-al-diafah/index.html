@@ -3496,6 +3496,59 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </div>
         </div>
       </div>
+      <!-- ── Route Pricing ─────────────────────────────────── -->
+      <div class="form-section">
+        <div class="form-section-title">Route Pricing</div>
+
+        <!-- 1. Arrival / Entry Port -->
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <span style="font-size:0.8571rem;font-weight:700;color:var(--gold-dark)">🛬 Entry Port → Destination (Arrival)</span>
+              <span style="font-size:0.7143rem;color:var(--ink-muted);margin-right:8px"> — من المطار إلى المدينة</span>
+            </div>
+            <button type="button" class="btn btn-xs" onclick="addBusRouteRow('arrival')">+ إضافة</button>
+          </div>
+          <div id="bc-routes-arrival" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- 2. Departure / Exit Port -->
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <span style="font-size:0.8571rem;font-weight:700;color:var(--gold-dark)">🛫 City → Exit Port (Departure)</span>
+              <span style="font-size:0.7143rem;color:var(--ink-muted);margin-right:8px"> — من المدينة إلى المطار</span>
+            </div>
+            <button type="button" class="btn btn-xs" onclick="addBusRouteRow('departure')">+ إضافة</button>
+          </div>
+          <div id="bc-routes-departure" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- 3. Visit Tours -->
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <span style="font-size:0.8571rem;font-weight:700;color:var(--gold-dark)">🕌 Visit Tours (Ziyarah)</span>
+              <span style="font-size:0.7143rem;color:var(--ink-muted);margin-right:8px"> — جولات الزيارة حسب المدينة</span>
+            </div>
+            <button type="button" class="btn btn-xs" onclick="addBusRouteRow('visits')">+ إضافة</button>
+          </div>
+          <div id="bc-routes-visits" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+
+        <!-- 4. Inter-city -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div>
+              <span style="font-size:0.8571rem;font-weight:700;color:var(--gold-dark)">🛣️ Inter-city Routes</span>
+              <span style="font-size:0.7143rem;color:var(--ink-muted);margin-right:8px"> — مسارات بين المدن</span>
+            </div>
+            <button type="button" class="btn btn-xs" onclick="addBusRouteRow('intercity')">+ إضافة</button>
+          </div>
+          <div id="bc-routes-intercity" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+      </div>
+
       <div class="form-section" style="margin-bottom:0">
         <div class="form-section-title">Notes</div>
         <div class="field"><textarea id="bc-notes" placeholder="Contract terms, reliability notes, preferred contact times..."></textarea></div>
@@ -5310,6 +5363,26 @@ function renderBuses() {
           ` : ''}
           ${b.routes ? `<div style="font-size:0.8571rem;color:var(--ink-muted);margin-top:10px">🗺 ${b.routes}</div>` : ''}
           ${svcTags(b) ? `<div style="margin-top:10px;display:flex;flex-wrap:wrap">${svcTags(b)}</div>` : ''}
+          ${(() => {
+            const rp = b.routePricing;
+            if (!rp) return '';
+            const sar = n => `SAR ${Number(n||0).toLocaleString()}`;
+            const sections = [
+              { key:'arrival',   icon:'🛬', label:'Arrival',   rows: (rp.arrival||[]).map(r=>`${r.port||''}→${r.city||''} · ${sar(r.cost)} / ${sar(r.sell)}`) },
+              { key:'departure', icon:'🛫', label:'Departure', rows: (rp.departure||[]).map(r=>`${r.city||''}→${r.port||''} · ${sar(r.cost)} / ${sar(r.sell)}`) },
+              { key:'visits',    icon:'🕌', label:'Visits',    rows: (rp.visits||[]).map(r=>`${r.city||''} · ${sar(r.cost)} / ${sar(r.sell)}`) },
+              { key:'intercity', icon:'🛣️', label:'Intercity', rows: (rp.intercity||[]).map(r=>`${r.from||''}→${r.to||''} · ${sar(r.cost)} / ${sar(r.sell)}`) },
+            ].filter(s => s.rows.length);
+            if (!sections.length) return '';
+            return `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="font-size:0.7143rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:8px">Route Pricing</div>
+              ${sections.map(s=>`
+                <div style="margin-bottom:6px">
+                  <div style="font-size:0.7857rem;font-weight:700;color:var(--gold-dark);margin-bottom:3px">${s.icon} ${s.label}</div>
+                  ${s.rows.map(r=>`<div style="font-size:0.7857rem;color:var(--ink-muted);padding:2px 0 2px 14px">${r}</div>`).join('')}
+                </div>`).join('')}
+            </div>`;
+          })()}
           ${b.notes ? `<div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">${b.notes}</div>` : ''}
         </div>
         <div style="padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--cream)">
@@ -5321,6 +5394,97 @@ function renderBuses() {
 }
 
 let editingBusId = null;
+let busRouteCounters = { arrival:0, departure:0, visits:0, intercity:0 };
+
+/* ─────────────────────────────────────────────────────────
+   Route pricing rows for the bus modal
+───────────────────────────────────────────────────────── */
+function addBusRouteRow(type, prefill) {
+  busRouteCounters[type]++;
+  const idx = busRouteCounters[type];
+  const container = document.getElementById(`bc-routes-${type}`);
+  if (!container) return;
+
+  const fld = (id, label, placeholder, bg) =>
+    `<div class="field" style="margin-bottom:0">
+       <label style="font-size:0.7143rem;margin-bottom:2px">${label}</label>
+       <input id="${id}" type="text" placeholder="${placeholder}"
+         style="background:${bg||'var(--surface)'};font-family:inherit;font-size:0.9rem;padding:6px 9px;border:1px solid var(--border-strong);border-radius:var(--r-sm);width:100%;color:var(--ink)">
+     </div>`;
+  const numFld = (id, label, bg) =>
+    `<div class="field" style="margin-bottom:0">
+       <label style="font-size:0.7143rem;margin-bottom:2px">${label}</label>
+       <input id="${id}" type="number" min="0" placeholder="0"
+         style="background:${bg};font-family:inherit;font-size:0.9rem;padding:6px 9px;border:1px solid var(--border-strong);border-radius:var(--r-sm);width:100%;color:var(--ink)">
+     </div>`;
+
+  let cols, inner;
+  if (type === 'arrival' || type === 'departure') {
+    cols = '1fr 1fr 110px 110px 28px';
+    inner = [
+      fld(`bc-rr-${type}-${idx}-port`, 'اسم المنفذ / المطار', type==='arrival'?'e.g. Jeddah JED':'e.g. Jeddah JED'),
+      fld(`bc-rr-${type}-${idx}-city`, type==='arrival'?'مدينة الوجهة':'مدينة الانطلاق', 'e.g. مكة'),
+      numFld(`bc-rr-${type}-${idx}-cost`, 'التكلفة (ر.س)', 'var(--red-light)'),
+      numFld(`bc-rr-${type}-${idx}-sell`, 'سعر البيع (ر.س)', 'var(--green-light)'),
+    ].join('');
+  } else if (type === 'visits') {
+    cols = '1fr 110px 110px 28px';
+    inner = [
+      fld(`bc-rr-${type}-${idx}-city`, 'المدينة / اسم الجولة', 'e.g. مكة المكرمة'),
+      numFld(`bc-rr-${type}-${idx}-cost`, 'التكلفة (ر.س)', 'var(--red-light)'),
+      numFld(`bc-rr-${type}-${idx}-sell`, 'سعر البيع (ر.س)', 'var(--green-light)'),
+    ].join('');
+  } else { // intercity
+    cols = '1fr 1fr 110px 110px 28px';
+    inner = [
+      fld(`bc-rr-${type}-${idx}-from`, 'مدينة الانطلاق', 'e.g. مكة'),
+      fld(`bc-rr-${type}-${idx}-to`,   'مدينة الوصول',   'e.g. المدينة'),
+      numFld(`bc-rr-${type}-${idx}-cost`, 'التكلفة (ر.س)', 'var(--red-light)'),
+      numFld(`bc-rr-${type}-${idx}-sell`, 'سعر البيع (ر.س)', 'var(--green-light)'),
+    ].join('');
+  }
+
+  const div = document.createElement('div');
+  div.id = `bc-rr-${type}-${idx}`;
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:${cols};gap:8px;align-items:end;background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px">
+      ${inner}
+      <button type="button" onclick="document.getElementById('bc-rr-${type}-${idx}').remove()"
+        style="align-self:flex-end;background:none;border:none;color:var(--red);font-size:1.25rem;cursor:pointer;line-height:1;padding:2px 0;margin-bottom:1px">×</button>
+    </div>`;
+  container.appendChild(div);
+
+  if (prefill) {
+    const set = (sfx, val) => { const el=document.getElementById(`bc-rr-${type}-${idx}-${sfx}`); if(el && val!=null) el.value=val; };
+    if (type==='arrival'||type==='departure') { set('port',prefill.port); set('city',prefill.city); }
+    else if (type==='visits') { set('city',prefill.city); }
+    else { set('from',prefill.from); set('to',prefill.to); }
+    set('cost', prefill.cost||''); set('sell', prefill.sell||'');
+  }
+}
+
+function collectBusRoutes() {
+  const result = {};
+  ['arrival','departure','visits','intercity'].forEach(type => {
+    const container = document.getElementById(`bc-routes-${type}`);
+    if (!container) { result[type]=[]; return; }
+    const rows = [];
+    container.querySelectorAll(`[id^="bc-rr-${type}-"]`).forEach(row => {
+      if (!row.id.match(/^bc-rr-[a-z]+-\d+$/)) return;
+      const idx = row.id.split('-').pop();
+      const g = sfx => document.getElementById(`bc-rr-${type}-${idx}-${sfx}`)?.value.trim()||'';
+      const gn = sfx => Number(document.getElementById(`bc-rr-${type}-${idx}-${sfx}`)?.value)||0;
+      let r = { cost:gn('cost'), sell:gn('sell') };
+      if (type==='arrival'||type==='departure') { r.port=g('port'); r.city=g('city'); }
+      else if (type==='visits') { r.city=g('city'); }
+      else { r.from=g('from'); r.to=g('to'); }
+      // only keep rows with at least one meaningful field
+      if (r.port||r.city||r.from||r.to||r.cost||r.sell) rows.push(r);
+    });
+    result[type] = rows;
+  });
+  return result;
+}
 
 function openBusModal(id) {
   editingBusId = id || null;
@@ -5352,6 +5516,18 @@ function openBusModal(id) {
   } else {
     addBusFleetRow();
   }
+
+  // Clear and re-populate route pricing rows
+  busRouteCounters = { arrival:0, departure:0, visits:0, intercity:0 };
+  ['arrival','departure','visits','intercity'].forEach(type => {
+    const container = document.getElementById(`bc-routes-${type}`);
+    if (container) container.innerHTML = '';
+    const rows = b?.routePricing?.[type] || [];
+    if (rows.length) {
+      rows.forEach(r => addBusRouteRow(type, r));
+    }
+  });
+
   openModal('modal-bus');
 }
 
@@ -5445,6 +5621,7 @@ function saveBusCompany() {
     svcDedicated: document.getElementById('bc-svc-dedicated').checked,
     svcNight: document.getElementById('bc-svc-night').checked,
     notes: document.getElementById('bc-notes').value.trim(),
+    routePricing: collectBusRoutes(),
   };
 
   if (editingBusId) {
