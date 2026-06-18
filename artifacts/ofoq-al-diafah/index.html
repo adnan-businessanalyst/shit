@@ -1712,7 +1712,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div id="vou-transport-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"></div>
         </div>
 
-        <div class="action-bar">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;padding-top:4px;border-top:1.5px solid var(--border)">
+          <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">All Vouchers</div>
           <select id="vou-filter" onchange="renderVouchers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
             <option value="">جميع الحالات</option>
             <option value="Tentative – Pending Reservation">مؤقت (حجز)</option>
