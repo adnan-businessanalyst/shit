@@ -8404,6 +8404,17 @@ function renderVouchers() {
   `).join('');
 }
 
+function saveFlightEdit(id) {
+  const v = vouchers.find(x => x.id === id);
+  if (!v) return;
+  const arrFlight = document.getElementById('vd-arr-flight')?.value.trim() || '';
+  const depFlight = document.getElementById('vd-dep-flight')?.value.trim() || '';
+  v.arrFlight = arrFlight;
+  v.depFlight = depFlight;
+  persist();
+  toast('تم حفظ أرقام الرحلات ✓');
+}
+
 function voucherStepIdx(status) {
   const steps = ['Tentative – Pending Reservation','Tentative – Pending Payment','Confirmed'];
   const i = steps.indexOf(status);
@@ -8517,16 +8528,29 @@ function viewVoucherDetail(id) {
       <div class="conf-field"><div class="conf-field-label">Voucher Ref</div><strong>${v.ref}</strong></div>
     </div>
 
-    <!-- Flights -->
+    <!-- Flights (inline-editable flight numbers) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div style="background:var(--green-light);border-radius:var(--r-sm);padding:12px 14px">
-        <div style="font-size:0.7143rem;font-weight:700;color:var(--green);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px">✈ Arrival</div>
-        <div style="font-size:0.8571rem">${v.arrFlight||'—'} · ${fmtDate(v.arrDate)} · ${v.arrTime||''} · ${v.arrAirport||''}</div>
+        <div style="font-size:0.7143rem;font-weight:700;color:var(--green);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px">✈ Arrival</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <input id="vd-arr-flight" type="text" value="${v.arrFlight||''}" placeholder="رقم الرحلة"
+            style="font-family:inherit;font-size:0.9286rem;font-weight:600;padding:4px 8px;border:1px solid rgba(26,107,60,0.3);border-radius:var(--r-sm);background:rgba(255,255,255,0.7);color:var(--ink);width:120px"
+            onkeydown="if(event.key==='Enter')saveFlightEdit('${v.id}')">
+        </div>
+        <div style="font-size:0.8571rem;color:var(--ink-muted)">${fmtDate(v.arrDate)}${v.arrTime?' · '+v.arrTime:''}${v.arrAirport?' · '+v.arrAirport:''}</div>
       </div>
       <div style="background:var(--red-light);border-radius:var(--r-sm);padding:12px 14px">
-        <div style="font-size:0.7143rem;font-weight:700;color:var(--red);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px">✈ Departure</div>
-        <div style="font-size:0.8571rem">${v.depFlight||'—'} · ${fmtDate(v.depDate)} · ${v.depTime||''} · ${v.depAirport||''}</div>
+        <div style="font-size:0.7143rem;font-weight:700;color:var(--red);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px">✈ Departure</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <input id="vd-dep-flight" type="text" value="${v.depFlight||''}" placeholder="رقم الرحلة"
+            style="font-family:inherit;font-size:0.9286rem;font-weight:600;padding:4px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:var(--r-sm);background:rgba(255,255,255,0.7);color:var(--ink);width:120px"
+            onkeydown="if(event.key==='Enter')saveFlightEdit('${v.id}')">
+        </div>
+        <div style="font-size:0.8571rem;color:var(--ink-muted)">${fmtDate(v.depDate)}${v.depTime?' · '+v.depTime:''}${v.depAirport?' · '+v.depAirport:''}</div>
       </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <button class="btn btn-sm btn-gold" onclick="saveFlightEdit('${v.id}')">💾 حفظ أرقام الرحلات</button>
     </div>
 
     <!-- Hotels -->
