@@ -8769,43 +8769,85 @@ function renderTransportStats() {
   const fromVal = document.getElementById('ts-from')?.value || '';
   const toVal   = document.getElementById('ts-to')?.value   || '';
 
-  const counts = { arrival:0, visits:0, internal:0, departure:0 };
+  // breakdown maps: cat → { key(port/city) → count }
+  const breakdown = { arrival:{}, visits:{}, internal:{}, departure:{} };
+  const totals    = { arrival:0,  visits:0,  internal:0,  departure:0  };
+
   vouchers.forEach(v => {
     (v.transport || []).forEach(t => {
       const cat  = t.category || '';
       const date = t.date || '';
       if (fromVal && date && date < fromVal) return;
       if (toVal   && date && date > toVal)   return;
-      if (counts[cat] !== undefined) counts[cat]++;
+      if (!(cat in breakdown)) return;
+      totals[cat]++;
+      let dim = '';
+      if (cat === 'arrival')   dim = t.toPort   || t.toCity   || '';
+      if (cat === 'departure') dim = t.fromPort  || t.fromCity || '';
+      if (cat === 'visits')    dim = t.toCity    || t.toPort   || '';
+      if (cat === 'internal')  dim = t.fromCity  || t.fromPort || '';
+      dim = dim.trim() || 'غير محدد';
+      breakdown[cat][dim] = (breakdown[cat][dim] || 0) + 1;
     });
   });
-  const total = counts.arrival + counts.visits + counts.internal + counts.departure;
+
+  const grandTotal = totals.arrival + totals.visits + totals.internal + totals.departure;
 
   const cats = [
-    { key:'arrival',   label:'الوصول',        en:'Arrivals',        icon:'🛬', bg:'#e8f0ff', col:'#2563eb' },
-    { key:'visits',    label:'الزيارات',       en:'Visit Routes',    icon:'🕌', bg:'#fef9e7', col:'#d4a843' },
-    { key:'internal',  label:'الداخلي',        en:'Internal Routes', icon:'🔄', bg:'#f0fdf4', col:'#16a34a' },
-    { key:'departure', label:'المغادرة',       en:'Departure Routes',icon:'🛫', bg:'#fff0f0', col:'#dc2626' },
+    { key:'arrival',   label:'الوصول',   en:'Arrivals',         icon:'🛬', bg:'#e8f0ff', col:'#2563eb', unit:'رحلة / مجموعة', dimLabel:'المطار / المحطة' },
+    { key:'departure', label:'المغادرة', en:'Departures',        icon:'🛫', bg:'#fff0f0', col:'#dc2626', unit:'رحلة / مجموعة', dimLabel:'مطار المغادرة'   },
+    { key:'visits',    label:'الزيارات', en:'Visit Tours',       icon:'🕌', bg:'#fef9e7', col:'#d4a843', unit:'جولة',          dimLabel:'المدينة'          },
+    { key:'internal',  label:'الداخلي',  en:'Internal Tours',    icon:'🔄', bg:'#f0fdf4', col:'#16a34a', unit:'رحلة',          dimLabel:'مدينة الانطلاق'  },
   ];
 
-  el.innerHTML = cats.map(c => `
-    <div onclick="goTransportReportFiltered('${c.key}','${fromVal}','${toVal}')"
-      style="background:${c.bg};border:1.5px solid ${c.col}22;border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:box-shadow 0.15s;user-select:none"
-      onmouseover="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.10)'" onmouseout="this.style.boxShadow='none'">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-        <span style="font-size:1.4rem">${c.icon}</span>
-        <span style="font-size:0.7143rem;font-weight:700;padding:2px 8px;border-radius:999px;background:${c.col}18;color:${c.col}">${c.en}</span>
+  const miniCard = (c, dim, count) => {
+    const safe = dim.replace(/'/g, '&#39;');
+    return `<div onclick="goTransportReportFiltered('${c.key}','${fromVal}','${toVal}')"
+      style="background:${c.bg};border:1px solid ${c.col}30;border-radius:var(--r-sm);padding:9px 14px;cursor:pointer;min-width:110px;flex:0 0 auto;transition:box-shadow 0.12s"
+      onmouseover="this.style.boxShadow='0 3px 12px rgba(0,0,0,0.10)'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px" title="${safe}">${safe}</div>
+      <div style="font-size:1.6rem;font-weight:800;color:${c.col};line-height:1.1">${count}</div>
+      <div style="font-size:0.7rem;color:var(--ink-muted);margin-top:2px">${c.unit}</div>
+    </div>`;
+  };
+
+  const groupSection = c => {
+    const entries = Object.entries(breakdown[c.key]).sort((a,b)=>b[1]-a[1]);
+    const cards = entries.length
+      ? entries.map(([dim, cnt]) => miniCard(c, dim, cnt)).join('')
+      : `<div style="font-size:0.85rem;color:var(--ink-muted);padding:6px 4px">لا توجد بيانات</div>`;
+    return `
+    <div style="border:1.5px solid ${c.col}25;border-radius:var(--r);overflow:hidden">
+      <div onclick="goTransportReportFiltered('${c.key}','${fromVal}','${toVal}')"
+        style="background:${c.bg};padding:10px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer"
+        onmouseover="this.style.filter='brightness(0.96)'" onmouseout="this.style.filter='none'">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.3rem">${c.icon}</span>
+          <span style="font-weight:700;color:${c.col};font-size:0.9rem">${c.en}</span>
+          <span style="color:var(--ink-muted);font-size:0.85rem">${c.label}</span>
+          <span style="font-size:0.75rem;color:var(--ink-muted);background:var(--surface);border-radius:999px;padding:1px 7px;border:1px solid ${c.col}30">${c.dimLabel}</span>
+        </div>
+        <span style="font-size:1.5rem;font-weight:800;color:${c.col}">${totals[c.key]}</span>
       </div>
-      <div style="font-size:2rem;font-weight:800;color:${c.col};line-height:1;margin-bottom:4px">${counts[c.key]}</div>
-      <div style="font-size:0.8571rem;color:var(--ink-muted)">${c.label}</div>
-    </div>
-  `).join('') + `
-    <div style="background:var(--ink);border-radius:var(--r);padding:16px 18px">
-      <div style="font-size:0.7143rem;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.5px;margin-bottom:10px">TOTAL</div>
-      <div style="font-size:2rem;font-weight:800;color:var(--gold);line-height:1;margin-bottom:4px">${total}</div>
-      <div style="font-size:0.8571rem;color:rgba(255,255,255,0.55)">إجمالي رحلات النقل</div>
-    </div>
-  `;
+      <div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;background:var(--surface)">
+        ${cards}
+      </div>
+    </div>`;
+  };
+
+  // override container to column layout
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
+  el.style.gap = '12px';
+
+  el.innerHTML = cats.map(groupSection).join('') + `
+    <div style="background:var(--ink);border-radius:var(--r);padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:0.7143rem;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.5px;margin-bottom:4px">TOTAL</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.55)">إجمالي رحلات النقل</div>
+      </div>
+      <div style="font-size:2.2rem;font-weight:800;color:var(--gold);line-height:1">${grandTotal}</div>
+    </div>`;
 }
 
 function goTransportReportFiltered(cat, from, to) {
