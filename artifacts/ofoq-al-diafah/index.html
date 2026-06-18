@@ -7787,7 +7787,7 @@ function importInternalRoutes() {
       fromCity: from.city,
       fromPort: from.hotelName,
       toCity:   to.city,
-      toArea:   to.hotelName,
+      toPort:   to.hotelName,
     });
     imported++;
   }
@@ -7824,7 +7824,7 @@ function addTripRow(category, prefill) {
   div.dataset.category = category;
   div.style.cssText = 'border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;background:var(--surface)';
   div.innerHTML = `
-    <!-- Route line: date | fromCity | fromPort | toCity | toArea | time | delete -->
+    <!-- Route line: date | fromCity | fromPort | toCity | toPort | time | delete -->
     <div style="display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr 100px auto;gap:8px;align-items:center;margin-bottom:8px">
       ${container.children.length === 0 ? `
       <div style="font-size:0.7143rem;font-weight:600;color:var(--ink-muted)">التاريخ</div>
@@ -7838,7 +7838,7 @@ function addTripRow(category, prefill) {
       <input id="tr-fromCity-${idx}" type="text" list="tr-city-datalist" placeholder="مكة / المدينة..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
       <input id="tr-fromPort-${idx}" type="text" list="tr-area-datalist" placeholder="الحي / الفندق..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
       <input id="tr-toCity-${idx}"   type="text" list="tr-city-datalist" placeholder="مكة / المدينة..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
-      <input id="tr-toArea-${idx}"   type="text" list="tr-area-datalist" placeholder="الحي / الفندق..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
+      <input id="tr-toPort-${idx}"   type="text" list="tr-area-datalist" placeholder="الحي / الفندق..." style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%">
       ${inp(`tr-time-${idx}`, 'text', '07:00')}
       <button class="remove-guest" style="margin-bottom:0"
         onclick="document.getElementById('tr-row-${idx}').remove();${addBtnId ? `document.getElementById('${addBtnId}').style.display='';` : ''}">×</button>
@@ -7906,7 +7906,7 @@ function addTripRow(category, prefill) {
     document.getElementById(`tr-fromCity-${idx}`).value     = prefill.fromCity     || prefill.from  || '';
     document.getElementById(`tr-fromPort-${idx}`).value     = prefill.fromPort || prefill.fromArea || '';
     document.getElementById(`tr-toCity-${idx}`).value       = prefill.toCity       || prefill.to    || '';
-    document.getElementById(`tr-toArea-${idx}`).value       = prefill.toArea       || '';
+    document.getElementById(`tr-toPort-${idx}`).value       = prefill.toPort || prefill.toArea || '';
     document.getElementById(`tr-time-${idx}`).value         = prefill.time         || '';
     document.getElementById(`tr-paymentBy-${idx}`).value    = prefill.paymentBy    || '';
     const _tcSel = document.getElementById(`tr-transCompany-${idx}`);
@@ -7942,7 +7942,7 @@ function addTripRow(category, prefill) {
       document.getElementById(`tr-fromCity-${idx}`).value = portCity(port);
       document.getElementById(`tr-fromPort-${idx}`).value = port;
       document.getElementById(`tr-toCity-${idx}`).value   = first?.city      || '';
-      document.getElementById(`tr-toArea-${idx}`).value   = first?.hotelName || '';
+      document.getElementById(`tr-toPort-${idx}`).value   = first?.hotelName || '';
     } else if (category === 'departure') {
       // Departure: FROM last hotel → TO airport (port of exit)
       const date  = document.getElementById('v-dep-date')?.value    || '';
@@ -7953,7 +7953,7 @@ function addTripRow(category, prefill) {
       document.getElementById(`tr-fromCity-${idx}`).value = last?.city      || '';
       document.getElementById(`tr-fromPort-${idx}`).value = last?.hotelName || '';
       document.getElementById(`tr-toCity-${idx}`).value   = portCity(port);
-      document.getElementById(`tr-toArea-${idx}`).value   = port;
+      document.getElementById(`tr-toPort-${idx}`).value   = port;
     }
   }
 
@@ -7976,15 +7976,15 @@ function collectTransport() {
       const fromCity = document.getElementById(`tr-fromCity-${idx}`)?.value.trim() || '';
       const fromPort = document.getElementById(`tr-fromPort-${idx}`)?.value.trim() || '';
       const toCity   = document.getElementById(`tr-toCity-${idx}`)?.value.trim()   || '';
-      const toArea   = document.getElementById(`tr-toArea-${idx}`)?.value.trim()   || '';
-      if (!fromCity && !fromPort && !toCity && !toArea) return;
+      const toPort   = document.getElementById(`tr-toPort-${idx}`)?.value.trim()   || '';
+      if (!fromCity && !fromPort && !toCity && !toPort) return;
       rows.push({
         category:     cat,
         date:         document.getElementById(`tr-date-${idx}`)?.value || '',
         fromCity,
         fromPort,
         toCity,
-        toArea,
+        toPort,
         time:         document.getElementById(`tr-time-${idx}`)?.value.trim()         || '',
         paymentBy:    document.getElementById(`tr-paymentBy-${idx}`)?.value           || '',
         transCompany: (() => { const s=document.getElementById(`tr-transCompany-${idx}`); return s?.value==='__other__' ? (document.getElementById(`tr-transCompany-other-${idx}`)?.value.trim()||'') : (s?.value.trim()||''); })(),
@@ -14163,7 +14163,7 @@ function getTransportReportRows() {
       const fromCity = t.fromCity || t.from || '';
       const fromPort = t.fromPort || t.fromArea || '';
       const toCity   = t.toCity   || t.to   || '';
-      const toArea   = t.toArea   || '';
+      const toPort   = t.toPort   || t.toArea || '';
 
       // Compute operations number
       let opNum = '';
@@ -14200,7 +14200,7 @@ function getTransportReportRows() {
         fromCity,
         fromPort,
         toCity,
-        toArea,
+        toPort,
         time:         t.time || (t.category==='arrival' ? (v.arrTime||'') : t.category==='departure' ? (v.depTime||'') : ''),
         transCompany: t.transCompany|| '',
         ourCompany:   v.ourCompany  || t.ourCompany || '',
@@ -14232,7 +14232,7 @@ const TR_COLUMNS = [
   { key:'fromCity',     label:'مدينة منفذ الوصول' },
   { key:'fromPort',     label:'اسم منفذ الوصول' },
   { key:'toCity',       label:'اسم منفذ المغادرة' },
-  { key:'toArea',       label:'مدينة منفذ المغادرة' },
+  { key:'toPort',       label:'مدينة منفذ المغادرة' },
   { key:'time',         label:'الوقت' },
   { key:'transCompany', label:'شركة النقل' },
   { key:'driver',       label:'السائق' },
@@ -14411,7 +14411,7 @@ function renderTransportReport() {
       ${col('fromCity',    plainCell(r.fromCity))}
       ${col('fromPort',    plainCell(r.fromPort))}
       ${col('toCity',      plainCell(r.toCity))}
-      ${col('toArea',      plainCell(r.toArea))}
+      ${col('toPort',      plainCell(r.toPort))}
       ${col('time',        plainCell(r.time))}
       ${col('transCompany',cell(r.transCompany, false))}
       ${col('driver',      editCell(r.driver,  'driver',  r.vId, r.tIdx))}
@@ -14500,7 +14500,7 @@ function exportTransportReportCSV() {
     fromCity:     r => r.fromCity,
     fromPort:     r => r.fromPort,
     toCity:       r => r.toCity,
-    toArea:       r => r.toArea,
+    toPort:       r => r.toPort,
     time:         r => r.time,
     transCompany: r => r.transCompany,
     driver:       r => r.driver,
