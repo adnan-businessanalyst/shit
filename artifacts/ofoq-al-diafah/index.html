@@ -8376,7 +8376,7 @@ function renderVouchers() {
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           ${(v.status==='Pending'||v.status.startsWith('Tentative'))?`<button class="btn btn-xs" onclick="openNewVoucherPage('${v.id}')">Edit</button>`:''}
-          <button class="btn btn-xs" onclick="printVoucher('${v.id}')">View</button>
+          <button class="btn btn-xs" onclick="viewVoucherDetail('${v.id}')">View</button>
           <button class="btn btn-xs btn-gold" onclick="quickPayVoucher('${v.id}')" title="تسجيل الدفع">💳 دفع</button>
           <button class="btn btn-xs btn-red" onclick="deleteVoucher('${v.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
@@ -8578,6 +8578,7 @@ function viewVoucherDetail(id) {
   // ── Footer buttons per step ───────────────────────────────
   const footer = document.getElementById('vd-footer');
   let btns = `<button class="btn" onclick="closeModal('modal-voucher-detail')">Close</button>`;
+  btns += `<button class="btn btn-sm" onclick="printVoucher('${v.id}')">🖨 Print / PDF</button>`;
 
   if (!cancelled) {
     if (s === 'Tentative – Pending Reservation') {
@@ -8592,7 +8593,6 @@ function viewVoucherDetail(id) {
         btns += `<button class="btn btn-green" onclick="confirmVoucher('${v.id}')">✓ Confirm Voucher</button>`;
       }
     } else if (s === 'Confirmed') {
-      btns += `<button class="btn btn-sm" onclick="printVoucher('${v.id}')">🖨 Print / PDF</button>`;
       btns += `<button class="btn btn-sm" onclick="registerMutamersFromVoucher('${v.id}')">👥 Register Mutamers</button>`;
       btns += `<button class="btn btn-sm" onclick="shareVoucherEmail('${v.id}')">✉ Share via Email</button>`;
       btns += `<button class="btn btn-sm btn-gold" onclick="shareVoucherWhatsApp('${v.id}')">💬 Share via WhatsApp</button>`;
