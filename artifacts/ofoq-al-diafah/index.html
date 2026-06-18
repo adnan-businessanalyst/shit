@@ -2211,6 +2211,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">عدد الركاب</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">الجنسيات</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المسار</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم الرحلة</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التاريخ</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">مدينة المغادرة</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">منطقة المغادرة</th>
@@ -14180,6 +14181,7 @@ function getTransportReportRows() {
         status:       v.status      || '',
         cat:          t.category    || '',
         catLabel:     catLabel[t.category] || t.category || '—',
+        flightNo:     t.category === 'arrival' ? (v.arrFlight || '') : t.category === 'departure' ? (v.depFlight || '') : '',
         date:         t.date        || '',
         fromCity,
         fromArea,
@@ -14301,6 +14303,7 @@ function renderTransportReport() {
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;text-align:center;font-weight:600">${r.paxTotal||'—'}</td>
       ${natCell(r.natMap)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:${r.flightNo?'600':'400'};color:${r.flightNo?'var(--gold-dark)':'var(--ink-muted)'}">${r.flightNo||'—'}</td>
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
       ${plainCell(r.fromCity)}
       ${plainCell(r.fromArea)}
@@ -14321,11 +14324,11 @@ function renderTransportReport() {
 
 function exportTransportReportCSV() {
   const rows = getTransportReportRows();
-  const headers = ['المرجع','اسم العميل','مرجع العميل','عدد الركاب','الجنسيات','المسار','التاريخ','مدينة المغادرة','منطقة المغادرة','مدينة الوصول','منطقة الوصول','الوقت','شركة النقل','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','شركتنا','رقم التصريح','رقم التأكيد'];
+  const headers = ['المرجع','اسم العميل','مرجع العميل','عدد الركاب','الجنسيات','المسار','رقم الرحلة','التاريخ','مدينة المغادرة','منطقة المغادرة','مدينة الوصول','منطقة الوصول','الوقت','شركة النقل','السائق','هاتف السائق','نوع المركبة','لوحة الترخيص','شركتنا','رقم التصريح','رقم التأكيد'];
   const lines = [headers.join(',')];
   rows.forEach(r => {
     const natFlat = Object.entries(r.natMap||{}).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${k}:${n}`).join('; ');
-    lines.push([r.ref, r.agency, r.agencyRef, r.paxTotal||'', natFlat, r.catLabel, r.date,
+    lines.push([r.ref, r.agency, r.agencyRef, r.paxTotal||'', natFlat, r.catLabel, r.flightNo, r.date,
       r.fromCity, r.fromArea, r.toCity, r.toArea, r.time,
       r.transCompany, r.driver, r.dphone, r.vehicle, r.plate, r.ourCompany, r.permit, r.conf]
       .map(v => `"${(String(v||'')).replace(/"/g,'""')}"`)
