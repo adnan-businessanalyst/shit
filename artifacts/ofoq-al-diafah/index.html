@@ -53,6 +53,18 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
 
 /* ─── Sidebar ───────────────────────────────────────────── */
+#impersonation-bar {
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: #2D1A5E; color: #C4B5FD;
+  padding: 0 16px; height: 36px;
+  align-items: center; gap: 12px;
+  font-size: 0.8571rem; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+#impersonation-bar.visible { display: flex; }
+body.impersonating #sidebar { top: 36px; }
+body.impersonating #main    { padding-top: 36px; }
+
 #sidebar {
   width: 240px; min-width: 240px;
   background: #BE9C5C;
@@ -1298,6 +1310,13 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 <!-- Overlay to close sidebar on mobile -->
+<!-- Impersonation bar (superadmin "view as user" mode) -->
+<div id="impersonation-bar">
+  <span>👁 Viewing as &nbsp;<strong id="impersonate-name"></strong></span>
+  <span style="font-size:0.7143rem;opacity:0.7;margin-right:auto">&nbsp;— changes affect this user's data</span>
+  <button onclick="stopImpersonating()" style="background:#C4B5FD;color:#2D1A5E;border:none;border-radius:999px;padding:4px 14px;font-weight:700;cursor:pointer;font-size:0.7857rem;font-family:inherit">↩ Return to Super Admin</button>
+</div>
+
 <div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ════════ MAIN ════════ -->
@@ -13517,6 +13536,12 @@ function enterApp() {
   if (currentUser?.role === 'superadmin') {
     document.getElementById('admin-nav-item').style.display = 'flex';
   }
+  // Show/hide impersonation bar
+  if (isImpersonating()) {
+    showImpersonationBar();
+  } else {
+    hideImpersonationBar();
+  }
   renderDashboard();
   applyRoleUI();
   checkOnboarding();
@@ -13541,6 +13566,8 @@ function updateUserPill() {
 }
 
 function doLogout() {
+  sessionStorage.removeItem('oad_impersonate_origin');
+  hideImpersonationBar();
   sessionClear();
   currentUser = null;
   localStorage.removeItem('oad_lang');
@@ -13550,6 +13577,59 @@ function doLogout() {
   document.getElementById('login-password').value = '';
   document.getElementById('login-error').classList.remove('show');
   switchAuthTab('login');
+}
+
+function isImpersonating() {
+  try { return !!sessionStorage.getItem('oad_impersonate_origin'); } catch { return false; }
+}
+
+function showImpersonationBar() {
+  const bar = document.getElementById('impersonation-bar');
+  if (!bar) return;
+  bar.classList.add('visible');
+  const nameEl = document.getElementById('impersonate-name');
+  if (nameEl) nameEl.textContent = currentUser?.name || currentUser?.email || '?';
+  document.body.classList.add('impersonating');
+}
+
+function hideImpersonationBar() {
+  const bar = document.getElementById('impersonation-bar');
+  if (bar) bar.classList.remove('visible');
+  document.body.classList.remove('impersonating');
+}
+
+function switchToUser(userId) {
+  if (!isSuperAdmin()) { toast('Only super admin can switch users', false); return; }
+  const users = authDB();
+  const u = users.find(x => x.id === userId);
+  if (!u) { toast('User not found', false); return; }
+  // Save origin superadmin session (only if not already impersonating)
+  if (!isImpersonating()) {
+    sessionStorage.setItem('oad_impersonate_origin', JSON.stringify(currentUser));
+  }
+  currentUser = u;
+  sessionSet(u);
+  enterApp();
+  navigate(document.querySelector('[data-page=vouchers]'), 'vouchers');
+  toast(`Switched to ${u.name}`);
+}
+
+function stopImpersonating() {
+  const raw = sessionStorage.getItem('oad_impersonate_origin');
+  if (!raw) return;
+  try {
+    const admin = JSON.parse(raw);
+    sessionStorage.removeItem('oad_impersonate_origin');
+    currentUser = admin;
+    sessionSet(admin);
+    hideImpersonationBar();
+    enterApp();
+    navigate(document.querySelector('[data-page=users]'), 'users');
+    toast('Returned to Super Admin');
+  } catch(e) {
+    sessionStorage.removeItem('oad_impersonate_origin');
+    doLogout();
+  }
 }
 
 /* ─── Admin Panel ─────────────────────────────────────── */
@@ -14007,9 +14087,10 @@ function userCard(u, isSuper) {
       ${u.phone?`<div>📞 ${u.phone}</div>`:''}
       ${u.notes?`<div style="margin-top:6px;font-size:0.7857rem;border-top:1px solid var(--border);padding-top:6px">${u.notes}</div>`:''}
     </div>
-    ${!isSuper ? `<div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;gap:6px;background:var(--cream)">
+    ${!isSuper ? `<div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;gap:6px;background:var(--cream);flex-wrap:wrap">
       <button class="btn btn-xs btn-gold" onclick="openAddUserModal('${u.id}')">Edit</button>
       <button class="btn btn-xs btn-red" onclick="revokeUser('${u.id}')">Revoke</button>
+      ${isSuperAdmin() ? `<button class="btn btn-xs" onclick="switchToUser('${u.id}')" style="margin-right:auto;background:#2D1A5E;color:#C4B5FD;border-color:#2D1A5E" title="View app as this user">👁 Switch to User</button>` : ''}
     </div>` : ''}
   </div>`;
 }
