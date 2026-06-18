@@ -8454,12 +8454,6 @@ function viewVoucherDetail(id) {
         <span style="font-weight:600">${dest}</span>
         ${t.time?`<span style="color:var(--ink-muted);margin-right:auto">${t.time}</span>`:'<span style="margin-right:auto"></span>'}
         ${t.vehicle?`<span class="badge" style="background:var(--cream-dark)">${t.vehicle}</span>`:''}
-        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp1('${v.id}',${tIdx})" title="رسالة واتساب 1" style="font-size:0.7143rem">
-          💬 رسالة 1
-        </button>
-        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp2('${v.id}',${tIdx})" title="رسالة واتساب 2" style="font-size:0.7143rem;opacity:0.85">
-          💬 رسالة 2
-        </button>
       </div>
       ${t.permit?`<div style="margin-top:4px;font-size:0.7857rem;color:var(--ink-muted)">امر التفويج: <strong>${t.permit}</strong></div>`:''}
     </div>`;
@@ -10775,7 +10769,7 @@ function sendTransportWhatsApp1(vId, tIdx) {
   const phone = (t.dphone || v.leaderPhone || '').replace(/\D/g, '');
   const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
   window.open(url, '_blank');
-  toast('فتح واتساب — رسالة 1...');
+  toast('فتح واتساب — رسالة للعميل / الوكيل...');
 }
 
 function sendTransportWhatsApp2(vId, tIdx) {
@@ -10808,7 +10802,7 @@ function sendTransportWhatsApp2(vId, tIdx) {
   const phone = (v.leaderPhone || '').replace(/\D/g, '');
   const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
   window.open(url, '_blank');
-  toast('فتح واتساب — رسالة 2...');
+  toast('فتح واتساب — رسالة للمندوب...');
 }
 
 function confirmVoucher(id) {
@@ -14559,8 +14553,10 @@ function renderTransportReport() {
       ${col('plate',       editCell(r.plate,   'plate',   r.vId, r.tIdx))}
       ${col('permit',      editCell(r.permit,  'permit',  r.vId, r.tIdx))}
       ${col('conf',        editCell(r.conf,    'conf',    r.vId, r.tIdx))}
-      <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap">
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap;display:flex;gap:4px;align-items:center">
         <button class="btn btn-xs btn-gold" onclick="saveTransportRowEdit('${r.vId}',${r.tIdx})" title="حفظ التعديلات">💾</button>
+        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp1('${r.vId}',${r.tIdx})" title="رسالة للعميل / الوكيل" style="font-size:0.6786rem;padding:3px 6px">💬 عميل</button>
+        <button class="btn btn-xs btn-green" onclick="sendTransportWhatsApp2('${r.vId}',${r.tIdx})" title="رسالة للمندوب" style="font-size:0.6786rem;padding:3px 6px;opacity:0.85">💬 مندوب</button>
       </td>
     </tr>
   `).join('');
