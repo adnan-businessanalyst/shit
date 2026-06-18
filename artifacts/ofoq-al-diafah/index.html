@@ -2174,7 +2174,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </select>
           </div>
           <div>
-            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">التصريح</div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">امر التفويج</div>
             <select id="tr-rep-permit" onchange="renderTransportReport()" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
               <option value="">الكل</option>
               <option value="present">✅ متوفر</option>
@@ -7889,7 +7889,7 @@ function addTripRow(category, prefill) {
         ${inp(`tr-plate-${idx}`, 'text', 'أ ب ج 1234')}
       </div>
       <div>
-        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">رقم التصريح</div>
+        <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">امر التفويج</div>
         ${inp(`tr-permit-${idx}`, 'text', 'PRM-...')}
       </div>
       <div>
@@ -14299,7 +14299,7 @@ const TR_COLUMNS = [
   { key:'dphone',       label:'هاتف' },
   { key:'vehicle',      label:'المركبة' },
   { key:'plate',        label:'اللوحة' },
-  { key:'permit',       label:'التصريح' },
+  { key:'permit',       label:'امر التفويج' },
   { key:'conf',         label:'رقم التأكيد' },
 ];
 function getTrHiddenCols() {
