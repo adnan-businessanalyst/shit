@@ -1707,6 +1707,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
             <div class="field"><label>اسم الوكالة</label><input id="v-agency" type="text" placeholder="يُعبأ تلقائياً عند اختيار الشركة"></div>
             <div class="field"><label class="required">رقم المجموعة</label><input id="v-agency-ref" type="text" placeholder="مثال: 901002419"></div>
+            <div class="field"><label class="required">شركتنا</label><select id="v-our-company" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%"><option value="">— اختر الشركة —</option></select></div>
             <div class="field"><label class="recommended">اسم القائد</label><input id="v-leader-name" type="text" placeholder="الاسم الكامل..."></div>
             <div class="field"><label class="recommended">هاتف القائد</label><input id="v-leader-phone" type="text" placeholder="+62..."></div>
             <div class="field"><label>هاتف الوكيل</label><input id="v-phone" type="text" placeholder="+966..."></div>
@@ -7427,9 +7428,11 @@ function openNewVoucherPage(editId) {
   populateTransportLookups();
   ['v-agency','v-agency-ref','v-leader-name','v-leader-phone','v-phone','v-email','v-notes',
    'v-arr-date','v-arr-flight','v-arr-time','v-dep-date','v-dep-flight','v-dep-time',
-   'v-pax-total','v-pax-men','v-pax-women'].forEach(id => {
+   'v-pax-total','v-pax-men','v-pax-women','v-our-company'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  const ocSel = document.getElementById('v-our-company');
+  if (ocSel) ocSel.innerHTML = '<option value="">— اختر الشركة —</option>' + getLookupList('ourCompanies').map(c=>`<option value="${c}">${c}</option>`).join('');
   ['v-arr-airport','v-dep-airport'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
@@ -7453,7 +7456,8 @@ function openNewVoucherPage(editId) {
     // Pre-fill all fields from existing voucher
     document.getElementById('v-agency').value = editing.agency || '';
     if (editing.clientId) document.getElementById('v-agency-select').value = editing.clientId;
-    document.getElementById('v-agency-ref').value = editing.agencyRef || '';
+    document.getElementById('v-agency-ref').value  = editing.agencyRef  || '';
+    document.getElementById('v-our-company').value = editing.ourCompany || '';
     document.getElementById('v-leader-name').value = editing.leaderName || '';
     document.getElementById('v-leader-phone').value = editing.leaderPhone || '';
     document.getElementById('v-phone').value = editing.agentPhone || '';
@@ -8326,7 +8330,8 @@ function saveVoucher() {
     id: uid(),
     ref: `VCH-${new Date().getFullYear()}-${String(voucherCounter).padStart(3, '0')}`,
     agency,
-    agencyRef: document.getElementById('v-agency-ref').value.trim(),
+    agencyRef:  document.getElementById('v-agency-ref').value.trim(),
+    ourCompany: document.getElementById('v-our-company')?.value || '',
     leaderName: document.getElementById('v-leader-name').value.trim(),
     leaderPhone: document.getElementById('v-leader-phone').value.trim(),
     agent: document.getElementById('v-agency').value.trim(),
@@ -14201,7 +14206,7 @@ function getTransportReportRows() {
         toArea,
         time:         t.time        || '',
         transCompany: t.transCompany|| '',
-        ourCompany:   t.ourCompany  || '',
+        ourCompany:   v.ourCompany  || t.ourCompany || '',
         driver:       t.driver      || '',
         dphone:       t.dphone      || '',
         vehicle:      t.vehicle     || '',
@@ -14401,7 +14406,7 @@ function saveTransportRowEdit(vId, tIdx) {
   if (dphone     !== undefined) t.dphone     = dphone;
   if (vehicle    !== undefined) t.vehicle    = vehicle;
   if (plate      !== undefined) t.plate      = plate;
-  if (ourCompany !== undefined) t.ourCompany = ourCompany;
+  if (ourCompany !== undefined) v.ourCompany = ourCompany;
   if (permit     !== undefined) t.permit     = permit;
   if (conf       !== undefined) t.conf       = conf;
   if (paxTotal   !== undefined) t.paxTotal   = paxTotal;
