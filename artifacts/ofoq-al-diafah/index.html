@@ -1610,6 +1610,8 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
       <!-- Vouchers tab -->
       <div class="tab-panel active" id="vou-panel-vouchers">
+        <!-- Hotel category stats -->
+        <div id="vou-cat-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px"></div>
         <div class="action-bar">
           <select id="vou-filter" onchange="renderVouchers()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
             <option value="">جميع الحالات</option>
@@ -3841,6 +3843,14 @@ body.dark-mode .action-bar { background: #1A1A1A; }
               <option value="3">⭐⭐⭐ 3 Stars</option>
               <option value="4">⭐⭐⭐⭐ 4 Stars</option>
               <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+            </select>
+          </div>
+          <div class="field"><label>Category / الفئة</label>
+            <select id="h-category">
+              <option value="">— Select category —</option>
+              <option value="luxury">Luxury — فاخر</option>
+              <option value="midrange">Mid Range — متوسط</option>
+              <option value="economical">Economical — اقتصادي</option>
             </select>
           </div>
           <div class="field"><label>Hotel Brand / Chain</label><input id="h-brand" type="text" placeholder="e.g. Marriott, Hilton, Independent"></div>
@@ -6281,6 +6291,8 @@ function renderHotels() {
   const starsDisplay = n => '⭐'.repeat(Number(n)||0);
   const batchesForHotel = h => batches.filter(b=>b.hotel===h.name).length;
   const roomsForHotel = h => rooms.filter(r=>r.hotel===h.name).length;
+  const catLabel = { luxury:'Luxury — فاخر', midrange:'Mid Range — متوسط', economical:'Economical — اقتصادي' };
+  const catColor = { luxury:'background:var(--gold-light);color:var(--gold-dark)', midrange:'background:var(--blue-light);color:var(--blue)', economical:'background:#e8f5e9;color:#2e7d32' };
 
   el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">` +
     list.map(h => `
@@ -6299,6 +6311,7 @@ function renderHotels() {
           ${h.email?`<div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:6px">✉ ${h.email}</div>`:''}
           ${h.zone?`<div style="font-size:0.8571rem;color:var(--ink-muted);margin-bottom:6px">🗺 Zone: ${h.zone}</div>`:''}
           <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            ${h.category?`<span class="badge" style="${catColor[h.category]||''}">${catLabel[h.category]||h.category}</span>`:''}
             <span class="badge" style="background:var(--blue-light);color:var(--blue)">${batchesForHotel(h)} batch${batchesForHotel(h)!==1?'es':''}</span>
             <span class="badge" style="background:var(--cream-dark);color:var(--ink-mid)">${roomsForHotel(h)} room${roomsForHotel(h)!==1?'s':''}</span>
           </div>
@@ -6324,6 +6337,7 @@ function openHotelModal(id) {
   document.getElementById('h-name').value = h?.name||'';
   document.getElementById('h-city').value = h?.city||'';
   document.getElementById('h-stars').value = h?.stars||'';
+  document.getElementById('h-category').value = h?.category||'';
   document.getElementById('h-brand').value = h?.brand||'';
   document.getElementById('h-address').value = h?.address||'';
   document.getElementById('h-distance').value = h?.distance||'';
@@ -6340,7 +6354,7 @@ function openHotelModalFromWizard() {
   openFromWizard = true;
   editingHotelId = null;
   document.getElementById('hotel-modal-title').textContent = 'Add New Hotel';
-  ['h-id','h-name','h-city','h-stars','h-brand','h-address','h-distance','h-zone',
+  ['h-id','h-name','h-city','h-stars','h-category','h-brand','h-address','h-distance','h-zone',
    'h-phone','h-email','h-contact','h-website','h-notes'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -6355,8 +6369,9 @@ function saveHotel() {
   const data = {
     name,
     city,
-    stars: document.getElementById('h-stars').value,
-    brand: document.getElementById('h-brand').value.trim(),
+    stars:    document.getElementById('h-stars').value,
+    category: document.getElementById('h-category').value,
+    brand:    document.getElementById('h-brand').value.trim(),
     address: document.getElementById('h-address').value.trim(),
     distance: Number(document.getElementById('h-distance').value)||0,
     zone: document.getElementById('h-zone').value.trim(),
@@ -8347,7 +8362,84 @@ function saveVoucher() {
   updateLogCount('vou');
 }
 
+function renderVoucherCategoryStats() {
+  const el = document.getElementById('vou-cat-stats');
+  if (!el) return;
+
+  const CATS = [
+    { key:'luxury',      label:'Luxury',      ar:'فاخر',    icon:'✨', bg:'var(--gold-light)',  col:'var(--gold-dark)' },
+    { key:'midrange',    label:'Mid Range',   ar:'متوسط',   icon:'🏨', bg:'var(--blue-light)',  col:'var(--blue)' },
+    { key:'economical',  label:'Economical',  ar:'اقتصادي', icon:'💰', bg:'#e8f5e9',            col:'#2e7d32' },
+  ];
+
+  // Map hotelId / hotelName → category
+  const hotelCatById   = {};
+  const hotelCatByName = {};
+  hotels.forEach(h => {
+    if (h.category) {
+      hotelCatById[h.id]     = h.category;
+      hotelCatByName[h.name] = h.category;
+    }
+  });
+
+  // Bookings = number of hotelConf entries per category across all vouchers
+  // Rooms    = rooms inventory count per category
+  const bookings = { luxury:0, midrange:0, economical:0 };
+  const roomsCount = { luxury:0, midrange:0, economical:0 };
+
+  vouchers.forEach(v => {
+    (v.hotelConfs||[]).forEach(hc => {
+      const cat = hotelCatById[hc.hotelId] || hotelCatByName[hc.hotelName] || null;
+      if (cat && bookings[cat] !== undefined) bookings[cat]++;
+    });
+  });
+
+  rooms.forEach(r => {
+    const cat = hotelCatById[r.hotelId] || hotelCatByName[r.hotel] || null;
+    if (cat && roomsCount[cat] !== undefined) roomsCount[cat]++;
+  });
+
+  const total = { bookings: Object.values(bookings).reduce((a,b)=>a+b,0), rooms: Object.values(roomsCount).reduce((a,b)=>a+b,0) };
+
+  el.innerHTML = CATS.map(c => `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;border-right:4px solid ${c.col}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:1.0rem">${c.icon}</span>
+        <span style="font-size:0.7143rem;font-weight:700;padding:2px 8px;border-radius:999px;background:${c.bg};color:${c.col}">${c.label}</span>
+      </div>
+      <div style="font-family:'Alexandria',sans-serif;font-size:0.8571rem;font-weight:700;color:var(--ink);margin-bottom:2px">${c.label} — ${c.ar}</div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <div>
+          <div style="font-size:1.4286rem;font-weight:700;color:${c.col};line-height:1">${bookings[c.key]}</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted);margin-top:2px">حجوزات / bookings</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div>
+          <div style="font-size:1.4286rem;font-weight:700;color:${c.col};line-height:1">${roomsCount[c.key]}</div>
+          <div style="font-size:0.7143rem;color:var(--ink-muted);margin-top:2px">غرف / rooms</div>
+        </div>
+      </div>
+    </div>
+  `).join('') + `
+    <div style="background:var(--ink);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between">
+      <div style="font-size:0.7857rem;font-weight:600;color:var(--gold-light);margin-bottom:8px">الإجمالي / Total</div>
+      <div style="display:flex;gap:12px;margin-top:auto">
+        <div>
+          <div style="font-size:1.4286rem;font-weight:700;color:var(--gold-light);line-height:1">${total.bookings}</div>
+          <div style="font-size:0.7143rem;color:rgba(255,255,255,0.5);margin-top:2px">حجوزات</div>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+        <div>
+          <div style="font-size:1.4286rem;font-weight:700;color:var(--gold-light);line-height:1">${total.rooms}</div>
+          <div style="font-size:0.7143rem;color:rgba(255,255,255,0.5);margin-top:2px">غرفة</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderVouchers() {
+  renderVoucherCategoryStats();
   const f = document.getElementById('vou-filter').value;
   let list = f ? vouchers.filter(v=>v.status===f) : vouchers;
   list = [...list].reverse();
