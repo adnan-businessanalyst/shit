@@ -1261,7 +1261,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     </div>
     <div class="nav-item" data-page="transport-report" onclick="navigate(this,'transport-report')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><circle cx="6.5" cy="19" r="1.5"/><circle cx="17.5" cy="19" r="1.5"/><path d="M1 12h22"/></svg>
-      <span>Transportation Snapshot</span>
+      <span>Transportation Report</span>
     </div>
     <div class="nav-item" data-page="financial" onclick="navigate(this,'financial')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1664,7 +1664,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="navigate(document.querySelector('[data-page=transport-report]'),'transport-report')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><path d="M1 12h22"/></svg>
-          <span>Transportation Snapshot</span>
+          <span>Transportation Report</span>
         </button>
         <button class="btn btn-gold" onclick="openNewVoucherPage()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1703,7 +1703,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <!-- Transport Stats -->
         <div style="margin-bottom:20px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">Transportation Snapshot</div>
+            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">Transportation Report</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <input type="date" id="ts-day" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
               <button class="btn btn-xs btn-gold" onclick="(function(){const t=new Date().toISOString().slice(0,10);document.getElementById('ts-day').value=t;renderTransportStats();})()">Today</button>
@@ -2190,7 +2190,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-transport-report" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">Transportation Snapshot</div>
+        <div class="topbar-title">Transportation Report</div>
         <div class="topbar-sub" id="tr-report-subtitle">جميع رحلات النقل من الحجوزات</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -15576,7 +15576,7 @@ function printTransportReport() {
   const catSummary = Object.entries(catCountsPr).filter(([,c])=>c>0)
     .map(([k,c]) => `${catLabelsPr[k]}: <strong>${c}</strong>`).join(' &nbsp;|&nbsp; ');
 
-  const title = `Transportation Snapshot${dayVal ? ` · ${dayVal}` : ''}`;
+  const title = `Transportation Report${dayVal ? ` · ${dayVal}` : ''}`;
 
   const html = `<!DOCTYPE html>
 <html dir="rtl" lang="ar">
