@@ -10351,15 +10351,27 @@ function openPaymentModal(id) {
   if (!v) return;
   window._payReceiptImages = v.paymentImages ? [...v.paymentImages] : (v.paymentReceipt && v.paymentReceipt !== 'attached' ? [v.paymentReceipt] : []);
 
+  const _payTotal = v.resSellTotal || 0;
   document.getElementById('vd-footer').innerHTML = `
     <button class="btn" onclick="viewVoucherDetail('${id}')">← Back</button>
     <div style="flex:1;display:flex;flex-direction:column;gap:12px">
       <div style="font-size:1.0rem;font-weight:700;color:var(--ink)">💳 Payment Details</div>
 
+      <div style="display:flex;gap:0;border:2px solid var(--border-strong);border-radius:var(--r-sm);overflow:hidden;align-self:flex-start">
+        <button id="pay-type-full" onclick="setPayType('full',${_payTotal})"
+          style="padding:8px 22px;font-size:0.9286rem;font-weight:600;border:none;cursor:pointer;background:var(--gold);color:#010101;transition:all 0.15s">
+          ✅ دفع كامل
+        </button>
+        <button id="pay-type-partial" onclick="setPayType('partial',${_payTotal})"
+          style="padding:8px 22px;font-size:0.9286rem;font-weight:600;border:none;cursor:pointer;background:var(--cream);color:var(--ink-mid);border-right:none;transition:all 0.15s">
+          💰 دفع جزئي
+        </button>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end">
         <div class="field">
           <label>Payment Amount (SAR)</label>
-          <input id="pay-amount" type="number" min="0" placeholder="0.00" value="${v.paymentAmount||''}"
+          <input id="pay-amount" type="number" min="0" placeholder="0.00" value="${v.paymentAmount||(_payTotal||'')}"
             style="background:var(--green-light);border-color:rgba(26,107,60,0.25);font-weight:600;font-size:1.0714rem">
         </div>
         <div class="field">
@@ -10407,6 +10419,29 @@ function openPaymentModal(id) {
   `;
 
   renderPayReceiptGrid();
+}
+
+function setPayType(type, total) {
+  const fullBtn    = document.getElementById('pay-type-full');
+  const partialBtn = document.getElementById('pay-type-partial');
+  const amtInput   = document.getElementById('pay-amount');
+  if (!fullBtn || !partialBtn || !amtInput) return;
+  if (type === 'full') {
+    fullBtn.style.background    = 'var(--gold)';
+    fullBtn.style.color         = '#010101';
+    partialBtn.style.background = 'var(--cream)';
+    partialBtn.style.color      = 'var(--ink-mid)';
+    if (total) { amtInput.value = total; amtInput.readOnly = true; amtInput.style.opacity = '0.7'; }
+  } else {
+    partialBtn.style.background = 'var(--gold)';
+    partialBtn.style.color      = '#010101';
+    fullBtn.style.background    = 'var(--cream)';
+    fullBtn.style.color         = 'var(--ink-mid)';
+    amtInput.readOnly  = false;
+    amtInput.style.opacity = '1';
+    amtInput.focus();
+  }
+  window._payType = type;
 }
 
 function handlePayReceiptFiles(event) {
