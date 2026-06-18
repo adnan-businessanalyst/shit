@@ -4364,6 +4364,40 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   </div>
 </div>
 
+<!-- ════════ WHATSAPP CONTACT PICKER ════════ -->
+<div class="modal-backdrop" id="modal-wa-picker">
+  <div class="modal" style="width:520px;max-width:100%">
+    <div class="modal-header">
+      <div class="modal-title">📨 إرسال رسالة واتساب</div>
+      <button class="modal-close" onclick="closeModal('modal-wa-picker')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="wa-picker-contacts" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <div class="field">
+        <label>رقم آخر / New number</label>
+        <input id="wa-picker-custom" type="tel" placeholder="+966 5x xxx xxxx" style="font-family:inherit;direction:ltr"
+          oninput="document.querySelectorAll('.wa-contact-chip').forEach(c=>c.classList.remove('selected'));_waSelected=this.value.trim()">
+      </div>
+      <div class="field">
+        <label style="display:flex;justify-content:space-between">
+          <span>نص الرسالة</span>
+          <span id="wa-picker-chars" style="color:var(--ink-muted);font-size:0.7857rem"></span>
+        </label>
+        <textarea id="wa-picker-msg" rows="8"
+          style="font-family:inherit;font-size:0.8571rem;width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);resize:vertical;direction:ltr"
+          oninput="document.getElementById('wa-picker-chars').textContent=this.value.length+' حرف'"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeModal('modal-wa-picker')">إلغاء</button>
+      <button class="btn btn-whatsapp" onclick="_waPickerSend()">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.975-1.418A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+        إرسال عبر واتساب
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ CONFIRMATION DETAIL MODAL ════════ -->
 <!-- ════════ TOAST ════════ -->
 <div id="toast">
@@ -11061,30 +11095,111 @@ function shareVoucherEmail(id) {
   toast('Opening email client...');
 }
 
+/* ── WhatsApp contact picker ─────────────────────────── */
+let _waSelected  = '';
+let _waOnSend    = null;
+
+function openWaContactPicker(msgText, contacts, onSend) {
+  _waSelected = '';
+  _waOnSend   = onSend || null;
+
+  const contEl  = document.getElementById('wa-picker-contacts');
+  const msgEl   = document.getElementById('wa-picker-msg');
+  const charEl  = document.getElementById('wa-picker-chars');
+  const custEl  = document.getElementById('wa-picker-custom');
+  if (!contEl || !msgEl) return;
+
+  custEl.value = '';
+  msgEl.value  = msgText;
+  charEl.textContent = msgText.length + ' حرف';
+
+  const unique = [];
+  const seen   = new Set();
+  contacts.forEach(c => {
+    const num = (c.number||'').trim();
+    if (!num || seen.has(num)) return;
+    seen.add(num);
+    unique.push(c);
+  });
+
+  if (unique.length === 0) {
+    contEl.innerHTML = '';
+  } else {
+    contEl.innerHTML = `<div style="font-size:0.8rem;font-weight:600;color:var(--ink-muted);margin-bottom:4px">جهات الاتصال المقترحة</div>` +
+      unique.map((c, i) => `
+        <div class="wa-contact-chip${i===0?' selected':''}" data-num="${c.number||''}"
+          onclick="waPickerSelect(this,'${(c.number||'').replace(/'/g,'')}')"
+          style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-sm);border:2px solid ${i===0?'var(--gold)':'var(--border)'};background:${i===0?'var(--gold-light)':'var(--surface)'};cursor:pointer;transition:all 0.12s">
+          <div style="font-size:1.2rem">👤</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:0.9rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.label}</div>
+            <div style="font-size:0.8rem;color:var(--ink-muted);direction:ltr">${c.number}</div>
+          </div>
+          <div class="wa-chip-check" style="font-size:1rem;color:var(--gold-dark)">${i===0?'✔':''}</div>
+        </div>`
+      ).join('');
+    _waSelected = unique[0]?.number || '';
+  }
+
+  openModal('modal-wa-picker');
+}
+
+function waPickerSelect(el, num) {
+  document.querySelectorAll('.wa-contact-chip').forEach(c => {
+    c.style.border      = '2px solid var(--border)';
+    c.style.background  = 'var(--surface)';
+    c.querySelector('.wa-chip-check').textContent = '';
+    c.classList.remove('selected');
+  });
+  el.style.border     = '2px solid var(--gold)';
+  el.style.background = 'var(--gold-light)';
+  el.querySelector('.wa-chip-check').textContent = '✔';
+  el.classList.add('selected');
+  _waSelected = num;
+  const custEl = document.getElementById('wa-picker-custom');
+  if (custEl) custEl.value = '';
+}
+
+function _waPickerSend() {
+  const custVal = (document.getElementById('wa-picker-custom')?.value || '').trim();
+  const phone   = (custVal || _waSelected || '').replace(/\D/g, '');
+  const msgEl   = document.getElementById('wa-picker-msg');
+  const msgText = msgEl?.value || '';
+  const msg     = encodeURIComponent(msgText);
+  const url     = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url, '_blank');
+  if (_waOnSend) _waOnSend(phone);
+  closeModal('modal-wa-picker');
+  toast('فتح واتساب...');
+}
+/* ── end WhatsApp picker ─────────────────────────────── */
+
 function shareVoucherWhatsApp(id) {
   const v = vouchers.find(x => x.id === id);
   if (!v) return;
   const s = settings || {};
   const client = clientCompanies.find(x => x.id === v.clientId);
-  const phone = (client?.whatsapp || v.leaderPhone || '').replace(/\D/g,'');
-  const hotels = (v.hotelConfs||[]).map(h=>`🏨 ${h.hotelName}: ${fmtDate(h.checkIn)}–${fmtDate(h.checkOut)}`).join('\n');
-  const msg = encodeURIComponent(
+  const hotelsText = (v.hotelConfs||[]).map(h=>`🏨 ${h.hotelName}: ${fmtDate(h.checkIn)}–${fmtDate(h.checkOut)}`).join('\n');
+  const msgText =
     `✅ *Voucher Confirmed — ${v.ref}*\n` +
     `Agency: ${v.agency}\n` +
     `Group Ref: ${v.agencyRef||'—'}\n` +
     `PAX: ${v.paxTotal} (${v.paxMen}M / ${v.paxWomen}F)\n` +
     `Arrival: ${v.arrFlight||''} ${fmtDate(v.arrDate)} @ ${v.arrTime||''}\n` +
     `Departure: ${v.depFlight||''} ${fmtDate(v.depDate)} @ ${v.depTime||''}\n\n` +
-    `${hotels}\n\n` +
-    `${s.waSignature||'Ofoq Al Diafah | أفق الضيافة'}`
-  );
-  const url = phone
-    ? `https://wa.me/${phone}?text=${msg}`
-    : `https://wa.me/?text=${msg}`;
-  window.open(url, '_blank');
-  const _vw = vouchers.find(x=>x.id===id);
-  if (_vw) { _vw.sharedAt = new Date().toISOString(); _vw.sharedVia = 'WhatsApp'; persist(); renderVouchers(); }
-  toast('Opening WhatsApp...');
+    `${hotelsText}\n\n` +
+    `${s.waSignature||'Ofoq Al Diafah | أفق الضيافة'}`;
+
+  const contacts = [
+    client?.whatsapp  && { label: `${client.name} (WhatsApp)`, number: client.whatsapp },
+    client?.phone     && { label: `${client.name} (هاتف)`,     number: client.phone },
+    v.leaderPhone     && { label: `هاتف قائد المجموعة`,         number: v.leaderPhone },
+  ].filter(Boolean);
+
+  openWaContactPicker(msgText, contacts, (phone) => {
+    const _vw = vouchers.find(x=>x.id===id);
+    if (_vw) { _vw.sharedAt = new Date().toISOString(); _vw.sharedVia = 'WhatsApp'; persist(); renderVouchers(); }
+  });
 }
 
 function sendTransportWhatsApp1(vId, tIdx) {
@@ -11101,7 +11216,7 @@ function sendTransportWhatsApp1(vId, tIdx) {
   const itinerary = [[fromCity, fromPort].filter(Boolean).join(' '), [toCity, toPort].filter(Boolean).join(' ')].filter(Boolean).join(' ← ') || '—';
   const company   = t.ourCompany || v.ourCompany || s.companyName || 'أفق الضيافة';
 
-  const lines = [
+  const msgText = [
     `🚌 *أمر نقل — ${v.ref}*`,
     ``,
     `اسم العميل: ${v.agency || '—'}`,
@@ -11120,13 +11235,17 @@ function sendTransportWhatsApp1(vId, tIdx) {
     `رقم اللوحة: ${t.plate || '—'}`,
     `اسم الشركة: ${company}`,
     `امر التفويج: ${t.permit || '—'}`,
-  ];
+  ].join('\n');
 
-  const msg = encodeURIComponent(lines.join('\n'));
-  const phone = (t.dphone || v.leaderPhone || '').replace(/\D/g, '');
-  const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
-  window.open(url, '_blank');
-  toast('فتح واتساب — رسالة للعميل / الوكيل...');
+  const client = clientCompanies.find(x => x.id === v.clientId);
+  const contacts = [
+    t.dphone       && { label: `السائق — ${t.driver||'سائق'}`,   number: t.dphone },
+    v.leaderPhone  && { label: `هاتف قائد المجموعة`,              number: v.leaderPhone },
+    client?.whatsapp && { label: `${client.name} (WhatsApp)`,     number: client.whatsapp },
+    client?.phone  && { label: `${client.name} (هاتف)`,           number: client.phone },
+  ].filter(Boolean);
+
+  openWaContactPicker(msgText, contacts, null);
 }
 
 function sendTransportWhatsApp2(vId, tIdx) {
@@ -11142,7 +11261,7 @@ function sendTransportWhatsApp2(vId, tIdx) {
   const pickup  = t.fromPort || t.fromArea || t.fromCity || t.from || '—';
   const org     = t.ourCompany || v.ourCompany || s.companyName || 'أفق الضيافة';
 
-  const lines = [
+  const msgText = [
     `🚌 *أمر نقل — ${v.ref}*`,
     ``,
     `رقم المجموعة: ${v.agencyRef || '—'}`,
@@ -11155,13 +11274,17 @@ function sendTransportWhatsApp2(vId, tIdx) {
     `مكان الركوب: ${pickup}`,
     `اسم المنظمة: ${org}`,
     `امر التفويج: ${t.permit || '—'}`,
-  ];
+  ].join('\n');
 
-  const msg = encodeURIComponent(lines.join('\n'));
-  const phone = (v.leaderPhone || '').replace(/\D/g, '');
-  const url = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
-  window.open(url, '_blank');
-  toast('فتح واتساب — رسالة للمندوب...');
+  const client = clientCompanies.find(x => x.id === v.clientId);
+  const contacts = [
+    v.leaderPhone    && { label: `هاتف قائد المجموعة`,            number: v.leaderPhone },
+    t.dphone         && { label: `السائق — ${t.driver||'سائق'}`,  number: t.dphone },
+    client?.whatsapp && { label: `${client.name} (WhatsApp)`,     number: client.whatsapp },
+    client?.phone    && { label: `${client.name} (هاتف)`,          number: client.phone },
+  ].filter(Boolean);
+
+  openWaContactPicker(msgText, contacts, null);
 }
 
 function confirmVoucher(id) {
