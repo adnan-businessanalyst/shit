@@ -1631,6 +1631,23 @@ body.dark-mode .action-bar { background: #1A1A1A; }
 
       <!-- Vouchers tab -->
       <div class="tab-panel active" id="vou-panel-vouchers">
+        <!-- Hotel category stats date filter -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-muted)">إحصائيات الفنادق</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-right:auto">
+            <div style="font-size:0.7857rem;color:var(--ink-muted)">من</div>
+            <div>
+              <input type="date" id="vcs-from" oninput="document.getElementById('vcs-from-h').textContent=fmtHijri(this.value)||'';renderVoucherCategoryStats();" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <div id="vcs-from-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:2px;min-height:1em;direction:rtl"></div>
+            </div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted)">إلى</div>
+            <div>
+              <input type="date" id="vcs-to" oninput="document.getElementById('vcs-to-h').textContent=fmtHijri(this.value)||'';renderVoucherCategoryStats();" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <div id="vcs-to-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:2px;min-height:1em;direction:rtl"></div>
+            </div>
+            <button class="btn btn-xs" onclick="document.getElementById('vcs-from').value='';document.getElementById('vcs-to').value='';document.getElementById('vcs-from-h').textContent='';document.getElementById('vcs-to-h').textContent='';renderVoucherCategoryStats()">إعادة ضبط</button>
+          </div>
+        </div>
         <!-- Hotel category stats -->
         <div id="vou-cat-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px"></div>
 
@@ -8562,6 +8579,9 @@ function renderVoucherCategoryStats() {
     }
   });
 
+  const fromVal = document.getElementById('vcs-from')?.value || '';
+  const toVal   = document.getElementById('vcs-to')?.value   || '';
+
   // Bookings = number of hotelConf entries per category across all vouchers
   // Rooms    = rooms inventory count per category
   const bookings = { luxury:0, midrange:0, economical:0 };
@@ -8569,6 +8589,8 @@ function renderVoucherCategoryStats() {
 
   vouchers.forEach(v => {
     (v.hotelConfs||[]).forEach(hc => {
+      if (fromVal && hc.checkIn  && hc.checkIn  < fromVal) return;
+      if (toVal   && hc.checkOut && hc.checkOut > toVal)   return;
       const cat = hotelCatById[hc.hotelId] || hotelCatByName[hc.hotelName] || null;
       if (cat && bookings[cat] !== undefined) bookings[cat]++;
     });
