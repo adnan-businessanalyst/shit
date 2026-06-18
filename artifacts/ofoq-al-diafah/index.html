@@ -15134,15 +15134,19 @@ function renderTransportReport() {
     const entries = Object.entries(natMap).sort((a,b)=>b[1]-a[1]);
     const natTotal = entries.reduce((s,[,n])=>s+n, 0);
     const mismatch = paxTotal && natTotal !== paxTotal;
-    const textVal = entries.map(([k,n])=>`${k}:${n}`).join(', ');
-    const safeVal = textVal.replace(/"/g,'&quot;');
     const id = `tr-nat-${vId}-${tIdx}`;
-    return `<td style="padding:5px 8px;border-bottom:1px solid var(--border);min-width:160px">
-      <input id="${id}" type="text" value="${safeVal}" placeholder="e.g. Indonesian:10, Turkish:5"
-        title="${mismatch?'⚠ المجموع '+natTotal+' لا يساوي إجمالي الركاب '+paxTotal:''}"
-        onkeydown="if(event.key==='Enter')saveNatEdit('${vId}',${tIdx})"
-        style="font-family:inherit;font-size:0.8rem;padding:4px 7px;border:1px solid ${mismatch?'var(--amber)':'var(--border)'};border-radius:var(--r-sm);background:transparent;color:var(--ink);width:180px">
-      ${mismatch?`<div style="font-size:0.7rem;color:var(--amber);margin-top:2px">⚠ ${natTotal}/${paxTotal}</div>`:''}
+    const rows = entries.length
+      ? entries.map(([k,n], i) => _natRowHtml(vId, tIdx, i, k, n)).join('')
+      : _natRowHtml(vId, tIdx, 0, '', '');
+    return `<td style="padding:5px 8px;border-bottom:1px solid var(--border);min-width:210px">
+      <div id="${id}" style="display:flex;flex-direction:column;gap:3px">${rows}</div>
+      <div style="display:flex;gap:4px;margin-top:5px;align-items:center">
+        <button onclick="natAddRow('${vId}',${tIdx})"
+          style="font-size:0.75rem;padding:2px 8px;border:1px dashed var(--border);background:transparent;border-radius:var(--r-sm);cursor:pointer;color:var(--ink-muted);white-space:nowrap">+ إضافة</button>
+        <button onclick="saveNatEdit('${vId}',${tIdx})"
+          style="font-size:0.75rem;padding:2px 8px;border:1px solid var(--gold-dark);background:transparent;border-radius:var(--r-sm);cursor:pointer;color:var(--gold-dark);white-space:nowrap">💾 حفظ</button>
+        ${mismatch ? `<span style="font-size:0.7rem;color:var(--amber);white-space:nowrap">⚠ ${natTotal}/${paxTotal}</span>` : ''}
+      </div>
     </td>`;
   };
 
@@ -15197,16 +15201,50 @@ function renderTransportReport() {
   if (typeof trUpdateScrollBtns === 'function') trUpdateScrollBtns();
 }
 
+function _natRowHtml(vId, tIdx, i, key, val) {
+  const safeKey = String(key).replace(/"/g,'&quot;');
+  const inpStyle = 'font-family:inherit;font-size:0.8rem;padding:3px 6px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink)';
+  return `<div id="tr-nat-row-${vId}-${tIdx}-${i}" style="display:flex;gap:3px;align-items:center">
+    <input id="tr-nat-key-${vId}-${tIdx}-${i}" type="text" value="${safeKey}" placeholder="الجنسية"
+      style="${inpStyle};flex:1;min-width:80px">
+    <input id="tr-nat-val-${vId}-${tIdx}-${i}" type="number" min="0" value="${val||''}" placeholder="عدد"
+      style="${inpStyle};width:54px"
+      onkeydown="if(event.key==='Enter')saveNatEdit('${vId}',${tIdx})">
+    <button onclick="natRemoveRow('${vId}',${tIdx},${i})"
+      style="width:20px;height:20px;border:none;background:transparent;cursor:pointer;color:var(--ink-muted);font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:50%"
+      onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-muted)'">×</button>
+  </div>`;
+}
+
+function natAddRow(vId, tIdx) {
+  const container = document.getElementById(`tr-nat-${vId}-${tIdx}`);
+  if (!container) return;
+  const i = container.querySelectorAll('[id^="tr-nat-row-"]').length;
+  const div = document.createElement('div');
+  div.innerHTML = _natRowHtml(vId, tIdx, i, '', '');
+  container.appendChild(div.firstElementChild);
+  container.querySelector(`#tr-nat-key-${vId}-${tIdx}-${i}`)?.focus();
+}
+
+function natRemoveRow(vId, tIdx, i) {
+  const row = document.getElementById(`tr-nat-row-${vId}-${tIdx}-${i}`);
+  if (row) row.remove();
+}
+
 function saveNatEdit(vId, tIdx) {
   const v = vouchers.find(x => x.id === vId);
   if (!v) return;
-  const input = document.getElementById(`tr-nat-${vId}-${tIdx}`);
-  if (!input) return;
-  const raw = input.value.trim();
+  const container = document.getElementById(`tr-nat-${vId}-${tIdx}`);
+  if (!container) return;
   const natMap = {};
-  raw.split(',').forEach(part => {
-    const m = part.trim().match(/^(.+?)\s*:\s*(\d+)$/);
-    if (m && m[1].trim()) natMap[m[1].trim()] = parseInt(m[2], 10);
+  container.querySelectorAll('[id^="tr-nat-row-"]').forEach(row => {
+    const idParts = row.id.split('-');
+    const i = idParts[idParts.length - 1];
+    const keyEl = row.querySelector(`#tr-nat-key-${vId}-${tIdx}-${i}`);
+    const valEl = row.querySelector(`#tr-nat-val-${vId}-${tIdx}-${i}`);
+    const k = keyEl?.value.trim();
+    const n = parseInt(valEl?.value, 10);
+    if (k && n > 0) natMap[k] = n;
   });
   const total = Object.values(natMap).reduce((s,n)=>s+n, 0);
   v.natMapOverride = Object.keys(natMap).length ? natMap : undefined;
