@@ -2225,8 +2225,12 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div id="tr-rep-summary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
 
       <!-- Table -->
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto">
+      <div class="card no-print" style="padding:0;overflow:hidden;position:relative" id="tr-table-card">
+        <button onclick="document.getElementById('tr-table-scroll').scrollBy({left:-320,behavior:'smooth'})" id="tr-scroll-right"
+          style="position:absolute;top:50%;right:0;transform:translateY(-50%);z-index:10;width:36px;height:56px;background:var(--ink);color:var(--gold);border:none;border-radius:6px 0 0 6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:-2px 0 10px rgba(0,0,0,0.18);opacity:0.85;transition:opacity 0.15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">&#8250;</button>
+        <button onclick="document.getElementById('tr-table-scroll').scrollBy({left:320,behavior:'smooth'})" id="tr-scroll-left"
+          style="position:absolute;top:50%;left:0;transform:translateY(-50%);z-index:10;width:36px;height:56px;background:var(--ink);color:var(--gold);border:none;border-radius:0 6px 6px 0;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:2px 0 10px rgba(0,0,0,0.18);opacity:0.85;transition:opacity 0.15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">&#8249;</button>
+        <div id="tr-table-scroll" style="overflow-x:auto;scroll-behavior:smooth" onscroll="trUpdateScrollBtns()">
           <table style="width:100%;border-collapse:collapse;font-size:0.8571rem">
             <thead id="tr-rep-head"></thead>
             <tbody id="tr-rep-body"></tbody>
@@ -2234,6 +2238,19 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         </div>
         <div id="tr-rep-empty" style="display:none;padding:40px;text-align:center;color:var(--ink-muted)">لا توجد رحلات نقل تطابق المرشّحات المختارة</div>
       </div>
+      <script>
+      function trUpdateScrollBtns() {
+        const el = document.getElementById('tr-table-scroll');
+        if (!el) return;
+        const atStart = el.scrollLeft === 0;
+        const atEnd   = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+        const btnR = document.getElementById('tr-scroll-right');
+        const btnL = document.getElementById('tr-scroll-left');
+        if (btnR) btnR.style.display = atStart ? 'none' : 'flex';
+        if (btnL) btnL.style.display = atEnd   ? 'none' : 'flex';
+      }
+      document.addEventListener('DOMContentLoaded', trUpdateScrollBtns);
+      </script>
 
     </div>
   </div>
@@ -14871,6 +14888,7 @@ function renderTransportReport() {
       </td>
     </tr>
   `).join('');
+  if (typeof trUpdateScrollBtns === 'function') trUpdateScrollBtns();
 }
 
 function saveNatEdit(vId, tIdx) {
