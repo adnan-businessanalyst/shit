@@ -460,6 +460,8 @@ body:has(#page-transport-report.active) {
   @page { size: A4 landscape; margin: 12mm; }
   #page-transport-report .card { box-shadow: none; border: 1px solid #ccc; }
   #tr-rep-summary { page-break-inside: avoid; }
+  #tr-rep-filters, #tr-rep-summary { display: none !important; }
+  #page-transport-report .topbar { display: none !important; }
 }
 
 /* ─── RTL sidebar (all sizes) ───────────────────────────── */
@@ -2133,7 +2135,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="content">
 
       <!-- Filters -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card no-print" id="tr-rep-filters" style="margin-bottom:18px">
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;align-items:end">
 
           <div>
@@ -14927,7 +14929,36 @@ function saveTransportRowEdit(vId, tIdx) {
 }
 
 function exportTransportReportCSV() {
-  const rows = getTransportReportRows();
+  const fromVal     = document.getElementById('tr-rep-from')?.value       || '';
+  const toVal       = document.getElementById('tr-rep-to')?.value         || '';
+  const catVal      = document.getElementById('tr-rep-cat')?.value        || '';
+  const driverF     = document.getElementById('tr-rep-driver')?.value     || '';
+  const dphoneF     = document.getElementById('tr-rep-dphone')?.value     || '';
+  const plateF      = document.getElementById('tr-rep-plate')?.value      || '';
+  const vehicleF    = document.getElementById('tr-rep-vehicle')?.value    || '';
+  const permitF     = document.getElementById('tr-rep-permit')?.value     || '';
+  const fromCityF   = (document.getElementById('tr-rep-fromCity')?.value  || '').trim().toLowerCase();
+  const toCityF     = (document.getElementById('tr-rep-toCity')?.value    || '').trim().toLowerCase();
+  const ourCompanyF = document.getElementById('tr-rep-ourCompany')?.value || '';
+  const fld = (val, filter) => {
+    if (!filter) return true;
+    const has = val && val.trim() !== '';
+    return filter === 'present' ? has : !has;
+  };
+  const rows = getTransportReportRows().filter(r => {
+    if (fromVal      && r.date && r.date < fromVal)                      return false;
+    if (toVal        && r.date && r.date > toVal)                        return false;
+    if (catVal       && r.cat !== catVal)                                return false;
+    if (fromCityF    && !r.fromCity.toLowerCase().includes(fromCityF))   return false;
+    if (toCityF      && !r.toCity.toLowerCase().includes(toCityF))       return false;
+    if (ourCompanyF  && r.ourCompany !== ourCompanyF)                    return false;
+    if (!fld(r.driver,  driverF))  return false;
+    if (!fld(r.dphone,  dphoneF))  return false;
+    if (!fld(r.plate,   plateF))   return false;
+    if (!fld(r.vehicle, vehicleF)) return false;
+    if (!fld(r.permit,  permitF))  return false;
+    return true;
+  });
   const hidden = getTrHiddenCols();
   const visCols = TR_COLUMNS.filter(c => !hidden.has(c.key));
   const colData = {
