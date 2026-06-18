@@ -1699,13 +1699,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <!-- Transport Stats -->
         <div style="margin-bottom:20px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">إحصائيات النقل / Transport Stats</div>
+            <div style="font-size:0.8571rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--ink-muted)">Transportation Snapshot</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <div style="font-size:0.7857rem;color:var(--ink-muted)">من</div>
-              <input type="date" id="ts-from" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
-              <div style="font-size:0.7857rem;color:var(--ink-muted)">إلى</div>
-              <input type="date" id="ts-to" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
-              <button class="btn btn-xs" onclick="document.getElementById('ts-from').value='';document.getElementById('ts-to').value='';renderTransportStats()">إعادة ضبط</button>
+              <input type="date" id="ts-day" oninput="renderTransportStats()" style="font-family:inherit;font-size:0.8571rem;padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+              <button class="btn btn-xs btn-gold" onclick="(function(){const t=new Date().toISOString().slice(0,10);document.getElementById('ts-day').value=t;renderTransportStats();})()">Today</button>
             </div>
           </div>
           <div id="vou-transport-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"></div>
@@ -8764,8 +8761,7 @@ function renderVoucherCategoryStats() {
 function renderTransportStats() {
   const el = document.getElementById('vou-transport-stats');
   if (!el) return;
-  const fromVal = document.getElementById('ts-from')?.value || '';
-  const toVal   = document.getElementById('ts-to')?.value   || '';
+  const dayVal  = document.getElementById('ts-day')?.value  || '';
 
   // breakdown maps: cat → { key(port/city) → count }
   const breakdown = { arrival:{}, visits:{}, internal:{}, departure:{} };
@@ -8775,8 +8771,7 @@ function renderTransportStats() {
     (v.transport || []).forEach(t => {
       const cat  = t.category || '';
       const date = t.date || '';
-      if (fromVal && date && date < fromVal) return;
-      if (toVal   && date && date > toVal)   return;
+      if (dayVal && date !== dayVal) return;
       if (!(cat in breakdown)) return;
       totals[cat]++;
       let dim = '';
