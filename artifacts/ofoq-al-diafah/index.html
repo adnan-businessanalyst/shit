@@ -2207,6 +2207,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             <thead>
               <tr style="background:var(--cream-dark);text-align:start">
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المرجع</th>
+                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">شركتنا</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اسم العميل</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم المجموعة</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم العملية</th>
@@ -2225,7 +2226,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">هاتف</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">المركبة</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">اللوحة</th>
-                <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">شركتنا</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">التصريح</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap">رقم التأكيد</th>
                 <th style="padding:10px 12px;font-weight:600;color:var(--ink-muted);white-space:nowrap"></th>
@@ -14364,6 +14364,7 @@ function renderTransportReport() {
   tbody.innerHTML = rows.map((r, i) => `
     <tr style="background:${i%2===0?'transparent':'var(--cream)'}">
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.ref}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid var(--border)"><select id="tr-edit-${r.vId}-${r.tIdx}-ourCompany" onchange="saveTransportRowEdit('${r.vId}',${r.tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink);max-width:150px"><option value="">—</option>${getLookupList('ourCompanies').map(c=>`<option value="${c}"${r.ourCompany===c?' selected':''}>${c}</option>`).join('')}</select></td>
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.agency}</td>
       ${plainCell(r.agencyRef)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600;color:var(--gold-dark)">${r.opNum||'—'}</td>
@@ -14382,7 +14383,6 @@ function renderTransportReport() {
       ${editCell(r.dphone,  'dphone',  r.vId, r.tIdx)}
       ${editCell(r.vehicle, 'vehicle', r.vId, r.tIdx)}
       ${editCell(r.plate,   'plate',   r.vId, r.tIdx)}
-      <td style="padding:5px 8px;border-bottom:1px solid var(--border)"><select id="tr-edit-${r.vId}-${r.tIdx}-ourCompany" onchange="saveTransportRowEdit('${r.vId}',${r.tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;color:var(--ink);max-width:150px"><option value="">—</option>${getLookupList('ourCompanies').map(c=>`<option value="${c}"${r.ourCompany===c?' selected':''}>${c}</option>`).join('')}</select></td>
       ${editCell(r.permit, 'permit', r.vId, r.tIdx)}
       ${editCell(r.conf,   'conf',   r.vId, r.tIdx)}
       <td style="padding:5px 8px;border-bottom:1px solid var(--border);white-space:nowrap">
