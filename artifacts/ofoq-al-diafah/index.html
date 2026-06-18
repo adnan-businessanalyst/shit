@@ -14291,7 +14291,7 @@ function renderTransportReport() {
   const plainCell = v => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${v||'—'}</td>`;
   const editCell = (val, field, vId, tIdx) => {
     const id = `tr-edit-${vId}-${tIdx}-${field}`;
-    const safeVal = (val||'').replace(/"/g,'&quot;');
+    const safeVal = String(val??'').replace(/"/g,'&quot;');
     const missing = !val || !String(val).trim();
     return `<td style="padding:5px 8px;border-bottom:1px solid var(--border)"><input id="${id}" type="text" value="${safeVal}" placeholder="—" onkeydown="if(event.key==='Enter')saveTransportRowEdit('${vId}',${tIdx})" style="font-family:inherit;font-size:0.8571rem;padding:4px 8px;border:1px solid ${missing?'var(--red)':'var(--border)'};border-radius:var(--r-sm);background:transparent;color:var(--ink);width:110px"></td>`;
   };
