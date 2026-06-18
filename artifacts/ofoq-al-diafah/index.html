@@ -7886,7 +7886,7 @@ function addTripRow(category, prefill) {
         <div style="font-size:0.7143rem;color:var(--ink-muted);margin-bottom:3px">شركة النقل</div>
         <select id="tr-transCompany-${idx}" onchange="onTransCompanyChange(${idx})" style="font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%;margin-bottom:4px">
           <option value="">— اختر شركة النقل —</option>
-          ${getLookupList('transportCompanies').map(c=>`<option value="${c}">${c}</option>`).join('')}
+          ${busCompanies.map(b=>`<option value="${b.name}">${b.name}</option>`).join('')}
           <option value="__other__">✏️ أخرى...</option>
         </select>
         <input id="tr-transCompany-other-${idx}" type="text" placeholder="اسم الشركة..." style="display:none;font-family:inherit;font-size:0.9286rem;padding:8px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);width:100%;box-sizing:border-box">
