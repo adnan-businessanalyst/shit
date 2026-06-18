@@ -14343,7 +14343,7 @@ function renderTransportReport() {
       ${editCell(r.paxTotal, 'paxTotal', r.vId, r.tIdx)}
       ${natEditCell(r.natMap, r.paxTotal, r.vId, r.tIdx)}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${r.catLabel}</td>
-      ${editCell(r.flightNo, 'flightNo', r.vId, r.tIdx)}
+      ${(r.cat==='arrival'||r.cat==='departure') ? editCell(r.flightNo,'flightNo',r.vId,r.tIdx) : `<td style="padding:9px 12px;border-bottom:1px solid var(--border);color:var(--ink-muted);font-size:0.85em">N/A</td>`}
       <td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap">${fmtDate(r.date)}</td>
       ${plainCell(r.fromCity)}
       ${plainCell(r.fromArea)}
