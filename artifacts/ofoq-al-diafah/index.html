@@ -1261,7 +1261,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     </div>
     <div class="nav-item" data-page="transport-report" onclick="navigate(this,'transport-report')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><circle cx="6.5" cy="19" r="1.5"/><circle cx="17.5" cy="19" r="1.5"/><path d="M1 12h22"/></svg>
-      <span>تقرير النقل</span>
+      <span>Transportation Snapshot</span>
     </div>
     <div class="nav-item" data-page="financial" onclick="navigate(this,'financial')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1660,7 +1660,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="navigate(document.querySelector('[data-page=transport-report]'),'transport-report')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M16 6V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/><path d="M1 12h22"/></svg>
-          <span>تقرير النقل</span>
+          <span>Transportation Snapshot</span>
         </button>
         <button class="btn btn-gold" onclick="openNewVoucherPage()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2189,7 +2189,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
   <div id="page-transport-report" class="page">
     <div class="topbar">
       <div>
-        <div class="topbar-title">تقرير النقل — Transport Report</div>
+        <div class="topbar-title">Transportation Snapshot</div>
         <div class="topbar-sub" id="tr-report-subtitle">جميع رحلات النقل من الحجوزات</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -2217,14 +2217,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;align-items:end">
 
           <div>
-            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">من تاريخ</div>
-            <input id="tr-rep-from" type="date" onchange="renderTransportReport()" oninput="document.getElementById('tr-rep-from-h').textContent=fmtHijri(this.value)||'';renderTransportReport();" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
-            <div id="tr-rep-from-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:3px;direction:rtl;min-height:1.1em"></div>
-          </div>
-          <div>
-            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">إلى تاريخ</div>
-            <input id="tr-rep-to" type="date" onchange="renderTransportReport()" oninput="document.getElementById('tr-rep-to-h').textContent=fmtHijri(this.value)||'';renderTransportReport();" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
-            <div id="tr-rep-to-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:3px;direction:rtl;min-height:1.1em"></div>
+            <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">اليوم</div>
+            <input id="tr-rep-day" type="date" onchange="renderTransportReport()" oninput="document.getElementById('tr-rep-day-h').textContent=fmtHijri(this.value)||'';renderTransportReport();" style="width:100%;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);color:var(--ink)">
+            <div id="tr-rep-day-h" style="font-size:0.7143rem;color:var(--gold-dark);margin-top:3px;direction:rtl;min-height:1.1em"></div>
           </div>
           <div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-bottom:4px">نوع المسار</div>
@@ -2293,7 +2288,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </select>
           </div>
           <div style="display:flex;align-items:flex-end">
-            <button class="btn" onclick="['tr-rep-from','tr-rep-to','tr-rep-cat','tr-rep-driver','tr-rep-dphone','tr-rep-plate','tr-rep-vehicle','tr-rep-permit','tr-rep-fromCity','tr-rep-toCity','tr-rep-ourCompany'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderTransportReport();" style="width:100%">إعادة ضبط</button>
+            <button class="btn" onclick="['tr-rep-day','tr-rep-cat','tr-rep-driver','tr-rep-dphone','tr-rep-plate','tr-rep-vehicle','tr-rep-permit','tr-rep-fromCity','tr-rep-toCity','tr-rep-ourCompany'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('tr-rep-day-h').textContent='';renderTransportReport();" style="width:100%">إعادة ضبط</button>
           </div>
 
         </div>
@@ -8854,12 +8849,10 @@ function renderTransportStats() {
 }
 
 function goTransportReportFiltered(cat, from, to) {
-  const catEl  = document.getElementById('tr-rep-cat');
-  const fromEl = document.getElementById('tr-rep-from');
-  const toEl   = document.getElementById('tr-rep-to');
-  if (catEl)  catEl.value  = cat;
-  if (fromEl) { fromEl.value = from; document.getElementById('tr-rep-from-h').textContent = fmtHijri(from) || ''; }
-  if (toEl)   { toEl.value   = to;   document.getElementById('tr-rep-to-h').textContent   = fmtHijri(to)   || ''; }
+  const catEl = document.getElementById('tr-rep-cat');
+  const dayEl = document.getElementById('tr-rep-day');
+  if (catEl) catEl.value = cat;
+  if (dayEl) { dayEl.value = from || to || ''; document.getElementById('tr-rep-day-h').textContent = fmtHijri(dayEl.value) || ''; }
   navigate(document.querySelector('[data-page=transport-report]'), 'transport-report');
 }
 
@@ -15090,8 +15083,7 @@ function renderTrColPanel() {
 }
 
 function renderTransportReport() {
-  const fromVal      = document.getElementById('tr-rep-from')?.value       || '';
-  const toVal        = document.getElementById('tr-rep-to')?.value         || '';
+  const dayVal       = document.getElementById('tr-rep-day')?.value        || '';
   const catVal       = document.getElementById('tr-rep-cat')?.value        || '';
   const driverF      = document.getElementById('tr-rep-driver')?.value     || '';
   const dphoneF      = document.getElementById('tr-rep-dphone')?.value     || '';
@@ -15109,8 +15101,7 @@ function renderTransportReport() {
   };
 
   let rows = getTransportReportRows().filter(r => {
-    if (fromVal      && r.date && r.date < fromVal)                          return false;
-    if (toVal        && r.date && r.date > toVal)                            return false;
+    if (dayVal       && r.date !== dayVal)                                   return false;
     if (catVal       && r.cat !== catVal)                                    return false;
     if (fromCityF    && !r.fromCity.toLowerCase().includes(fromCityF))       return false;
     if (toCityF      && !r.toCity.toLowerCase().includes(toCityF))           return false;
@@ -15159,7 +15150,7 @@ function renderTransportReport() {
   }
 
   const subtitle = document.getElementById('tr-report-subtitle');
-  if (subtitle) subtitle.textContent = `${total} رحلة · ${totalPax} راكب${fromVal||toVal ? ' · مفلترة حسب التاريخ' : ''}`;
+  if (subtitle) subtitle.textContent = `${total} رحلة · ${totalPax} راكب${dayVal ? ` · ${dayVal}` : ''}`;
 
   const missingCell = v => !v || (typeof v==='string' && !v.trim());
   const cell = (v, warn) => `<td style="padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap${warn&&missingCell(v)?';color:var(--red)':''}">${v || (warn ? '<span style="color:var(--red);font-size:0.7857rem">⚠ ناقص</span>' : '—')}</td>`;
@@ -15338,8 +15329,7 @@ function saveTransportRowEdit(vId, tIdx) {
 }
 
 function exportTransportReportCSV() {
-  const fromVal     = document.getElementById('tr-rep-from')?.value       || '';
-  const toVal       = document.getElementById('tr-rep-to')?.value         || '';
+  const dayVal      = document.getElementById('tr-rep-day')?.value        || '';
   const catVal      = document.getElementById('tr-rep-cat')?.value        || '';
   const driverF     = document.getElementById('tr-rep-driver')?.value     || '';
   const dphoneF     = document.getElementById('tr-rep-dphone')?.value     || '';
@@ -15355,8 +15345,7 @@ function exportTransportReportCSV() {
     return filter === 'present' ? has : !has;
   };
   const rows = getTransportReportRows().filter(r => {
-    if (fromVal      && r.date && r.date < fromVal)                      return false;
-    if (toVal        && r.date && r.date > toVal)                        return false;
+    if (dayVal       && r.date !== dayVal)                               return false;
     if (catVal       && r.cat !== catVal)                                return false;
     if (fromCityF    && !r.fromCity.toLowerCase().includes(fromCityF))   return false;
     if (toCityF      && !r.toCity.toLowerCase().includes(toCityF))       return false;
@@ -15404,8 +15393,7 @@ function exportTransportReportCSV() {
 }
 
 function printTransportReport() {
-  const fromVal     = document.getElementById('tr-rep-from')?.value       || '';
-  const toVal       = document.getElementById('tr-rep-to')?.value         || '';
+  const dayVal      = document.getElementById('tr-rep-day')?.value        || '';
   const catVal      = document.getElementById('tr-rep-cat')?.value        || '';
   const driverF     = document.getElementById('tr-rep-driver')?.value     || '';
   const dphoneF     = document.getElementById('tr-rep-dphone')?.value     || '';
@@ -15421,8 +15409,7 @@ function printTransportReport() {
     return filter === 'present' ? has : !has;
   };
   const rows = getTransportReportRows().filter(r => {
-    if (fromVal      && r.date && r.date < fromVal)                      return false;
-    if (toVal        && r.date && r.date > toVal)                        return false;
+    if (dayVal       && r.date !== dayVal)                               return false;
     if (catVal       && r.cat !== catVal)                                return false;
     if (fromCityF    && !r.fromCity.toLowerCase().includes(fromCityF))   return false;
     if (toCityF      && !r.toCity.toLowerCase().includes(toCityF))       return false;
@@ -15478,8 +15465,7 @@ function printTransportReport() {
   const catSummary = Object.entries(catCountsPr).filter(([,c])=>c>0)
     .map(([k,c]) => `${catLabelsPr[k]}: <strong>${c}</strong>`).join(' &nbsp;|&nbsp; ');
 
-  const dateLabel = (fromVal||toVal) ? ` · ${fromVal||''}${fromVal&&toVal?' — ':''}${toVal||''}` : '';
-  const title = `تقرير النقل${dateLabel}`;
+  const title = `Transportation Snapshot${dayVal ? ` · ${dayVal}` : ''}`;
 
   const html = `<!DOCTYPE html>
 <html dir="rtl" lang="ar">
