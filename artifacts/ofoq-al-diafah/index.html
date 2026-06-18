@@ -8378,10 +8378,14 @@ function renderVouchers() {
         </div>
       </div>
       <div class="voucher-meta" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-        ${statusBadge(v.status)}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
+          ${statusBadge(v.status)}
+          ${paymentStatusBadge(v)}
+        </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
           ${(v.status==='Pending'||v.status.startsWith('Tentative'))?`<button class="btn btn-xs" onclick="openNewVoucherPage('${v.id}')">Edit</button>`:''}
           <button class="btn btn-xs" onclick="viewVoucherDetail('${v.id}')">View</button>
+          <button class="btn btn-xs btn-gold" onclick="quickPayVoucher('${v.id}')" title="تسجيل الدفع">💳 دفع</button>
           <button class="btn btn-xs btn-red" onclick="deleteVoucher('${v.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
             Delete
@@ -10468,6 +10472,24 @@ setInterval(() => {
   const v = vouchers.find(x => x.ref === ref);
   if (v?.holdExpiresAt) el.textContent = formatHoldCountdown(v.holdExpiresAt);
 }, 1000);
+
+function quickPayVoucher(id) {
+  viewVoucherDetail(id);
+  setTimeout(() => openPaymentModal(id), 80);
+}
+
+function paymentStatusBadge(v) {
+  if (!v.paymentReceipt && !v.paymentAmount) return '';
+  const paid  = Number(v.paymentAmount || 0);
+  const total = Number(v.resSellTotal  || 0);
+  const isFull = paid > 0 && (total === 0 || paid >= total);
+  if (isFull) {
+    return `<span style="font-size:0.7143rem;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(26,107,60,0.12);color:var(--green);white-space:nowrap">✅ مدفوع بالكامل</span>`;
+  } else if (paid > 0) {
+    return `<span style="font-size:0.7143rem;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(212,134,11,0.12);color:var(--amber);white-space:nowrap">💰 دفع جزئي</span>`;
+  }
+  return '';
+}
 
 function openPaymentModal(id) {
   const v = vouchers.find(x => x.id === id);
