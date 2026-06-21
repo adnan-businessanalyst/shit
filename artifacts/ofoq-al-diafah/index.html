@@ -6,6 +6,7 @@
 <title>Ofoq Al Diafah — أفق الضيافة</title>
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>html { font-size: 14px; }
 
 /* ─── Reset & Base ─────────────────────────────────────── */
@@ -3887,7 +3888,15 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="form-section">
         <div class="form-section-title">Additional Guests (optional)</div>
         <div id="b2c-extra-guests"></div>
-        <button class="btn btn-sm" onclick="addB2CGuest()">+ Add Guest</button>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <button class="btn btn-sm" onclick="addB2CGuest()">+ Add Guest</button>
+          <button class="btn btn-sm" style="background:var(--cream-dark);color:var(--gold-dark);border:1px solid var(--gold-light)" onclick="document.getElementById('b2c-guest-excel-input').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Excel
+          </button>
+          <input type="file" id="b2c-guest-excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importGuestsFromExcel(this)">
+          <span style="font-size:0.75rem;color:var(--ink-muted)">Columns: Full Name, Nationality, Phone, WhatsApp</span>
+        </div>
       </div>
 
       <!-- Hotel & dates -->
@@ -12880,7 +12889,7 @@ function openB2CBooking() {
   openModal('modal-b2c-booking');
 }
 
-function addB2CGuest() {
+function addB2CGuest(data) {
   b2cGuestCount++;
   const idx = b2cGuestCount;
   const div = document.createElement('div');
@@ -12891,12 +12900,56 @@ function addB2CGuest() {
       <button class="remove-guest" onclick="document.getElementById('b2cg-${idx}').remove()">×</button>
     </div>
     <div class="form-grid">
-      <div class="field"><label>Full Name</label><input id="b2cg-name-${idx}" type="text" placeholder="Full name"></div>
+      <div class="field"><label>Full Name</label><input id="b2cg-name-${idx}" type="text" placeholder="Full name" value="${data?.name||''}"></div>
       <div class="field"><label>Sex</label><select id="b2cg-sex-${idx}"><option>Male</option><option>Female</option></select></div>
-      <div class="field"><label>Passport No.</label><input id="b2cg-passport-${idx}" type="text" placeholder="Passport"></div>
-      <div class="field"><label>Nationality</label><input id="b2cg-nat-${idx}" type="text" placeholder="Nationality"></div>
+      <div class="field"><label>Nationality</label><input id="b2cg-nat-${idx}" type="text" placeholder="Nationality" value="${data?.nationality||''}"></div>
+      <div class="field"><label>Passport No.</label><input id="b2cg-passport-${idx}" type="text" placeholder="Passport" value="${data?.passport||''}"></div>
+      <div class="field"><label>Phone</label><input id="b2cg-phone-${idx}" type="text" placeholder="+966..." value="${data?.phone||''}"></div>
+      <div class="field"><label>WhatsApp</label><input id="b2cg-whatsapp-${idx}" type="text" placeholder="+966..." value="${data?.whatsapp||''}"></div>
     </div>`;
   document.getElementById('b2c-extra-guests').appendChild(div);
+}
+
+function importGuestsFromExcel(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  if (typeof XLSX === 'undefined') { toast('Excel library not loaded yet, please try again.', false); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      if (!rows.length) { toast('No data found in the file.', false); return; }
+      const normalize = key => key.toLowerCase().replace(/[\s_\-\.]+/g, '');
+      let added = 0;
+      rows.forEach(row => {
+        const get = (...aliases) => {
+          for (const a of aliases) {
+            for (const k of Object.keys(row)) {
+              if (normalize(k) === normalize(a)) return String(row[k]).trim();
+            }
+          }
+          return '';
+        };
+        const name = get('Full Name','Name','FullName','الاسم','الاسم الكامل');
+        if (!name) return;
+        addB2CGuest({
+          name,
+          nationality: get('Nationality','الجنسية'),
+          phone:       get('Phone','Phone Number','Mobile','الهاتف','رقم الهاتف'),
+          whatsapp:    get('WhatsApp','Whatsapp Number','واتساب','رقم واتساب'),
+          passport:    get('Passport','Passport No','Passport Number','جواز السفر'),
+        });
+        added++;
+      });
+      toast(`✓ Imported ${added} guest${added!==1?'s':''} from Excel`);
+    } catch(err) {
+      toast('Could not read file. Make sure it is a valid Excel or CSV file.', false);
+    }
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function addB2CHotelRow() {
@@ -12983,8 +13036,10 @@ function saveB2CBooking() {
     const name = document.getElementById(`b2cg-name-${idx}`)?.value.trim();
     if (!name) return;
     extraGuests.push({ name, sex: document.getElementById(`b2cg-sex-${idx}`)?.value||'',
-      passport: document.getElementById(`b2cg-passport-${idx}`)?.value.trim()||'',
-      nationality: document.getElementById(`b2cg-nat-${idx}`)?.value.trim()||'' });
+      passport:    document.getElementById(`b2cg-passport-${idx}`)?.value.trim()||'',
+      nationality: document.getElementById(`b2cg-nat-${idx}`)?.value.trim()||'',
+      phone:       document.getElementById(`b2cg-phone-${idx}`)?.value.trim()||'',
+      whatsapp:    document.getElementById(`b2cg-whatsapp-${idx}`)?.value.trim()||'' });
   });
 
   // Meals
