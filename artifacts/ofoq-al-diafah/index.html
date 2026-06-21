@@ -3904,10 +3904,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="form-section-title">Hotel & Stay</div>
         <div id="b2c-hotel-conf-container"></div>
         <button class="btn btn-sm" onclick="addB2CHotelRow()" style="margin-top:6px">+ Add Hotel</button>
-        <div class="form-grid" style="margin-top:12px">
-          <div class="field"><label class="required">Check-in</label><input id="b2c-checkin" type="date"></div>
-          <div class="field"><label class="required">Check-out</label><input id="b2c-checkout" type="date"></div>
-        </div>
       </div>
 
       <!-- Meals -->
@@ -12877,7 +12873,7 @@ function openB2CBooking() {
   ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
    'b2c-passport','b2c-passport-expiry','b2c-id',
    'b2c-phone','b2c-whatsapp','b2c-email',
-   'b2c-checkin','b2c-checkout','b2c-sell-price','b2c-deposit','b2c-notes'
+   'b2c-sell-price','b2c-deposit','b2c-notes'
   ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('b2c-sex').value = '';
   document.getElementById('b2c-payment-method').value = '';
@@ -13033,9 +13029,6 @@ function saveB2CBooking() {
   if (!fname || !lname) { toast('Guest first and last name are required', false); return; }
   if (!phone) { toast('Phone number is required', false); return; }
 
-  const checkIn  = document.getElementById('b2c-checkin')?.value;
-  const checkOut = document.getElementById('b2c-checkout')?.value;
-
   // Collect hotel confs
   const hotelConfs = [];
   document.querySelectorAll('[id^=b2ch-]').forEach(row => {
@@ -13045,8 +13038,8 @@ function saveB2CBooking() {
     const h = hotels.find(x=>x.id===hotelId);
     hotelConfs.push({
       hotelId, hotelName: h?.name||'', city: h?.city||'',
-      checkIn:  document.getElementById(`b2ch-in-${idx}`)?.value  || checkIn || '',
-      checkOut: document.getElementById(`b2ch-out-${idx}`)?.value || checkOut || '',
+      checkIn:  document.getElementById(`b2ch-in-${idx}`)?.value  || '',
+      checkOut: document.getElementById(`b2ch-out-${idx}`)?.value || '',
       roomType: document.getElementById(`b2ch-rtype-${idx}`)?.value || '',
       roomView: document.getElementById(`b2ch-rview-${idx}`)?.value || '',
       mealType: document.getElementById(`b2ch-meal-${idx}`)?.value  || '',
