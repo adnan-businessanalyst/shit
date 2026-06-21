@@ -7157,10 +7157,7 @@ function addRoomConfig() {
         <label class="required">Qty</label>
         <input id="rc-qty-${idx}" type="number" min="1" max="200" value="1" placeholder="1">
       </div>
-      <div class="field">
-        <label class="required">Room # / Prefix</label>
-        <input id="rc-prefix-${idx}" type="text" placeholder="e.g. 301 or 3">
-      </div>
+
       <div class="field">
         <label class="required">Type</label>
         <select id="rc-type-${idx}">
@@ -7219,7 +7216,6 @@ function collectRoomConfigs() {
     const idx = block.id.split('-').pop();
     configs.push({
       quantity: parseInt(document.getElementById(`rc-qty-${idx}`)?.value)||1,
-      roomNumberPrefix: document.getElementById(`rc-prefix-${idx}`)?.value.trim()||'',
       type: document.getElementById(`rc-type-${idx}`)?.value||'',
       view: document.getElementById(`rc-view-${idx}`)?.value||'',
       beds: document.getElementById(`rc-beds-${idx}`)?.value||'',
