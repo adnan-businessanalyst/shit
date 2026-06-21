@@ -12980,6 +12980,11 @@ function addB2CHotelRow() {
           <option>Half Board</option><option>Full Board</option><option>Other</option>
         </select>
       </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
+      <div class="field"><label>Cost (SAR)</label><input id="b2ch-cost-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Selling Price (SAR)</label><input id="b2ch-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Meal Price (SAR)</label><input id="b2ch-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
     </div>`;
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
 }
@@ -13031,9 +13036,12 @@ function saveB2CBooking() {
       hotelId, hotelName: h?.name||'', city: h?.city||'',
       checkIn:  document.getElementById(`b2ch-in-${idx}`)?.value  || '',
       checkOut: document.getElementById(`b2ch-out-${idx}`)?.value || '',
-      roomType: document.getElementById(`b2ch-rtype-${idx}`)?.value || '',
-      roomView: document.getElementById(`b2ch-rview-${idx}`)?.value || '',
-      mealType: document.getElementById(`b2ch-meal-${idx}`)?.value  || '',
+      roomType:  document.getElementById(`b2ch-rtype-${idx}`)?.value     || '',
+      roomView:  document.getElementById(`b2ch-rview-${idx}`)?.value     || '',
+      mealType:  document.getElementById(`b2ch-meal-${idx}`)?.value      || '',
+      cost:      Number(document.getElementById(`b2ch-cost-${idx}`)?.value)      || 0,
+      sellPrice: Number(document.getElementById(`b2ch-sell-${idx}`)?.value)      || 0,
+      mealPrice: Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0,
     });
   });
 
@@ -13176,6 +13184,30 @@ function addDbHotelRow() {
         <label>Check-out</label>
         <input id="db-h-out-${idx}" type="date">
       </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
+      <div class="field"><label>Room Type</label>
+        <select id="db-h-rtype-${idx}">
+          <option value="">— Select —</option>${HOTEL_ROOM_TYPES.map(t=>`<option>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Room View</label>
+        <select id="db-h-rview-${idx}">
+          <option value="">— Select —</option>${HOTEL_VIEWS.map(v=>`<option>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Meal Type</label>
+        <select id="db-h-meal-${idx}">
+          <option value="">— None —</option>
+          <option>Breakfast</option><option>Lunch</option><option>Dinner</option>
+          <option>Half Board</option><option>Full Board</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
+      <div class="field"><label>Cost (SAR)</label><input id="db-h-cost-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Selling Price (SAR)</label><input id="db-h-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Meal Price (SAR)</label><input id="db-h-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
     </div>`;
   document.getElementById('db-hotel-conf-container').appendChild(div);
 }
@@ -13233,8 +13265,14 @@ function collectDbHotelConfs() {
       hotelId,
       hotelName: h ? h.name : '',
       city: h ? h.city : '',
-      checkIn:  document.getElementById(`db-h-in-${idx}`)?.value  || '',
-      checkOut: document.getElementById(`db-h-out-${idx}`)?.value || '',
+      checkIn:   document.getElementById(`db-h-in-${idx}`)?.value       || '',
+      checkOut:  document.getElementById(`db-h-out-${idx}`)?.value      || '',
+      roomType:  document.getElementById(`db-h-rtype-${idx}`)?.value    || '',
+      roomView:  document.getElementById(`db-h-rview-${idx}`)?.value    || '',
+      mealType:  document.getElementById(`db-h-meal-${idx}`)?.value     || '',
+      cost:      Number(document.getElementById(`db-h-cost-${idx}`)?.value)      || 0,
+      sellPrice: Number(document.getElementById(`db-h-sell-${idx}`)?.value)      || 0,
+      mealPrice: Number(document.getElementById(`db-h-mealprice-${idx}`)?.value) || 0,
     });
   });
   return confs;
