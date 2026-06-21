@@ -3920,6 +3920,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="form-section">
         <div class="form-section-title">Pricing</div>
         <div class="form-grid">
+          <div class="field"><label>Total Rooms</label>
+            <input id="b2c-total-rooms" type="number" readonly placeholder="0"
+              style="background:var(--cream);border-color:rgba(0,0,0,0.1);color:var(--ink-muted);cursor:default;font-weight:600">
+          </div>
           <div class="field"><label>Total Before VAT (SAR)</label>
             <input id="b2c-sell-price" type="number" min="0" placeholder="0.00" style="background:var(--cream);border-color:rgba(0,0,0,0.12);font-weight:600" oninput="calcB2CTotals()">
           </div>
@@ -12988,7 +12992,7 @@ function openB2CBooking() {
   ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
    'b2c-passport','b2c-passport-expiry','b2c-id',
    'b2c-phone','b2c-whatsapp','b2c-email',
-   'b2c-sell-price','b2c-vat-amount','b2c-total-with-vat','b2c-deposit','b2c-notes'
+   'b2c-total-rooms','b2c-sell-price','b2c-vat-amount','b2c-total-with-vat','b2c-deposit','b2c-notes'
   ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   const vatToggle = document.getElementById('b2c-vat-toggle');
   if (vatToggle) vatToggle.checked = false;
@@ -13151,12 +13155,15 @@ function onB2CHotelSelect(idx) {
 }
 
 function calcB2CTotals() {
-  let subtotal = 0;
+  let subtotal = 0, totalRooms = 0;
   document.querySelectorAll('#b2c-hotel-conf-container > .guest-block').forEach(row => {
     const idx = row.id.split('-').pop();
-    subtotal += (Number(document.getElementById(`b2ch-sell-${idx}`)?.value) || 0)
-              + (Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0);
+    subtotal    += (Number(document.getElementById(`b2ch-sell-${idx}`)?.value) || 0)
+                + (Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0);
+    totalRooms  += (Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 1);
   });
+  const roomsEl = document.getElementById('b2c-total-rooms');
+  if (roomsEl) roomsEl.value = totalRooms > 0 ? totalRooms : '';
   // If user manually typed a value when there are no rows, respect it
   const sellEl = document.getElementById('b2c-sell-price');
   if (subtotal === 0 && sellEl && Number(sellEl.value) > 0) subtotal = Number(sellEl.value);
