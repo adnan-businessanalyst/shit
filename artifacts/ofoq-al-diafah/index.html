@@ -3997,15 +3997,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <button class="btn btn-sm" onclick="addDbHotelRow()" style="margin-top:6px">+ Add Hotel</button>
       </div>
 
-      <!-- Rooms -->
-      <div class="form-section">
-        <div class="form-section-title">Check-in / Check-out</div>
-        <div class="form-grid">
-          <div class="field"><label class="required">Check-in</label><input id="db-checkin" type="date"></div>
-          <div class="field"><label class="required">Check-out</label><input id="db-checkout" type="date"></div>
-        </div>
-      </div>
-
       <!-- Meals -->
       <div class="form-section">
         <div class="form-section-title">Meals (optional)</div>
@@ -13127,7 +13118,7 @@ function saveB2CBooking() {
 function openDirectBooking() {
   dbHotelCount = 0; dbMealCount = 0;
   ['db-agency','db-group-ref','db-phone','db-email','db-notes',
-   'db-pax-total','db-pax-men','db-pax-women','db-checkin','db-checkout'].forEach(id => {
+   'db-pax-total','db-pax-men','db-pax-women'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('db-hotel-conf-container').innerHTML = '';
@@ -13242,8 +13233,8 @@ function collectDbHotelConfs() {
       hotelId,
       hotelName: h ? h.name : '',
       city: h ? h.city : '',
-      checkIn:  document.getElementById(`db-h-in-${idx}`)?.value  || document.getElementById('db-checkin')?.value || '',
-      checkOut: document.getElementById(`db-h-out-${idx}`)?.value || document.getElementById('db-checkout')?.value || '',
+      checkIn:  document.getElementById(`db-h-in-${idx}`)?.value  || '',
+      checkOut: document.getElementById(`db-h-out-${idx}`)?.value || '',
     });
   });
   return confs;
@@ -13267,10 +13258,6 @@ function collectDbMeals() {
 function saveDirectBooking() {
   const agency = document.getElementById('db-agency')?.value.trim();
   if (!agency) { toast('Agency / group name is required', false); return; }
-  const checkIn  = document.getElementById('db-checkin')?.value;
-  const checkOut = document.getElementById('db-checkout')?.value;
-  if (!checkIn || !checkOut) { toast('Check-in and check-out dates are required', false); return; }
-
   const paxTotal = Number(document.getElementById('db-pax-total')?.value) || 0;
   const paxMen   = Number(document.getElementById('db-pax-men')?.value)   || 0;
   const paxWomen = Number(document.getElementById('db-pax-women')?.value) || 0;
