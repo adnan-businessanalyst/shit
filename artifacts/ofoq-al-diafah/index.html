@@ -4085,6 +4085,15 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div class="field"><label>Website</label><input id="h-website" type="text" placeholder="https://..."></div>
         </div>
       </div>
+      <div class="form-section">
+        <div class="form-section-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Room Types &amp; Views</span>
+          <button type="button" class="btn btn-sm" onclick="addHotelRoomTypeRow()">+ Add Room Type</button>
+        </div>
+        <div id="h-room-types-list" style="display:flex;flex-direction:column;gap:10px">
+          <div id="h-rt-empty" style="color:var(--ink-muted);font-size:0.857rem;padding:6px 0">No room types added yet — click "+ Add Room Type".</div>
+        </div>
+      </div>
       <div class="form-section" style="margin-bottom:0">
         <div class="form-section-title">Notes</div>
         <div class="field"><textarea id="h-notes" placeholder="Any notes about this hotel — facilities, policies, special terms..."></textarea></div>
@@ -6752,6 +6761,49 @@ function renderHotels() {
 let editingHotelId = null;
 let openFromWizard = false;
 
+const HOTEL_ROOM_TYPES = ['Single','Double','Triple','Quad','Suite','Junior Suite','Presidential Suite','Family','Studio','Connecting'];
+const HOTEL_VIEWS = ['Haram View','City View','Mountain View','Garden View','Pool View','Courtyard View','Street View','Sea View'];
+
+function addHotelRoomTypeRow(prefill) {
+  const list = document.getElementById('h-room-types-list');
+  const empty = document.getElementById('h-rt-empty');
+  if (empty) empty.remove();
+
+  const row = document.createElement('div');
+  row.className = 'h-rt-row';
+  row.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--cream-light,#faf9f6)';
+
+  const typeOpts = HOTEL_ROOM_TYPES.map(t =>
+    `<option value="${t}" ${prefill?.type===t?'selected':''}>${t}</option>`
+  ).join('');
+
+  const viewChecks = HOTEL_VIEWS.map(v => {
+    const checked = prefill?.views?.includes(v) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:var(--cream);white-space:nowrap">
+      <input type="checkbox" class="rt-view-cb" value="${v}" ${checked} style="accent-color:var(--gold)"> ${v}
+    </label>`;
+  }).join('');
+
+  row.innerHTML = `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <select class="rt-type-select" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem">
+        <option value="">— Room Type —</option>
+        ${typeOpts}
+      </select>
+      <button type="button" onclick="this.closest('.h-rt-row').remove();if(!document.querySelector('.h-rt-row')){const l=document.getElementById('h-room-types-list');const e=document.createElement('div');e.id='h-rt-empty';e.style.cssText='color:var(--ink-muted);font-size:0.857rem;padding:6px 0';e.textContent='No room types added yet — click \"+ Add Room Type\".';l.appendChild(e);}"
+        style="padding:4px 10px;border:1px solid var(--red,#c0392b);border-radius:6px;color:var(--red,#c0392b);background:transparent;cursor:pointer;font-size:0.85rem;flex-shrink:0">✕</button>
+    </div>
+    <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:6px;font-weight:500">Available Views</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${viewChecks}</div>`;
+
+  list.appendChild(row);
+}
+
+function resetHotelRoomTypes() {
+  const list = document.getElementById('h-room-types-list');
+  list.innerHTML = '<div id="h-rt-empty" style="color:var(--ink-muted);font-size:0.857rem;padding:6px 0">No room types added yet — click "+ Add Room Type".</div>';
+}
+
 function openHotelModal(id) {
   openFromWizard = false;
   editingHotelId = id || null;
@@ -6771,6 +6823,8 @@ function openHotelModal(id) {
   document.getElementById('h-contact').value = h?.contact||'';
   document.getElementById('h-website').value = h?.website||'';
   document.getElementById('h-notes').value = h?.notes||'';
+  resetHotelRoomTypes();
+  if (h?.roomTypes?.length) h.roomTypes.forEach(rt => addHotelRoomTypeRow(rt));
   openModal('modal-hotel');
 }
 
@@ -6782,6 +6836,7 @@ function openHotelModalFromWizard() {
    'h-phone','h-email','h-contact','h-website','h-notes'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
+  resetHotelRoomTypes();
   openModal('modal-hotel');
 }
 
@@ -6804,6 +6859,13 @@ function saveHotel() {
     contact: document.getElementById('h-contact').value.trim(),
     website: document.getElementById('h-website').value.trim(),
     notes: document.getElementById('h-notes').value.trim(),
+    roomTypes: [...document.querySelectorAll('#h-room-types-list .h-rt-row')].reduce((acc, row) => {
+      const type = row.querySelector('.rt-type-select')?.value;
+      if (!type) return acc;
+      const views = [...row.querySelectorAll('.rt-view-cb:checked')].map(cb => cb.value);
+      acc.push({ type, views });
+      return acc;
+    }, []),
   };
 
   let savedHotel;
