@@ -13163,6 +13163,21 @@ function addB2CHotelRow() {
         </select>
       </div>
     </div>
+    <div id="b2ch-rt-ct-row-${idx}" style="display:none;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:0.78rem;font-weight:600;color:var(--ink-muted);white-space:nowrap">Room Contract</span>
+        <div id="b2ch-rt-ct-${idx}" data-contract-type="none"
+          style="display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex:0 0 auto">
+          <button type="button" class="b2ch-rt-ct-btn" data-ctype="none" onclick="setB2CRoomContract(this,${idx},'none')"
+            style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--gold);color:#fff">None</button>
+          <button type="button" class="b2ch-rt-ct-btn" data-ctype="agreement" onclick="setB2CRoomContract(this,${idx},'agreement')"
+            style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Agreement</button>
+          <button type="button" class="b2ch-rt-ct-btn" data-ctype="allotment" onclick="setB2CRoomContract(this,${idx},'allotment')"
+            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Allotment</button>
+        </div>
+      </div>
+    </div>
+    <div id="b2ch-allot-info-${idx}" style="display:none;margin-top:4px"></div>
     <div id="b2ch-meal-ct-row-${idx}" style="display:none;margin-top:8px">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:0.78rem;font-weight:600;color:var(--ink-muted);white-space:nowrap">Meal Contract</span>
@@ -13182,8 +13197,7 @@ function addB2CHotelRow() {
       <div class="field"><label>Cost (SAR)</label><input id="b2ch-cost-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
       <div class="field"><label>Selling Price (SAR)</label><input id="b2ch-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
       <div class="field"><label>Meal Price (SAR)</label><input id="b2ch-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
-    </div>
-    <div id="b2ch-allot-info-${idx}" style="display:none;margin-top:-1px"></div>`;
+    </div>`;
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
 }
 
@@ -13253,45 +13267,76 @@ function getHotelAllotmentUsage(hotelId, roomType) {
   let used = 0;
   (vouchers || []).forEach(v => {
     (v.hotelConfs || []).forEach(hc => {
-      if (hc.hotelId === hotelId && hc.roomType === roomType) used += (hc.rooms || 1);
+      if (hc.hotelId === hotelId && hc.roomType === roomType && hc.roomContractType === 'allotment') used += (hc.rooms || 1);
     });
   });
   return used;
+}
+
+function setB2CRoomContract(btn, idx, type) {
+  const ctEl = document.getElementById(`b2ch-rt-ct-${idx}`);
+  if (ctEl) {
+    ctEl.dataset.contractType = type;
+    ctEl.querySelectorAll('.b2ch-rt-ct-btn').forEach(b => {
+      const active = b.dataset.ctype === type;
+      b.style.background = active ? 'var(--gold)' : 'var(--surface)';
+      b.style.color       = active ? '#fff'        : 'var(--ink)';
+    });
+  }
+  updateB2CAllotmentInfo(idx);
 }
 
 function updateB2CAllotmentInfo(idx) {
   const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
   const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
   const infoEl   = document.getElementById(`b2ch-allot-info-${idx}`);
+  const ctRow    = document.getElementById(`b2ch-rt-ct-row-${idx}`);
+  const ctEl     = document.getElementById(`b2ch-rt-ct-${idx}`);
+  if (ctRow) ctRow.style.display = roomType ? 'block' : 'none';
   if (!infoEl) return;
+  if (!roomType) { infoEl.style.display = 'none'; return; }
   const h  = hotels.find(x => x.id === hotelId);
   const rt = h?.roomTypes?.find(r => r.type === roomType);
-  const rct = rt?.contractType || (rt?.hasAgreement ? 'agreement' : 'none');
-  if (rct !== 'allotment' || !rt || !(rt.allotmentRooms > 0)) {
-    infoEl.style.display = 'none';
-    return;
+  if (!rt) { infoEl.style.display = 'none'; return; }
+  const rct          = rt.contractType || (rt.hasAgreement ? 'agreement' : 'none');
+  const selectedCt   = ctEl?.dataset.contractType || 'none';
+  const hasAllotment = (rct === 'allotment') && (rt.allotmentRooms > 0);
+  const hasAgreement = rct === 'agreement' || rct === 'allotment';
+  const allotTotal   = hasAllotment ? (rt.allotmentRooms || 0) : 0;
+  const allotUsed    = hasAllotment ? getHotelAllotmentUsage(hotelId, roomType) : 0;
+  const allotRemain  = Math.max(0, allotTotal - allotUsed);
+  const remColor     = allotRemain === 0 ? '#c0392b' : allotRemain < allotTotal * 0.2 ? '#e67e22' : '#1a6b3c';
+  let html = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;border-radius:6px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">`;
+  if (hasAllotment) {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">📦 Allotment <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> available</span>`;
+  } else {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">📦 No allotment</span>`;
   }
-  const total     = rt.allotmentRooms || 0;
-  const used      = getHotelAllotmentUsage(hotelId, roomType);
-  const pending   = Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 0;
-  const remaining = Math.max(0, total - used);
-  const afterThis = total - used - pending;
-  const pct       = total > 0 ? Math.min(100, Math.round(((used + pending) / total) * 100)) : 0;
-  const color     = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : afterThis < total * 0.2 ? '#e67e22' : '#1a6b3c';
-  const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
+  if (hasAgreement) {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:4px;font-weight:600;color:#7a5f00">✓ Agreement available</span>`;
+  } else {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">✗ No agreement</span>`;
+  }
+  html += `</div>`;
+  if (selectedCt === 'allotment' && hasAllotment) {
+    const pending   = Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 0;
+    const afterThis = allotTotal - allotUsed - pending;
+    const pct       = allotTotal > 0 ? Math.min(100, Math.round(((allotUsed + pending) / allotTotal) * 100)) : 0;
+    const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
+    html += `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 12px;margin-top:-1px;border-radius:0 0 6px 6px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
+        <span style="font-weight:700;color:var(--ink)">Room Allotment</span>
+        <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${allotUsed}</strong></span>
+        <span>Remaining: <strong style="color:${allotRemain===0?'#c0392b':'#1a6b3c'}">${allotRemain}</strong></span>
+        ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<allotTotal*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
+        <div style="flex:1;min-width:80px;max-width:160px;height:7px;background:rgba(0,0,0,0.1);border-radius:4px">
+          <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width 0.3s"></div>
+        </div>
+        <span style="color:var(--ink-muted)">${pct}%</span>
+      </div>`;
+  }
   infoEl.style.display = 'block';
-  infoEl.innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-radius:0 0 8px 8px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
-      <span style="font-weight:700;color:var(--ink);white-space:nowrap">Allotment</span>
-      <span style="color:var(--ink-muted)">Total: <strong style="color:var(--ink)">${total}</strong></span>
-      <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${used}</strong></span>
-      <span style="color:${remaining===0?'#c0392b':'var(--ink-muted)'}">Remaining: <strong style="color:${remaining===0?'#c0392b':'#1a6b3c'}">${remaining}</strong></span>
-      ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<total*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
-      <div style="flex:1;min-width:80px;max-width:160px;height:7px;background:rgba(0,0,0,0.1);border-radius:4px">
-        <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width 0.3s"></div>
-      </div>
-      <span style="color:var(--ink-muted)">${pct}%</span>
-    </div>`;
+  infoEl.innerHTML = html;
   calcB2CTotals();
 }
 
@@ -13370,7 +13415,14 @@ function onB2CRoomTypeSelect(idx) {
   const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
   if (costEl) costEl.value = prices ? prices.cost      : '';
   if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
-  updateB2CAllotmentInfo(idx);
+  if (roomType) {
+    const h   = hotels.find(x => x.id === hotelId);
+    const rt  = h?.roomTypes?.find(r => r.type === roomType);
+    const rct = rt?.contractType || (rt?.hasAgreement ? 'agreement' : 'none');
+    setB2CRoomContract(null, idx, rct);
+  } else {
+    setB2CRoomContract(null, idx, 'none');
+  }
   onB2CMealTypeSelect(idx);
 }
 
@@ -13416,6 +13468,7 @@ function saveB2CBooking() {
       roomType:  document.getElementById(`b2ch-rtype-${idx}`)?.value     || '',
       roomView:  document.getElementById(`b2ch-rview-${idx}`)?.value     || '',
       rooms:     Number(document.getElementById(`b2ch-rooms-${idx}`)?.value)     || 1,
+      roomContractType: document.getElementById(`b2ch-rt-ct-${idx}`)?.dataset.contractType || 'none',
       mealType:  document.getElementById(`b2ch-meal-${idx}`)?.value      || '',
       mealContractType: document.getElementById(`b2ch-meal-ct-${idx}`)?.dataset.mealContractType || 'none',
       cost:      Number(document.getElementById(`b2ch-cost-${idx}`)?.value)      || 0,
