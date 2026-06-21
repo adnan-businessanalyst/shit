@@ -8582,6 +8582,7 @@ function addMealRowPrefill(m) {
   if (typeEl) {
     typeEl.value = m.type || 'Breakfast';
     document.getElementById(`ml-notes-${idx}`).value = m.notes || m.desc || '';
+    document.getElementById(`ml-price-${idx}`).value = m.price || '';
     document.getElementById(`ml-count-${idx}`).value = m.count || '';
   }
 }
@@ -8617,7 +8618,7 @@ function addMealRow() {
       Meal ${idx}
       <button class="remove-guest" onclick="document.getElementById('meal-row-${idx}').remove()">×</button>
     </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 80px;gap:12px;align-items:end">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 80px;gap:12px;align-items:end">
       <div class="field">
         <label class="required">Meal Type</label>
         <select id="ml-type-${idx}">
@@ -8633,6 +8634,10 @@ function addMealRow() {
       <div class="field">
         <label>Notes</label>
         <input id="ml-notes-${idx}" type="text" placeholder="e.g. halal, buffet...">
+      </div>
+      <div class="field">
+        <label>Price (SAR)</label>
+        <input id="ml-price-${idx}" type="number" min="0" step="0.01" placeholder="0.00">
       </div>
       <div class="field">
         <label class="required">Count</label>
@@ -8651,9 +8656,11 @@ function collectMeals() {
     const type = document.getElementById(`ml-type-${idx}`)?.value;
     if (!type) return;
     const count = Number(document.getElementById(`ml-count-${idx}`)?.value) || 0;
+    const price = Number(document.getElementById(`ml-price-${idx}`)?.value) || 0;
     meals.push({
       type,
       notes: document.getElementById(`ml-notes-${idx}`)?.value.trim() || '',
+      price,
       count,
     });
   });
