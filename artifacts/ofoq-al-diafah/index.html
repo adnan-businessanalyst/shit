@@ -6827,8 +6827,13 @@ function addHotelRoomTypeRow(prefill) {
         <option value="">— Room Type —</option>
         ${typeOpts}
       </select>
+      <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+        <label style="font-size:0.72rem;color:var(--ink-muted);white-space:nowrap">Capacity (rooms)</label>
+        <input type="number" class="rt-capacity" min="1" step="1" placeholder="e.g. 10" value="${prefill?.capacity||''}"
+          style="width:110px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
       <button type="button" onclick="this.closest('.h-rt-row').remove();if(!document.querySelector('.h-rt-row')){const l=document.getElementById('h-room-types-list');const e=document.createElement('div');e.id='h-rt-empty';e.style.cssText='color:var(--ink-muted);font-size:0.857rem;padding:6px 0';e.textContent='No room types added yet — click \"+ Add Room Type\".';l.appendChild(e);}"
-        style="padding:4px 10px;border:1px solid var(--red,#c0392b);border-radius:6px;color:var(--red,#c0392b);background:transparent;cursor:pointer;font-size:0.85rem;flex-shrink:0">✕</button>
+        style="padding:4px 10px;border:1px solid var(--red,#c0392b);border-radius:6px;color:var(--red,#c0392b);background:transparent;cursor:pointer;font-size:0.85rem;flex-shrink:0;align-self:flex-end">✕</button>
     </div>
     <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:6px;font-weight:500">Available Views</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${viewChecks || '<span style="font-size:0.8rem;color:var(--ink-muted)">No views defined in Settings.</span>'}</div>
@@ -6940,7 +6945,8 @@ function saveHotel() {
         ma.push({ type: cb.value, cost: mCost, sellPrice: mSellPrice });
         return ma;
       }, []);
-      acc.push({ type, views, meals, hasAgreement, cost, sellPrice });
+      const capacity = Number(row.querySelector('.rt-capacity')?.value) || 0;
+      acc.push({ type, capacity, views, meals, hasAgreement, cost, sellPrice });
       return acc;
     }, []),
   };
