@@ -1625,7 +1625,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </select>
           <select id="inv-filter-source" onchange="renderInventory()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:inherit;font-size:0.9286rem;background:var(--surface);color:var(--ink);">
             <option value="">جميع المصادر</option>
-            <option value="direct">مباشر من الفندق</option>
+            <option value="direct">من الفنادق مباشرة</option>
             <option value="agent">وسيط</option>
             <option value="owned">ملكية الشركة</option>
           </select>
@@ -4180,7 +4180,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
           <div class="source-card" id="src-direct" onclick="selectSource('direct')" style="border:2px solid var(--gold);background:var(--gold-light);border-radius:var(--r);padding:16px;cursor:pointer;text-align:center;transition:all 0.15s">
             <div style="font-size:1.8571rem;margin-bottom:8px">🏨</div>
-            <div style="font-weight:600;font-size:0.9286rem;color:var(--gold-dark)">Direct Hotel</div>
+            <div style="font-weight:600;font-size:0.9286rem;color:var(--gold-dark)">Direct Hotel Reservation — من الفنادق مباشرة</div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:4px">Purchased directly from the hotel property</div>
           </div>
           <div class="source-card" id="src-agent" onclick="selectSource('agent')" style="border:1px solid var(--border);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer;text-align:center;transition:all 0.15s">
@@ -5493,7 +5493,7 @@ function renderInventory() {
   );
   document.getElementById('inv-subtitle').textContent = `${rooms.length} rooms total · ${rooms.filter(r=>r.status==='Available').length} available · ${batches.length} batch${batches.length!==1?'es':''}`;
 
-  const sourceLabel = {direct:'Direct Hotel',agent:'Wholesaler',owned:'Company Owned'};
+  const sourceLabel = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Company Owned'};
   const sourceBadgeStyle = {
     direct:'background:#E8F0F9;color:#1A4A7A',
     agent:'background:#FEF3E2;color:#7A4A00',
@@ -7371,7 +7371,7 @@ function buildAgreementStep(configs, meals) {
   const source = document.getElementById('b-source').value;
   const from = document.getElementById('b-from').value;
   const to = document.getElementById('b-to').value;
-  const sourceLabels = {direct:'Direct Hotel Purchase',agent:'Wholesaler',owned:'Company Owned'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Company Owned'};
   const totalRooms = configs.reduce((a,c)=>a+c.quantity,0);
 
   document.getElementById('agreement-summary').innerHTML = `
@@ -7536,7 +7536,7 @@ function commitBatch(confirmedBy) {
   batches.push(batch);
   persistBatches();
   persist();
-  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel',agent:'Wholesaler',owned:'Company Owned'})[source]}, confirmed by ${confirmedBy}`);
+  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Company Owned'})[source]}, confirmed by ${confirmedBy}`);
   closeModal('modal-room');
   renderInventory();
   updateLogCount('inv');
@@ -15829,7 +15829,7 @@ function renderOpsReports() {
     </div>` : '<div style="font-size:0.9286rem;color:var(--ink-muted);padding:8px 0">No bus reservations yet</div>');
 
   // ── Inventory Source Mix ──────────────────────────────────
-  const sourceLabels = {direct:'Direct Hotel',agent:'Wholesaler',owned:'Company Owned'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Company Owned'};
   const sourceCounts = {direct:0, agent:0, owned:0};
   rooms.forEach(r=>{ if(sourceCounts[r.source]!==undefined) sourceCounts[r.source]++; });
   const maxSrc = Math.max(...Object.values(sourceCounts)) || 1;
