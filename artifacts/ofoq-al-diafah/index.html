@@ -13090,7 +13090,7 @@ function addB2CHotelRow() {
       <div class="field"><label>Check-in</label><input id="b2ch-in-${idx}" type="date"></div>
       <div class="field"><label>Check-out</label><input id="b2ch-out-${idx}" type="date"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 80px 1fr;gap:12px;align-items:end;margin-top:10px">
       <div class="field"><label>Room Type</label>
         <select id="b2ch-rtype-${idx}" onchange="onB2CRoomTypeSelect(${idx})">
           <option value="">— Select —</option>${roomTypeOpts}
@@ -13100,6 +13100,9 @@ function addB2CHotelRow() {
         <select id="b2ch-rview-${idx}">
           <option value="">— Select —</option>${roomViewOpts}
         </select>
+      </div>
+      <div class="field"><label>Rooms</label>
+        <input id="b2ch-rooms-${idx}" type="number" min="1" step="1" placeholder="1" value="1">
       </div>
       <div class="field"><label>Meal Type</label>
         <select id="b2ch-meal-${idx}" onchange="onB2CMealTypeSelect(${idx})">
@@ -13217,6 +13220,7 @@ function saveB2CBooking() {
       checkOut: document.getElementById(`b2ch-out-${idx}`)?.value || '',
       roomType:  document.getElementById(`b2ch-rtype-${idx}`)?.value     || '',
       roomView:  document.getElementById(`b2ch-rview-${idx}`)?.value     || '',
+      rooms:     Number(document.getElementById(`b2ch-rooms-${idx}`)?.value)     || 1,
       mealType:  document.getElementById(`b2ch-meal-${idx}`)?.value      || '',
       cost:      Number(document.getElementById(`b2ch-cost-${idx}`)?.value)      || 0,
       sellPrice: Number(document.getElementById(`b2ch-sell-${idx}`)?.value)      || 0,
