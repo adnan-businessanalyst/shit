@@ -13273,6 +13273,31 @@ function getHotelAllotmentUsage(hotelId, roomType) {
   return used;
 }
 
+function setB2CCtBtnDisabled(btn, disabled) {
+  if (!btn) return;
+  btn.disabled = disabled;
+  btn.style.opacity       = disabled ? '0.4'         : '';
+  btn.style.cursor        = disabled ? 'not-allowed' : 'pointer';
+  btn.style.pointerEvents = disabled ? 'none'        : '';
+}
+
+function applyB2CContractPrices(idx, type) {
+  const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
+  const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
+  const costEl   = document.getElementById(`b2ch-cost-${idx}`);
+  const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
+  // "None" = ad-hoc booking with no contract → manual pricing, no auto-fill
+  if (type === 'none' || !roomType) {
+    if (costEl) costEl.value = '';
+    if (sellEl) sellEl.value = '';
+    return;
+  }
+  // Agreement & Allotment both use the negotiated agreement prices
+  const prices = getHotelAgreementPrices(hotelId, roomType);
+  if (costEl) costEl.value = prices ? prices.cost      : '';
+  if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
+}
+
 function setB2CRoomContract(btn, idx, type) {
   const ctEl = document.getElementById(`b2ch-rt-ct-${idx}`);
   if (ctEl) {
@@ -13283,6 +13308,7 @@ function setB2CRoomContract(btn, idx, type) {
       b.style.color       = active ? '#fff'        : 'var(--ink)';
     });
   }
+  applyB2CContractPrices(idx, type);
   updateB2CAllotmentInfo(idx);
 }
 
@@ -13293,15 +13319,17 @@ function updateB2CAllotmentInfo(idx) {
   const ctRow    = document.getElementById(`b2ch-rt-ct-row-${idx}`);
   const ctEl     = document.getElementById(`b2ch-rt-ct-${idx}`);
   if (ctRow) ctRow.style.display = roomType ? 'block' : 'none';
-  if (!infoEl) return;
-  if (!roomType) { infoEl.style.display = 'none'; return; }
   const h  = hotels.find(x => x.id === hotelId);
   const rt = h?.roomTypes?.find(r => r.type === roomType);
-  if (!rt) { infoEl.style.display = 'none'; return; }
-  const rct          = rt.contractType || (rt.hasAgreement ? 'agreement' : 'none');
-  const selectedCt   = ctEl?.dataset.contractType || 'none';
-  const hasAllotment = (rct === 'allotment') && (rt.allotmentRooms > 0);
+  const rct          = rt ? (rt.contractType || (rt.hasAgreement ? 'agreement' : 'none')) : 'none';
+  const hasAllotment = (rct === 'allotment') && (rt?.allotmentRooms > 0);
   const hasAgreement = rct === 'agreement' || rct === 'allotment';
+  // Disable the Agreement / Allotment buttons when this room type has no such contract
+  setB2CCtBtnDisabled(ctEl?.querySelector('.b2ch-rt-ct-btn[data-ctype="agreement"]'), !hasAgreement);
+  setB2CCtBtnDisabled(ctEl?.querySelector('.b2ch-rt-ct-btn[data-ctype="allotment"]'), !hasAllotment);
+  if (!infoEl) return;
+  if (!roomType || !rt) { infoEl.style.display = 'none'; return; }
+  const selectedCt   = ctEl?.dataset.contractType || 'none';
   const allotTotal   = hasAllotment ? (rt.allotmentRooms || 0) : 0;
   const allotUsed    = hasAllotment ? getHotelAllotmentUsage(hotelId, roomType) : 0;
   const allotRemain  = Math.max(0, allotTotal - allotUsed);
@@ -13410,11 +13438,6 @@ function calcB2CTotals() {
 function onB2CRoomTypeSelect(idx) {
   const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
   const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
-  const prices   = getHotelAgreementPrices(hotelId, roomType);
-  const costEl   = document.getElementById(`b2ch-cost-${idx}`);
-  const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
-  if (costEl) costEl.value = prices ? prices.cost      : '';
-  if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
   if (roomType) {
     const h   = hotels.find(x => x.id === hotelId);
     const rt  = h?.roomTypes?.find(r => r.type === roomType);
@@ -13456,7 +13479,7 @@ function saveB2CBooking() {
 
   // Collect hotel confs
   const hotelConfs = [];
-  document.querySelectorAll('[id^=b2ch-]').forEach(row => {
+  document.querySelectorAll('#b2c-hotel-conf-container > .guest-block').forEach(row => {
     const idx = row.id.split('-').pop();
     const hotelId = document.getElementById(`b2ch-hotel-${idx}`)?.value;
     if (!hotelId) return;
@@ -13479,7 +13502,7 @@ function saveB2CBooking() {
 
   // Extra guests
   const extraGuests = [];
-  document.querySelectorAll('[id^=b2cg-]').forEach(row => {
+  document.querySelectorAll('#b2c-extra-guests > .guest-block').forEach(row => {
     const idx = row.id.split('-').pop();
     const name = document.getElementById(`b2cg-name-${idx}`)?.value.trim();
     if (!name) return;

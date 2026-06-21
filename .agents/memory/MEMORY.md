@@ -1,1 +1,2 @@
 - [Artifact port registration](artifact-port-registration.md) — port 5000 must stay in `.replit` [[ports]] or the workflow is killed by the platform
+- [Persistence — Supabase _cache](persistence-supabase-cache.md) — app is NOT purely client-side; Supabase-synced `_cache` overrides localStorage, so seed tests via in-memory `hotels`/`_cache`, not localStorage
