@@ -3920,8 +3920,23 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="form-section">
         <div class="form-section-title">Pricing</div>
         <div class="form-grid">
-          <div class="field"><label>Total Selling Price (SAR)</label>
-            <input id="b2c-sell-price" type="number" min="0" placeholder="0.00" style="background:var(--green-light);border-color:rgba(26,107,60,0.25);font-weight:600">
+          <div class="field"><label>Total Before VAT (SAR)</label>
+            <input id="b2c-sell-price" type="number" min="0" placeholder="0.00" style="background:var(--cream);border-color:rgba(0,0,0,0.12);font-weight:600" oninput="calcB2CTotals()">
+          </div>
+          <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px">
+              <input type="checkbox" id="b2c-vat-toggle" style="accent-color:var(--gold);width:16px;height:16px" onchange="calcB2CTotals()">
+              <span style="font-size:0.875rem;font-weight:500">Apply VAT</span>
+              <span id="b2c-vat-rate-label" style="color:var(--gold);font-weight:700;font-size:0.85rem">(15%)</span>
+            </label>
+          </div>
+          <div class="field"><label>VAT Amount (SAR)</label>
+            <input id="b2c-vat-amount" type="number" readonly placeholder="0.00"
+              style="background:var(--cream);border-color:rgba(0,0,0,0.1);color:var(--ink-muted);cursor:default">
+          </div>
+          <div class="field"><label>Total with VAT (SAR)</label>
+            <input id="b2c-total-with-vat" type="number" readonly placeholder="0.00"
+              style="background:var(--green-light);border-color:rgba(26,107,60,0.25);font-weight:700;cursor:default">
           </div>
           <div class="field"><label>Deposit Received (SAR)</label>
             <input id="b2c-deposit" type="number" min="0" placeholder="0.00">
@@ -12935,8 +12950,12 @@ function openB2CBooking() {
   ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
    'b2c-passport','b2c-passport-expiry','b2c-id',
    'b2c-phone','b2c-whatsapp','b2c-email',
-   'b2c-sell-price','b2c-deposit','b2c-notes'
+   'b2c-sell-price','b2c-vat-amount','b2c-total-with-vat','b2c-deposit','b2c-notes'
   ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const vatToggle = document.getElementById('b2c-vat-toggle');
+  if (vatToggle) vatToggle.checked = false;
+  const rateLabel = document.getElementById('b2c-vat-rate-label');
+  if (rateLabel) rateLabel.textContent = `(${parseFloat(settings?.vatRate || '15')}%)`;
   document.getElementById('b2c-sex').value = '';
   document.getElementById('b2c-payment-method').value = '';
   document.getElementById('b2c-payment-status').value = 'Pending';
@@ -13086,14 +13105,30 @@ function onB2CHotelSelect(idx) {
 }
 
 function calcB2CTotals() {
-  let total = 0;
+  let subtotal = 0;
   document.querySelectorAll('#b2c-hotel-conf-container > .guest-block').forEach(row => {
     const idx = row.id.split('-').pop();
-    total += (Number(document.getElementById(`b2ch-sell-${idx}`)?.value) || 0)
-           + (Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0);
+    subtotal += (Number(document.getElementById(`b2ch-sell-${idx}`)?.value) || 0)
+              + (Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0);
   });
-  const el = document.getElementById('b2c-sell-price');
-  if (el) el.value = total > 0 ? total.toFixed(2) : '';
+  // If user manually typed a value when there are no rows, respect it
+  const sellEl = document.getElementById('b2c-sell-price');
+  if (subtotal === 0 && sellEl && Number(sellEl.value) > 0) subtotal = Number(sellEl.value);
+  else if (sellEl) sellEl.value = subtotal > 0 ? subtotal.toFixed(2) : '';
+
+  const applyVat  = document.getElementById('b2c-vat-toggle')?.checked || false;
+  const vatRate   = parseFloat(settings?.vatRate || '15') / 100;
+  const vatAmount = applyVat ? subtotal * vatRate : 0;
+  const totalWithVat = subtotal + vatAmount;
+
+  // Update the rate label to reflect current settings
+  const rateLabel = document.getElementById('b2c-vat-rate-label');
+  if (rateLabel) rateLabel.textContent = `(${parseFloat(settings?.vatRate || '15')}%)`;
+
+  const vatAmountEl  = document.getElementById('b2c-vat-amount');
+  const totalVatEl   = document.getElementById('b2c-total-with-vat');
+  if (vatAmountEl) vatAmountEl.value  = applyVat && vatAmount  > 0 ? vatAmount.toFixed(2)    : '';
+  if (totalVatEl)  totalVatEl.value   = applyVat && subtotal   > 0 ? totalWithVat.toFixed(2) : '';
 }
 
 function onB2CRoomTypeSelect(idx) {
@@ -13171,9 +13206,13 @@ function saveB2CBooking() {
     email: document.getElementById('b2c-email')?.value.trim()||'',
   };
 
-  const sellPrice = Number(document.getElementById('b2c-sell-price')?.value)||0;
-  const deposit   = Number(document.getElementById('b2c-deposit')?.value)||0;
-  const allGuests = [primaryGuest, ...extraGuests];
+  const sellPrice    = Number(document.getElementById('b2c-sell-price')?.value)||0;
+  const vatApplied   = document.getElementById('b2c-vat-toggle')?.checked || false;
+  const vatRate      = parseFloat(settings?.vatRate || '15');
+  const vatAmount    = vatApplied ? Number(document.getElementById('b2c-vat-amount')?.value)||0 : 0;
+  const totalWithVat = vatApplied ? Number(document.getElementById('b2c-total-with-vat')?.value)||0 : sellPrice;
+  const deposit      = Number(document.getElementById('b2c-deposit')?.value)||0;
+  const allGuests    = [primaryGuest, ...extraGuests];
 
   const resId = uid();
   hotelReservations.push({
@@ -13192,7 +13231,7 @@ function saveB2CBooking() {
     hotelConfs, rooms: [], meals: [],
     checkIn:  hotelConfs[0]?.checkIn  || '',
     checkOut: hotelConfs[hotelConfs.length-1]?.checkOut || '',
-    sellPrice, deposit,
+    sellPrice, vatApplied, vatRate: vatApplied ? vatRate : 0, vatAmount, totalWithVat, deposit,
     paymentMethod: document.getElementById('b2c-payment-method')?.value||'',
     paymentStatus: document.getElementById('b2c-payment-status')?.value||'Pending',
     notes: document.getElementById('b2c-notes')?.value.trim()||'',
