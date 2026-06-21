@@ -3858,6 +3858,9 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Guest identity -->
       <div class="form-section">
         <div class="form-section-title">Guest Information</div>
+        <div class="form-grid" style="margin-bottom:12px">
+          <div class="field"><label>Group Name</label><input id="b2c-group-name" type="text" placeholder="Group / booking reference name"></div>
+        </div>
         <div class="form-grid-3">
           <div class="field"><label class="required">First Name</label><input id="b2c-fname" type="text" placeholder="First name"></div>
           <div class="field"><label>Middle Name</label><input id="b2c-mname" type="text" placeholder="Middle name"></div>
@@ -12974,7 +12977,7 @@ let b2cHotelCount = 0;
 
 function openB2CBooking() {
   b2cGuestCount = 0; b2cHotelCount = 0;
-  ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
+  ['b2c-group-name','b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
    'b2c-phone','b2c-whatsapp','b2c-email',
    'b2c-total-rooms','b2c-sell-price','b2c-vat-amount','b2c-total-with-vat','b2c-deposit','b2c-notes'
   ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
@@ -13232,6 +13235,7 @@ function saveB2CBooking() {
   });
 
   const primaryGuest = {
+    groupName: document.getElementById('b2c-group-name')?.value.trim()||'',
     name: `${fname}${document.getElementById('b2c-mname')?.value.trim()?' '+document.getElementById('b2c-mname').value.trim():''} ${lname}`,
     dob: document.getElementById('b2c-dob')?.value||'',
     nationality: document.getElementById('b2c-nationality')?.value.trim()||'',
