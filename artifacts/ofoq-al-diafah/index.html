@@ -4217,7 +4217,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div id="owned-fields" style="display:none">
           <div class="form-grid">
             <div class="field"><label>Lease / Ownership Ref</label><input id="b-lease-ref" type="text" placeholder="Ownership or lease reference"></div>
-            <div class="field"><label>Internal Cost/Night (SAR)</label><input id="b-internal-cost" type="number" placeholder="Internal cost per room per night"></div>
+            <input type="hidden" id="b-internal-cost" value="">
+          </div>
+          <div style="padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:var(--r-sm);font-size:0.8571rem;color:var(--ink-muted);margin-top:8px">
+            💡 Cost per room is set <strong>per configuration</strong> in the next step — every room type + view combination gets its own nightly rate.
           </div>
         </div>
       </div>
@@ -7142,7 +7145,9 @@ function addRoomConfig() {
       </div>
       <div class="field">
         <label class="required">Cost / Night (SAR)</label>
-        <input id="rc-cost-${idx}" type="number" min="0" placeholder="e.g. 650">
+        <input id="rc-cost-${idx}" type="number" min="0" placeholder="e.g. 650"
+          style="background:var(--red-light);border-color:rgba(192,57,43,0.25)"
+          title="Purchase cost per room per night for this type + view">
       </div>
       <div class="field">
         <label>Extra Bed (SAR)</label>
