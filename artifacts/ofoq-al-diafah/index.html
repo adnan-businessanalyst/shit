@@ -13052,8 +13052,8 @@ function addB2CHotelRow() {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
       <div class="field"><label>Cost (SAR)</label><input id="b2ch-cost-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
-      <div class="field"><label>Selling Price (SAR)</label><input id="b2ch-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
-      <div class="field"><label>Meal Price (SAR)</label><input id="b2ch-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="field"><label>Selling Price (SAR)</label><input id="b2ch-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
+      <div class="field"><label>Meal Price (SAR)</label><input id="b2ch-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
     </div>`;
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
 }
@@ -13085,6 +13085,17 @@ function onB2CHotelSelect(idx) {
   onB2CRoomTypeSelect(idx);
 }
 
+function calcB2CTotals() {
+  let total = 0;
+  document.querySelectorAll('#b2c-hotel-conf-container > .guest-block').forEach(row => {
+    const idx = row.id.split('-').pop();
+    total += (Number(document.getElementById(`b2ch-sell-${idx}`)?.value) || 0)
+           + (Number(document.getElementById(`b2ch-mealprice-${idx}`)?.value) || 0);
+  });
+  const el = document.getElementById('b2c-sell-price');
+  if (el) el.value = total > 0 ? total.toFixed(2) : '';
+}
+
 function onB2CRoomTypeSelect(idx) {
   const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
   const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
@@ -13093,7 +13104,6 @@ function onB2CRoomTypeSelect(idx) {
   const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
   if (costEl) costEl.value = prices ? prices.cost      : '';
   if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
-  // Also refresh meal price if a meal is already selected
   onB2CMealTypeSelect(idx);
 }
 
@@ -13105,6 +13115,7 @@ function onB2CMealTypeSelect(idx) {
   if (!mealEl) return;
   const mp = getMealAgreementPrice(hotelId, roomType, mealType);
   mealEl.value = mp ? (mp.sellPrice || '') : '';
+  calcB2CTotals();
 }
 
 
