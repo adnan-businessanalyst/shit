@@ -13213,6 +13213,19 @@ function getHotelMealAllotmentUsage(hotelId, mealType) {
   return used;
 }
 
+function applyB2CMealContractPrices(idx, type) {
+  const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
+  const mealType = document.getElementById(`b2ch-meal-${idx}`)?.value;
+  const mealEl   = document.getElementById(`b2ch-mealprice-${idx}`);
+  if (!mealEl) return;
+  // "None" = no meal contract → manual pricing, no auto-fill
+  if (type === 'none' || !mealType) { mealEl.value = ''; return; }
+  // Agreement & Allotment both use the hotel's negotiated meal price
+  const h  = hotels.find(x => x.id === hotelId);
+  const ml = (h?.meals || []).find(m => m.type === mealType);
+  mealEl.value = ml ? (ml.sellPrice || '') : '';
+}
+
 function setB2CMealContract(btn, idx, type) {
   const ctEl = document.getElementById(`b2ch-meal-ct-${idx}`);
   if (ctEl) {
@@ -13223,6 +13236,7 @@ function setB2CMealContract(btn, idx, type) {
       b.style.color       = active ? '#fff'        : 'var(--ink)';
     });
   }
+  applyB2CMealContractPrices(idx, type);
   updateB2CMealAllotmentInfo(idx);
 }
 
@@ -13233,34 +13247,53 @@ function updateB2CMealAllotmentInfo(idx) {
   const ctRow    = document.getElementById(`b2ch-meal-ct-row-${idx}`);
   const ctEl     = document.getElementById(`b2ch-meal-ct-${idx}`);
   if (ctRow) ctRow.style.display = mealType ? 'block' : 'none';
-  if (!infoEl) return;
-  if (!mealType) { infoEl.style.display = 'none'; return; }
-  const mct = ctEl?.dataset.mealContractType || 'none';
   const h   = hotels.find(x => x.id === hotelId);
   const ml  = (h?.meals || []).find(m => m.type === mealType);
-  if (mct !== 'allotment' || !ml || !(ml.allotmentCount > 0)) {
-    infoEl.style.display = 'none'; return;
+  const mct          = ml ? (ml.contractType || (ml.hasAgreement ? 'agreement' : 'none')) : 'none';
+  const hasAllotment = (mct === 'allotment') && (ml?.allotmentCount > 0);
+  const hasAgreement = mct === 'agreement' || mct === 'allotment';
+  // Disable the Agreement / Allotment buttons when this meal type has no such contract
+  setB2CCtBtnDisabled(ctEl?.querySelector('.b2ch-meal-ct-btn[data-ctype="agreement"]'), !hasAgreement);
+  setB2CCtBtnDisabled(ctEl?.querySelector('.b2ch-meal-ct-btn[data-ctype="allotment"]'), !hasAllotment);
+  if (!infoEl) return;
+  if (!mealType || !ml) { infoEl.style.display = 'none'; return; }
+  const selectedCt  = ctEl?.dataset.mealContractType || 'none';
+  const allotTotal  = hasAllotment ? (ml.allotmentCount || 0) : 0;
+  const allotUsed   = hasAllotment ? getHotelMealAllotmentUsage(hotelId, mealType) : 0;
+  const allotRemain = Math.max(0, allotTotal - allotUsed);
+  const remColor    = allotRemain === 0 ? '#c0392b' : allotRemain < allotTotal * 0.2 ? '#e67e22' : '#1a6b3c';
+  let html = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;border-radius:6px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">`;
+  if (hasAllotment) {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">🍽 Meal Allotment <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> available</span>`;
+  } else {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">🍽 No meal allotment</span>`;
   }
-  const total     = ml.allotmentCount || 0;
-  const used      = getHotelMealAllotmentUsage(hotelId, mealType);
-  const pending   = Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 1;
-  const remaining = Math.max(0, total - used);
-  const afterThis = total - used - pending;
-  const pct       = total > 0 ? Math.min(100, Math.round(((used + pending) / total) * 100)) : 0;
-  const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#b8860b';
+  if (hasAgreement) {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:4px;font-weight:600;color:#7a5f00">✓ Meal agreement available</span>`;
+  } else {
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">✗ No meal agreement</span>`;
+  }
+  html += `</div>`;
+  if (selectedCt === 'allotment' && hasAllotment) {
+    const pending   = Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 0;
+    const afterThis = allotTotal - allotUsed - pending;
+    const pct       = allotTotal > 0 ? Math.min(100, Math.round(((allotUsed + pending) / allotTotal) * 100)) : 0;
+    const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
+    html += `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 12px;margin-top:-1px;border-radius:0 0 6px 6px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
+        <span style="font-weight:700;color:var(--ink)">Meal Allotment</span>
+        <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${allotUsed}</strong></span>
+        <span>Remaining: <strong style="color:${allotRemain===0?'#c0392b':'#1a6b3c'}">${allotRemain}</strong></span>
+        ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<allotTotal*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
+        <div style="flex:1;min-width:80px;max-width:160px;height:7px;background:rgba(0,0,0,0.1);border-radius:4px">
+          <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width 0.3s"></div>
+        </div>
+        <span style="color:var(--ink-muted)">${pct}%</span>
+      </div>`;
+  }
   infoEl.style.display = 'block';
-  infoEl.innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:6px 12px;border-radius:6px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">
-      <span style="font-weight:700;color:var(--ink);white-space:nowrap">Meal Allotment</span>
-      <span style="color:var(--ink-muted)">Total: <strong style="color:var(--ink)">${total}</strong></span>
-      <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${used}</strong></span>
-      <span>Remaining: <strong style="color:${remaining===0?'#c0392b':'#b8860b'}">${remaining}</strong></span>
-      ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<total*0.2?'#e67e22':'#b8860b'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
-      <div style="flex:1;min-width:80px;max-width:160px;height:7px;background:rgba(0,0,0,0.1);border-radius:4px">
-        <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width 0.3s"></div>
-      </div>
-      <span style="color:var(--ink-muted)">${pct}%</span>
-    </div>`;
+  infoEl.innerHTML = html;
+  calcB2CTotals();
 }
 
 function getHotelAllotmentUsage(hotelId, roomType) {
@@ -13451,21 +13484,16 @@ function onB2CRoomTypeSelect(idx) {
 
 function onB2CMealTypeSelect(idx) {
   const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
-  const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
   const mealType = document.getElementById(`b2ch-meal-${idx}`)?.value;
-  const mealEl   = document.getElementById(`b2ch-mealprice-${idx}`);
-  if (!mealEl) return;
-  // Auto-detect meal contract type from hotel config
+  // Auto-detect meal contract type from hotel config; pricing is applied by setB2CMealContract
   if (mealType) {
-    const h  = hotels.find(x => x.id === hotelId);
-    const ml = (h?.meals || []).find(m => m.type === mealType);
+    const h   = hotels.find(x => x.id === hotelId);
+    const ml  = (h?.meals || []).find(m => m.type === mealType);
     const mct = ml?.contractType || (ml?.hasAgreement ? 'agreement' : 'none');
     setB2CMealContract(null, idx, mct);
   } else {
-    updateB2CMealAllotmentInfo(idx);
+    setB2CMealContract(null, idx, 'none');
   }
-  const mp = getMealAgreementPrice(hotelId, roomType, mealType);
-  mealEl.value = mp ? (mp.sellPrice || '') : '';
   calcB2CTotals();
 }
 
