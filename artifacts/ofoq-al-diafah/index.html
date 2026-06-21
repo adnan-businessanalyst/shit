@@ -14537,8 +14537,7 @@ function doLogin() {
   if (email === (SUPER_ADMIN?.email||'').toLowerCase() && password === (SUPER_ADMIN?.password||'')) {
     currentUser = SUPER_ADMIN;
     sessionSet(currentUser);
-    localStorage.removeItem('oad_lang');
-    if (window.applyLang) window.applyLang('en');
+    if (window.applyLang) window.applyLang('ar');
     enterApp();
     return;
   }
@@ -14558,8 +14557,7 @@ function doLogin() {
 
   currentUser = user;
   sessionSet(currentUser);
-  localStorage.removeItem('oad_lang');
-  if (window.applyLang) window.applyLang('en');
+  if (window.applyLang) window.applyLang('ar');
   enterApp();
 }
 
@@ -14657,8 +14655,7 @@ function doLogout() {
   hideImpersonationBar();
   sessionClear();
   currentUser = null;
-  localStorage.removeItem('oad_lang');
-  if (window.applyLang) window.applyLang('en');
+  if (window.applyLang) window.applyLang('ar');
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
