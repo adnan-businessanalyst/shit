@@ -3916,13 +3916,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <button class="btn btn-sm" onclick="addB2CHotelRow()" style="margin-top:6px">+ Add Hotel</button>
       </div>
 
-      <!-- Meals -->
-      <div class="form-section">
-        <div class="form-section-title">Meals (optional)</div>
-        <div id="b2c-meals-container"></div>
-        <button class="btn btn-sm" onclick="addB2CMealRow()">+ Add Meal</button>
-      </div>
-
       <!-- Pricing -->
       <div class="form-section">
         <div class="form-section-title">Pricing</div>
@@ -4005,13 +3998,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div class="form-section-title">Hotels</div>
         <div id="db-hotel-conf-container"></div>
         <button class="btn btn-sm" onclick="addDbHotelRow()" style="margin-top:6px">+ Add Hotel</button>
-      </div>
-
-      <!-- Meals -->
-      <div class="form-section">
-        <div class="form-section-title">Meals (optional)</div>
-        <div id="db-meals-container"></div>
-        <button class="btn btn-sm" onclick="addDbMealRow()">+ Add Meal</button>
       </div>
 
       <!-- Notes -->
@@ -12859,7 +12845,6 @@ function completeReservation(id) {
    DIRECT BOOKING
 ═══════════════════════════════════════════════════════ */
 let dbHotelCount = 0;
-let dbMealCount  = 0;
 
 
 /* ═══════════════════════════════════════════════════════
@@ -12867,10 +12852,9 @@ let dbMealCount  = 0;
 ═══════════════════════════════════════════════════════ */
 let b2cGuestCount = 0;
 let b2cHotelCount = 0;
-let b2cMealCount  = 0;
 
 function openB2CBooking() {
-  b2cGuestCount = 0; b2cHotelCount = 0; b2cMealCount = 0;
+  b2cGuestCount = 0; b2cHotelCount = 0;
   ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
    'b2c-passport','b2c-passport-expiry','b2c-id',
    'b2c-phone','b2c-whatsapp','b2c-email',
@@ -12881,7 +12865,6 @@ function openB2CBooking() {
   document.getElementById('b2c-payment-status').value = 'Pending';
   document.getElementById('b2c-extra-guests').innerHTML = '';
   document.getElementById('b2c-hotel-conf-container').innerHTML = '';
-  document.getElementById('b2c-meals-container').innerHTML = '';
   addB2CHotelRow();
   openModal('modal-b2c-booking');
 }
@@ -13004,28 +12987,6 @@ function onB2CHotelSelect(idx) {
   if (city) city.value = h ? h.city : '';
 }
 
-function addB2CMealRow() {
-  b2cMealCount++;
-  const idx = b2cMealCount;
-  const div = document.createElement('div');
-  div.className = 'guest-block';
-  div.id = `b2cm-${idx}`;
-  div.innerHTML = `
-    <div class="guest-block-header">Meal ${idx}
-      <button class="remove-guest" onclick="document.getElementById('b2cm-${idx}').remove()">×</button>
-    </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 80px;gap:12px;align-items:end">
-      <div class="field"><label>Type</label>
-        <select id="b2cm-type-${idx}">
-          <option>Breakfast</option><option>Lunch</option><option>Dinner</option>
-          <option>Full Board</option><option>Half Board</option><option>Other</option>
-        </select>
-      </div>
-      <div class="field"><label>Notes</label><input id="b2cm-notes-${idx}" type="text" placeholder="e.g. halal..."></div>
-      <div class="field"><label>Count</label><input id="b2cm-count-${idx}" type="number" min="1" placeholder="14"></div>
-    </div>`;
-  document.getElementById('b2c-meals-container').appendChild(div);
-}
 
 function saveB2CBooking() {
   const fname = document.getElementById('b2c-fname')?.value.trim();
@@ -13067,16 +13028,6 @@ function saveB2CBooking() {
       whatsapp:    document.getElementById(`b2cg-whatsapp-${idx}`)?.value.trim()||'' });
   });
 
-  // Meals
-  const meals = [];
-  document.querySelectorAll('[id^=b2cm-]').forEach(row => {
-    const idx = row.id.split('-').pop();
-    const type = document.getElementById(`b2cm-type-${idx}`)?.value;
-    if (!type) return;
-    meals.push({ type, notes: document.getElementById(`b2cm-notes-${idx}`)?.value.trim()||'',
-      count: Number(document.getElementById(`b2cm-count-${idx}`)?.value)||0 });
-  });
-
   const primaryGuest = {
     name: `${fname}${document.getElementById('b2c-mname')?.value.trim()?' '+document.getElementById('b2c-mname').value.trim():''} ${lname}`,
     sex: document.getElementById('b2c-sex')?.value||'',
@@ -13107,7 +13058,7 @@ function saveB2CBooking() {
     paxMen:   allGuests.filter(g=>g.sex==='Male').length,
     paxWomen: allGuests.filter(g=>g.sex==='Female').length,
     guests: allGuests,
-    hotelConfs, rooms: [], meals,
+    hotelConfs, rooms: [], meals: [],
     checkIn:  hotelConfs[0]?.checkIn  || '',
     checkOut: hotelConfs[hotelConfs.length-1]?.checkOut || '',
     sellPrice, deposit,
@@ -13134,13 +13085,12 @@ function saveB2CBooking() {
 }
 
 function openDirectBooking() {
-  dbHotelCount = 0; dbMealCount = 0;
+  dbHotelCount = 0;
   ['db-agency','db-group-ref','db-phone','db-email','db-notes',
    'db-pax-total','db-pax-men','db-pax-women'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('db-hotel-conf-container').innerHTML = '';
-  document.getElementById('db-meals-container').innerHTML = '';
   document.getElementById('db-pax-warning').style.display = 'none';
   addDbHotelRow();
   openModal('modal-direct-booking');
@@ -13227,41 +13177,6 @@ function onDbHotelSelect(idx) {
   if (city) city.value = h ? h.city : '';
 }
 
-function addDbMealRow() {
-  dbMealCount++;
-  const idx = dbMealCount;
-  const div = document.createElement('div');
-  div.className = 'guest-block';
-  div.id = `db-meal-${idx}`;
-  div.innerHTML = `
-    <div class="guest-block-header">
-      Meal ${idx}
-      <button class="remove-guest" onclick="document.getElementById('db-meal-${idx}').remove()">×</button>
-    </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 80px;gap:12px;align-items:end">
-      <div class="field">
-        <label>Type</label>
-        <select id="db-m-type-${idx}">
-          <option value="Breakfast">🍳 Breakfast</option>
-          <option value="Lunch">🍽️ Lunch</option>
-          <option value="Dinner">🌙 Dinner</option>
-          <option value="Full Board">🍴 Full Board</option>
-          <option value="Half Board">🥗 Half Board</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Notes</label>
-        <input id="db-m-notes-${idx}" type="text" placeholder="e.g. halal, buffet...">
-      </div>
-      <div class="field">
-        <label>Count</label>
-        <input id="db-m-count-${idx}" type="number" min="1" placeholder="e.g. 14">
-      </div>
-    </div>`;
-  document.getElementById('db-meals-container').appendChild(div);
-}
-
 function collectDbHotelConfs() {
   const confs = [];
   document.querySelectorAll('[id^=db-hotel-]').forEach(row => {
@@ -13286,21 +13201,6 @@ function collectDbHotelConfs() {
   return confs;
 }
 
-function collectDbMeals() {
-  const meals = [];
-  document.querySelectorAll('[id^=db-meal-]').forEach(row => {
-    const idx = row.id.split('-').pop();
-    const type = document.getElementById(`db-m-type-${idx}`)?.value;
-    if (!type) return;
-    meals.push({
-      type,
-      notes: document.getElementById(`db-m-notes-${idx}`)?.value.trim() || '',
-      count: Number(document.getElementById(`db-m-count-${idx}`)?.value) || 0,
-    });
-  });
-  return meals;
-}
-
 function saveDirectBooking() {
   const agency = document.getElementById('db-agency')?.value.trim();
   if (!agency) { toast('Agency / group name is required', false); return; }
@@ -13308,7 +13208,6 @@ function saveDirectBooking() {
   const paxMen   = Number(document.getElementById('db-pax-men')?.value)   || 0;
   const paxWomen = Number(document.getElementById('db-pax-women')?.value) || 0;
   const hotelConfs = collectDbHotelConfs();
-  const meals      = collectDbMeals();
 
   // Create the hotel reservation directly (no voucher)
   const resId = uid();
@@ -13325,7 +13224,7 @@ function saveDirectBooking() {
     guests: [],
     hotelConfs,
     rooms:  [],
-    meals,
+    meals: [],
     checkIn:  hotelConfs[0]?.checkIn  || '',
     checkOut: hotelConfs[hotelConfs.length-1]?.checkOut || '',
     notes:  document.getElementById('db-notes')?.value.trim() || '',
