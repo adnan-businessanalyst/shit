@@ -6786,8 +6786,11 @@ function addHotelRoomTypeRow(prefill) {
     </label>`;
   }).join('');
 
-  const hasAgreement = prefill?.hasAgreement || false;
-  const agreeDisplay = hasAgreement ? 'grid' : 'none';
+  const ct = prefill?.contractType || (prefill?.hasAgreement ? 'agreement' : 'none');
+  row.dataset.contractType = ct;
+  const sharedDisplay  = ct !== 'none'       ? 'grid' : 'none';
+  const allotDisplay   = ct === 'allotment'  ? 'grid' : 'none';
+  const btnStyle = (active) => `flex:1;padding:8px 6px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;transition:background 0.15s;background:${active?'var(--gold)':'var(--surface)'};color:${active?'#fff':'var(--ink)'}`;
 
   row.innerHTML = `
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
@@ -6805,15 +6808,15 @@ function addHotelRoomTypeRow(prefill) {
     </div>
     <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:6px;font-weight:500">Available Views</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${viewChecks || '<span style="font-size:0.8rem;color:var(--ink-muted)">No views defined in Settings.</span>'}</div>
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px 8px 0 0;background:var(--cream)">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.875rem;font-weight:600;flex:1">
-        <input type="checkbox" class="rt-agreement-cb" ${hasAgreement?'checked':''} style="accent-color:var(--gold);width:16px;height:16px"
-          onchange="const r=this.closest('.h-rt-row');r.querySelector('.rt-agreement-fields').style.display=this.checked?'grid':'none'">
-        Agreement / عقد
-      </label>
-      <span style="font-size:0.78rem;color:var(--ink-muted)">Enable to enter agreed room prices</span>
+    <div style="display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:8px 8px 0 0;overflow:hidden">
+      <button type="button" class="rt-contract-btn" data-ctype="none" onclick="setRtContract(this,'none')"
+        style="${btnStyle(ct==='none')};border-right:1px solid var(--border)">No Contract</button>
+      <button type="button" class="rt-contract-btn" data-ctype="agreement" onclick="setRtContract(this,'agreement')"
+        style="${btnStyle(ct==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
+      <button type="button" class="rt-contract-btn" data-ctype="allotment" onclick="setRtContract(this,'allotment')"
+        style="${btnStyle(ct==='allotment')}">Allotment / مخزون</button>
     </div>
-    <div class="rt-agreement-fields" style="display:${agreeDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;border-radius:0 0 8px 8px;background:var(--cream)">
+    <div class="rt-contract-shared-fields" style="display:${sharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
         <label style="font-size:0.8rem">Room Cost (SAR)</label>
         <input type="number" class="rt-cost" min="0" step="0.01" placeholder="e.g. 450" value="${prefill?.cost||''}"
@@ -6824,9 +6827,59 @@ function addHotelRoomTypeRow(prefill) {
         <input type="number" class="rt-sell-price" min="0" step="0.01" placeholder="e.g. 600" value="${prefill?.sellPrice||''}"
           style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
       </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Start Date</label>
+        <input type="date" class="rt-start-date" value="${prefill?.startDate||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">End Date</label>
+        <input type="date" class="rt-end-date" value="${prefill?.endDate||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+    </div>
+    <div class="rt-allotment-extra" style="display:${allotDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid rgba(26,107,60,0.25);border-top:none;border-radius:0 0 8px 8px;background:rgba(26,107,60,0.04)">
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Allotted Rooms</label>
+        <input type="number" class="rt-allotment-rooms" min="0" step="1" placeholder="e.g. 20" value="${prefill?.allotmentRooms||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Allotted Meals</label>
+        <input type="number" class="rt-allotment-meals" min="0" step="1" placeholder="e.g. 40" value="${prefill?.allotmentMeals||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
     </div>`;
 
   list.appendChild(row);
+}
+
+function setRtContract(btn, type) {
+  const row = btn.closest('.h-rt-row');
+  row.dataset.contractType = type;
+  row.querySelectorAll('.rt-contract-btn').forEach(b => {
+    const active = b.dataset.ctype === type;
+    b.style.background = active ? 'var(--gold)' : 'var(--surface)';
+    b.style.color       = active ? '#fff'        : 'var(--ink)';
+  });
+  const shared = row.querySelector('.rt-contract-shared-fields');
+  const allot  = row.querySelector('.rt-allotment-extra');
+  if (shared) shared.style.display = type !== 'none' ? 'grid' : 'none';
+  if (allot)  allot.style.display  = type === 'allotment' ? 'grid' : 'none';
+}
+
+function setHmContract(btn, type) {
+  const row = btn.closest('.h-meal-row');
+  row.dataset.contractType = type;
+  row.querySelectorAll('.hm-contract-btn').forEach(b => {
+    const active = b.dataset.ctype === type;
+    b.style.background = active ? 'var(--gold)' : 'var(--surface)';
+    b.style.color       = active ? '#fff'        : 'var(--ink)';
+  });
+  const shared = row.querySelector('.hm-contract-shared-fields');
+  const allot  = row.querySelector('.hm-allotment-extra');
+  if (shared) shared.style.display = type !== 'none' ? 'grid' : 'none';
+  if (allot)  allot.style.display  = type === 'allotment' ? 'grid' : 'none';
 }
 
 function resetHotelRoomTypes() {
@@ -6852,8 +6905,11 @@ function addHotelMealRow(prefill) {
     `<option value="${m}" ${prefill?.type===m?'selected':''}>${m}</option>`
   ).join('');
 
-  const hasAgreement = prefill?.hasAgreement || false;
-  const agreeDisplay = hasAgreement ? 'grid' : 'none';
+  const hmCt = prefill?.contractType || (prefill?.hasAgreement ? 'agreement' : 'none');
+  row.dataset.contractType = hmCt;
+  const hmSharedDisplay = hmCt !== 'none'      ? 'grid' : 'none';
+  const hmAllotDisplay  = hmCt === 'allotment' ? 'grid' : 'none';
+  const hmBtnStyle = (active) => `flex:1;padding:8px 6px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;transition:background 0.15s;background:${active?'var(--gold)':'var(--surface)'};color:${active?'#fff':'var(--ink)'}`;
 
   row.innerHTML = `
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
@@ -6864,15 +6920,15 @@ function addHotelMealRow(prefill) {
       <button type="button" onclick="this.closest('.h-meal-row').remove();if(!document.querySelector('.h-meal-row')){const l=document.getElementById('h-meals-list');const e=document.createElement('div');e.id='h-meal-empty';e.style.cssText='color:var(--ink-muted);font-size:0.857rem;padding:6px 0';e.textContent='No meals added yet — click \"+ Add Meal\".';l.appendChild(e);}"
         style="padding:4px 10px;border:1px solid var(--red,#c0392b);border-radius:6px;color:var(--red,#c0392b);background:transparent;cursor:pointer;font-size:0.85rem;flex-shrink:0">✕</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:8px 8px 0 0;background:var(--cream)">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.875rem;font-weight:600;flex:1">
-        <input type="checkbox" class="hm-agreement-cb" ${hasAgreement?'checked':''} style="accent-color:var(--gold);width:16px;height:16px"
-          onchange="this.closest('.h-meal-row').querySelector('.hm-agreement-fields').style.display=this.checked?'grid':'none'">
-        Agreement / عقد
-      </label>
-      <span style="font-size:0.78rem;color:var(--ink-muted)">Enable to enter agreed meal prices</span>
+    <div style="display:flex;align-items:stretch;gap:0;border:1px solid var(--border);border-radius:8px 8px 0 0;overflow:hidden">
+      <button type="button" class="hm-contract-btn" data-ctype="none" onclick="setHmContract(this,'none')"
+        style="${hmBtnStyle(hmCt==='none')};border-right:1px solid var(--border)">No Contract</button>
+      <button type="button" class="hm-contract-btn" data-ctype="agreement" onclick="setHmContract(this,'agreement')"
+        style="${hmBtnStyle(hmCt==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
+      <button type="button" class="hm-contract-btn" data-ctype="allotment" onclick="setHmContract(this,'allotment')"
+        style="${hmBtnStyle(hmCt==='allotment')}">Allotment / مخزون</button>
     </div>
-    <div class="hm-agreement-fields" style="display:${agreeDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;border-radius:0 0 8px 8px;background:var(--cream)">
+    <div class="hm-contract-shared-fields" style="display:${hmSharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
         <label style="font-size:0.8rem">Meal Cost (SAR)</label>
         <input type="number" class="hm-cost" min="0" step="0.01" placeholder="e.g. 30" value="${prefill?.cost||''}"
@@ -6881,6 +6937,23 @@ function addHotelMealRow(prefill) {
       <div class="field" style="margin:0">
         <label style="font-size:0.8rem">Meal Selling Price (SAR)</label>
         <input type="number" class="hm-sell-price" min="0" step="0.01" placeholder="e.g. 50" value="${prefill?.sellPrice||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Start Date</label>
+        <input type="date" class="hm-start-date" value="${prefill?.startDate||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">End Date</label>
+        <input type="date" class="hm-end-date" value="${prefill?.endDate||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+    </div>
+    <div class="hm-allotment-extra" style="display:${hmAllotDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid rgba(26,107,60,0.25);border-top:none;border-radius:0 0 8px 8px;background:rgba(26,107,60,0.04)">
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Allotted Meals (qty)</label>
+        <input type="number" class="hm-allotment-count" min="0" step="1" placeholder="e.g. 60" value="${prefill?.allotmentCount||''}"
           style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
       </div>
     </div>`;
@@ -6949,21 +7022,28 @@ function saveHotel() {
     roomTypes: [...document.querySelectorAll('#h-room-types-list .h-rt-row')].reduce((acc, row) => {
       const type = row.querySelector('.rt-type-select')?.value;
       if (!type) return acc;
-      const views        = [...row.querySelectorAll('.rt-view-cb:checked')].map(cb => cb.value);
-      const hasAgreement = row.querySelector('.rt-agreement-cb')?.checked || false;
-      const cost         = hasAgreement ? (Number(row.querySelector('.rt-cost')?.value) || 0) : 0;
-      const sellPrice    = hasAgreement ? (Number(row.querySelector('.rt-sell-price')?.value) || 0) : 0;
-      const capacity     = Number(row.querySelector('.rt-capacity')?.value) || 0;
-      acc.push({ type, capacity, views, hasAgreement, cost, sellPrice });
+      const views    = [...row.querySelectorAll('.rt-view-cb:checked')].map(cb => cb.value);
+      const capacity = Number(row.querySelector('.rt-capacity')?.value) || 0;
+      const rct      = row.dataset.contractType || 'none';
+      const cost         = rct !== 'none' ? (Number(row.querySelector('.rt-cost')?.value)      || 0) : 0;
+      const sellPrice    = rct !== 'none' ? (Number(row.querySelector('.rt-sell-price')?.value) || 0) : 0;
+      const startDate    = rct !== 'none' ? (row.querySelector('.rt-start-date')?.value || '') : '';
+      const endDate      = rct !== 'none' ? (row.querySelector('.rt-end-date')?.value   || '') : '';
+      const allotmentRooms = rct === 'allotment' ? (Number(row.querySelector('.rt-allotment-rooms')?.value) || 0) : 0;
+      const allotmentMeals = rct === 'allotment' ? (Number(row.querySelector('.rt-allotment-meals')?.value) || 0) : 0;
+      acc.push({ type, capacity, views, contractType: rct, hasAgreement: rct === 'agreement', cost, sellPrice, startDate, endDate, allotmentRooms, allotmentMeals });
       return acc;
     }, []),
     meals: [...document.querySelectorAll('#h-meals-list .h-meal-row')].reduce((acc, row) => {
       const type = row.querySelector('.hm-type-select')?.value;
       if (!type) return acc;
-      const hasAgreement = row.querySelector('.hm-agreement-cb')?.checked || false;
-      const cost         = hasAgreement ? (Number(row.querySelector('.hm-cost')?.value) || 0) : 0;
-      const sellPrice    = hasAgreement ? (Number(row.querySelector('.hm-sell-price')?.value) || 0) : 0;
-      acc.push({ type, hasAgreement, cost, sellPrice });
+      const mct      = row.dataset.contractType || 'none';
+      const cost         = mct !== 'none' ? (Number(row.querySelector('.hm-cost')?.value)      || 0) : 0;
+      const sellPrice    = mct !== 'none' ? (Number(row.querySelector('.hm-sell-price')?.value) || 0) : 0;
+      const startDate    = mct !== 'none' ? (row.querySelector('.hm-start-date')?.value || '') : '';
+      const endDate      = mct !== 'none' ? (row.querySelector('.hm-end-date')?.value   || '') : '';
+      const allotmentCount = mct === 'allotment' ? (Number(row.querySelector('.hm-allotment-count')?.value) || 0) : 0;
+      acc.push({ type, contractType: mct, hasAgreement: mct === 'agreement', cost, sellPrice, startDate, endDate, allotmentCount });
       return acc;
     }, []),
   };
@@ -13113,17 +13193,22 @@ function getHotelAgreementPrices(hotelId, roomType) {
   const h = hotels.find(x => x.id === hotelId);
   if (!h?.roomTypes?.length) return null;
   const rt = h.roomTypes.find(r => r.type === roomType);
-  if (!rt?.hasAgreement) return null;
-  // New: meals live at hotel level as [{type,hasAgreement,cost,sellPrice}]
-  // Legacy fallback: meals were nested inside each room type as [{type,cost,sellPrice}] or string[]
+  if (!rt) return null;
+  const rct = rt.contractType || (rt.hasAgreement ? 'agreement' : 'none');
+  if (rct === 'none') return null;
+  // Meals: hotel-level array with contractType, fallback to legacy nested meals
   const hotelMeals = (h.meals || [])
-    .filter(m => m.hasAgreement)
-    .map(m => ({ type: m.type, cost: m.cost || 0, sellPrice: m.sellPrice || 0 }));
+    .filter(m => (m.contractType || (m.hasAgreement ? 'agreement' : 'none')) !== 'none')
+    .map(m => ({ type: m.type, cost: m.cost || 0, sellPrice: m.sellPrice || 0,
+      contractType: m.contractType || (m.hasAgreement ? 'agreement' : 'none'),
+      allotmentCount: m.allotmentCount || 0, startDate: m.startDate || '', endDate: m.endDate || '' }));
   const legacyMeals = (rt.meals || []).map(m =>
     typeof m === 'string' ? { type: m, cost: 0, sellPrice: 0 } : { type: m.type, cost: m.cost || 0, sellPrice: m.sellPrice || 0 }
   );
   const mealPrices = hotelMeals.length ? hotelMeals : legacyMeals;
-  return { cost: rt.cost || 0, sellPrice: rt.sellPrice || 0, mealPrices };
+  return { cost: rt.cost || 0, sellPrice: rt.sellPrice || 0, contractType: rct,
+    startDate: rt.startDate || '', endDate: rt.endDate || '',
+    allotmentRooms: rt.allotmentRooms || 0, allotmentMeals: rt.allotmentMeals || 0, mealPrices };
 }
 
 function getMealAgreementPrice(hotelId, roomType, mealType) {
