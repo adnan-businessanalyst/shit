@@ -3874,15 +3874,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         </div>
       </div>
 
-      <!-- Identity documents -->
-      <div class="form-section">
-        <div class="form-section-title">Identity Documents</div>
-        <div class="form-grid">
-          <div class="field"><label>Passport Number</label><input id="b2c-passport" type="text" placeholder="Passport no."></div>
-          <div class="field"><label>Passport Expiry</label><input id="b2c-passport-expiry" type="date"></div>
-          <div class="field"><label>National ID (Saudi citizens)</label><input id="b2c-id" type="text" placeholder="10-digit ID"></div>
-        </div>
-      </div>
 
       <!-- Contact -->
       <div class="form-section">
@@ -12990,7 +12981,6 @@ let b2cHotelCount = 0;
 function openB2CBooking() {
   b2cGuestCount = 0; b2cHotelCount = 0;
   ['b2c-fname','b2c-mname','b2c-lname','b2c-dob','b2c-nationality',
-   'b2c-passport','b2c-passport-expiry','b2c-id',
    'b2c-phone','b2c-whatsapp','b2c-email',
    'b2c-total-rooms','b2c-sell-price','b2c-vat-amount','b2c-total-with-vat','b2c-deposit','b2c-notes'
   ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
@@ -13253,9 +13243,6 @@ function saveB2CBooking() {
     sex: document.getElementById('b2c-sex')?.value||'',
     dob: document.getElementById('b2c-dob')?.value||'',
     nationality: document.getElementById('b2c-nationality')?.value.trim()||'',
-    passport: document.getElementById('b2c-passport')?.value.trim()||'',
-    passportExpiry: document.getElementById('b2c-passport-expiry')?.value||'',
-    idNumber: document.getElementById('b2c-id')?.value.trim()||'',
     phone, whatsapp: document.getElementById('b2c-whatsapp')?.value.trim()||'',
     email: document.getElementById('b2c-email')?.value.trim()||'',
   };
