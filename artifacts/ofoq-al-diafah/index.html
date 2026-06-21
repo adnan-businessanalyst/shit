@@ -2575,6 +2575,16 @@ body.dark-mode .action-bar { background: #1A1A1A; }
             </div>
           </div>
 
+          <!-- Meal Types -->
+          <div>
+            <div class="form-section-title" style="margin-bottom:10px">Meal Types</div>
+            <div id="set-mealTypes-list" style="margin-bottom:8px"></div>
+            <div style="display:flex;gap:6px">
+              <input id="set-mealType-new" type="text" placeholder="Add meal type..." style="flex:1;font-family:inherit;font-size:0.9286rem;padding:7px 10px;border:1px solid rgba(0,0,0,0.15);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);outline:none" onkeydown="if(event.key==='Enter')addLookupItem('mealTypes')">
+              <button class="btn btn-sm btn-gold" onclick="addLookupItem('mealTypes')">+ Add</button>
+            </div>
+          </div>
+
           <!-- Cancellation Reasons -->
           <div>
             <div class="form-section-title" style="margin-bottom:10px">Cancellation Reasons</div>
@@ -12946,8 +12956,9 @@ function addB2CHotelRow() {
   const div = document.createElement('div');
   div.className = 'guest-block';
   div.id = `b2ch-${idx}`;
-  const roomTypeOpts = HOTEL_ROOM_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('');
-  const roomViewOpts = HOTEL_VIEWS.map(v=>`<option value="${v}">${v}</option>`).join('');
+  const roomTypeOpts  = getLookupList('types').map(t=>`<option value="${t}">${t}</option>`).join('');
+  const roomViewOpts  = getLookupList('views').map(v=>`<option value="${v}">${v}</option>`).join('');
+  const mealTypeOpts  = getLookupList('mealTypes').map(m=>`<option value="${m}">${m}</option>`).join('');
   div.innerHTML = `
     <div class="guest-block-header">Hotel ${idx}
       ${idx>1?`<button class="remove-guest" onclick="document.getElementById('b2ch-${idx}').remove()">×</button>`:''}
@@ -12975,9 +12986,7 @@ function addB2CHotelRow() {
       </div>
       <div class="field"><label>Meal Type</label>
         <select id="b2ch-meal-${idx}">
-          <option value="">— None —</option>
-          <option>Breakfast</option><option>Lunch</option><option>Dinner</option>
-          <option>Half Board</option><option>Full Board</option><option>Other</option>
+          <option value="">— None —</option>${mealTypeOpts}
         </select>
       </div>
     </div>
@@ -13099,7 +13108,8 @@ function saveB2CBooking() {
     paxWomen: allGuests.filter(g=>g.sex==='Female').length,
     guests: allGuests,
     hotelConfs, rooms: [], meals,
-    checkIn: checkIn||'', checkOut: checkOut||'',
+    checkIn:  hotelConfs[0]?.checkIn  || '',
+    checkOut: hotelConfs[hotelConfs.length-1]?.checkOut || '',
     sellPrice, deposit,
     paymentMethod: document.getElementById('b2c-payment-method')?.value||'',
     paymentStatus: document.getElementById('b2c-payment-status')?.value||'Pending',
@@ -13112,7 +13122,7 @@ function saveB2CBooking() {
   persistReservations();
   addNotification('room',
     `B2C Booking — ${fname} ${lname}`,
-    `${allGuests.length} guest${allGuests.length!==1?'s':''} · ${hotelConfs.map(h=>h.hotelName).join(', ')||'Hotels TBC'} · ${fmtDate(checkIn||'')}–${fmtDate(checkOut||'')} · SAR ${sellPrice.toLocaleString()}`,
+    `${allGuests.length} guest${allGuests.length!==1?'s':''} · ${hotelConfs.map(h=>h.hotelName).join(', ')||'Hotels TBC'} · ${fmtDate(hotelConfs[0]?.checkIn||'')}–${fmtDate(hotelConfs[hotelConfs.length-1]?.checkOut||'')} · SAR ${sellPrice.toLocaleString()}`,
     null, resId
   );
   addLog('vou', 'B2C Booking Created', `${fname} ${lname} — ${allGuests.length} guest${allGuests.length!==1?'s':''}`, `By ${currentUser?.name||'unknown'}`);
@@ -13188,19 +13198,17 @@ function addDbHotelRow() {
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
       <div class="field"><label>Room Type</label>
         <select id="db-h-rtype-${idx}">
-          <option value="">— Select —</option>${HOTEL_ROOM_TYPES.map(t=>`<option>${t}</option>`).join('')}
+          <option value="">— Select —</option>${getLookupList('types').map(t=>`<option>${t}</option>`).join('')}
         </select>
       </div>
       <div class="field"><label>Room View</label>
         <select id="db-h-rview-${idx}">
-          <option value="">— Select —</option>${HOTEL_VIEWS.map(v=>`<option>${v}</option>`).join('')}
+          <option value="">— Select —</option>${getLookupList('views').map(v=>`<option>${v}</option>`).join('')}
         </select>
       </div>
       <div class="field"><label>Meal Type</label>
         <select id="db-h-meal-${idx}">
-          <option value="">— None —</option>
-          <option>Breakfast</option><option>Lunch</option><option>Dinner</option>
-          <option>Half Board</option><option>Full Board</option><option>Other</option>
+          <option value="">— None —</option>${getLookupList('mealTypes').map(m=>`<option>${m}</option>`).join('')}
         </select>
       </div>
     </div>
@@ -13318,7 +13326,8 @@ function saveDirectBooking() {
     hotelConfs,
     rooms:  [],
     meals,
-    checkIn, checkOut,
+    checkIn:  hotelConfs[0]?.checkIn  || '',
+    checkOut: hotelConfs[hotelConfs.length-1]?.checkOut || '',
     notes:  document.getElementById('db-notes')?.value.trim() || '',
     confirmedBy: '',
     status: 'Pending',
@@ -13329,7 +13338,7 @@ function saveDirectBooking() {
   persistReservations();
   addNotification('room',
     `Direct Booking Created — ${agency}`,
-    `${paxTotal} PAX · ${hotelConfs.map(h=>h.hotelName).join(', ')||'Hotels TBC'} · ${fmtDate(checkIn)}–${fmtDate(checkOut)}`,
+    `${paxTotal} PAX · ${hotelConfs.map(h=>h.hotelName).join(', ')||'Hotels TBC'} · ${fmtDate(hotelConfs[0]?.checkIn||'')}–${fmtDate(hotelConfs[hotelConfs.length-1]?.checkOut||'')}`,
     null, resId
   );
   addLog('vou', 'Direct Booking Created', `${agency} — ${paxTotal} PAX`, `By ${currentUser?.name||'unknown'}`);
@@ -16295,6 +16304,7 @@ function loadSettings() {
 const LOOKUP_DEFAULTS = {
   views:         ['City View','Haram View','Garden View','Pool View','Courtyard View','Sea View','Mountain View','Internal'],
   types:         ['Standard','Deluxe','Suite','Family','Presidential','Studio'],
+  mealTypes:     ['Breakfast','Lunch','Dinner','Half Board','Full Board','Other'],
   cancellations: ['Guest Request','Agency Request','No Show','Overbooking','Force Majeure','Medical Emergency','Visa Rejection','Flight Cancellation'],
   refunds:       ['Full Refund','Partial Refund','Credit Note','Non-Refundable','Refund to Agency','Direct to Guest'],
   ports:         ['Jeddah (JED)','Madinah (MED)','Riyadh (RUH)','Taif (TIF)','Dammam (DMM)','Other'],
