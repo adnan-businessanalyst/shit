@@ -3862,12 +3862,6 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           <div class="field"><label class="required">First Name</label><input id="b2c-fname" type="text" placeholder="First name"></div>
           <div class="field"><label>Middle Name</label><input id="b2c-mname" type="text" placeholder="Middle name"></div>
           <div class="field"><label class="required">Last Name</label><input id="b2c-lname" type="text" placeholder="Last name"></div>
-          <div class="field"><label class="required">Sex</label>
-            <select id="b2c-sex">
-              <option value="">— Select —</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
           </div>
           <div class="field"><label>Date of Birth</label><input id="b2c-dob" type="date"></div>
           <div class="field"><label>Nationality</label><input id="b2c-nationality" type="text" placeholder="e.g. Saudi, Egyptian..."></div>
@@ -12988,7 +12982,6 @@ function openB2CBooking() {
   if (vatToggle) vatToggle.checked = false;
   const rateLabel = document.getElementById('b2c-vat-rate-label');
   if (rateLabel) rateLabel.textContent = `(${parseFloat(settings?.vatRate || '15')}%)`;
-  document.getElementById('b2c-sex').value = '';
   document.getElementById('b2c-payment-method').value = '';
   document.getElementById('b2c-payment-status').value = 'Pending';
   document.getElementById('b2c-extra-guests').innerHTML = '';
@@ -13240,7 +13233,6 @@ function saveB2CBooking() {
 
   const primaryGuest = {
     name: `${fname}${document.getElementById('b2c-mname')?.value.trim()?' '+document.getElementById('b2c-mname').value.trim():''} ${lname}`,
-    sex: document.getElementById('b2c-sex')?.value||'',
     dob: document.getElementById('b2c-dob')?.value||'',
     nationality: document.getElementById('b2c-nationality')?.value.trim()||'',
     phone, whatsapp: document.getElementById('b2c-whatsapp')?.value.trim()||'',
