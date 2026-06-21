@@ -13172,7 +13172,7 @@ function addB2CHotelRow() {
         </select>
       </div>
       <div class="field"><label>Rooms</label>
-        <input id="b2ch-rooms-${idx}" type="number" min="1" step="1" placeholder="1" value="1">
+        <input id="b2ch-rooms-${idx}" type="number" min="1" step="1" placeholder="1" value="1" oninput="updateB2CAllotmentInfo(${idx});calcB2CTotals()">
       </div>
       <div class="field"><label>Meal Type</label>
         <select id="b2ch-meal-${idx}" onchange="onB2CMealTypeSelect(${idx})">
@@ -13184,8 +13184,55 @@ function addB2CHotelRow() {
       <div class="field"><label>Cost (SAR)</label><input id="b2ch-cost-${idx}" type="number" min="0" step="0.01" placeholder="0.00"></div>
       <div class="field"><label>Selling Price (SAR)</label><input id="b2ch-sell-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
       <div class="field"><label>Meal Price (SAR)</label><input id="b2ch-mealprice-${idx}" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcB2CTotals()"></div>
-    </div>`;
+    </div>
+    <div id="b2ch-allot-info-${idx}" style="display:none;margin-top:-1px"></div>`;
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
+}
+
+function getHotelAllotmentUsage(hotelId, roomType) {
+  let used = 0;
+  (vouchers || []).forEach(v => {
+    (v.hotelConfs || []).forEach(hc => {
+      if (hc.hotelId === hotelId && hc.roomType === roomType) used += (hc.rooms || 1);
+    });
+  });
+  return used;
+}
+
+function updateB2CAllotmentInfo(idx) {
+  const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
+  const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
+  const infoEl   = document.getElementById(`b2ch-allot-info-${idx}`);
+  if (!infoEl) return;
+  const h  = hotels.find(x => x.id === hotelId);
+  const rt = h?.roomTypes?.find(r => r.type === roomType);
+  const rct = rt?.contractType || (rt?.hasAgreement ? 'agreement' : 'none');
+  if (rct !== 'allotment' || !rt || !(rt.allotmentRooms > 0)) {
+    infoEl.style.display = 'none';
+    return;
+  }
+  const total     = rt.allotmentRooms || 0;
+  const used      = getHotelAllotmentUsage(hotelId, roomType);
+  const pending   = Number(document.getElementById(`b2ch-rooms-${idx}`)?.value) || 0;
+  const remaining = Math.max(0, total - used);
+  const afterThis = total - used - pending;
+  const pct       = total > 0 ? Math.min(100, Math.round(((used + pending) / total) * 100)) : 0;
+  const color     = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : afterThis < total * 0.2 ? '#e67e22' : '#1a6b3c';
+  const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
+  infoEl.style.display = 'block';
+  infoEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 12px;border-radius:0 0 8px 8px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
+      <span style="font-weight:700;color:var(--ink);white-space:nowrap">Allotment</span>
+      <span style="color:var(--ink-muted)">Total: <strong style="color:var(--ink)">${total}</strong></span>
+      <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${used}</strong></span>
+      <span style="color:${remaining===0?'#c0392b':'var(--ink-muted)'}">Remaining: <strong style="color:${remaining===0?'#c0392b':'#1a6b3c'}">${remaining}</strong></span>
+      ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<total*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
+      <div style="flex:1;min-width:80px;max-width:160px;height:7px;background:rgba(0,0,0,0.1);border-radius:4px">
+        <div style="height:7px;border-radius:4px;background:${barColor};width:${pct}%;transition:width 0.3s"></div>
+      </div>
+      <span style="color:var(--ink-muted)">${pct}%</span>
+    </div>`;
+  calcB2CTotals();
 }
 
 function getHotelAgreementPrices(hotelId, roomType) {
@@ -13263,6 +13310,7 @@ function onB2CRoomTypeSelect(idx) {
   const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
   if (costEl) costEl.value = prices ? prices.cost      : '';
   if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
+  updateB2CAllotmentInfo(idx);
   onB2CMealTypeSelect(idx);
 }
 
