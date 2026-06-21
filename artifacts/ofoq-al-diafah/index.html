@@ -12959,6 +12959,8 @@ function addB2CHotelRow() {
   const div = document.createElement('div');
   div.className = 'guest-block';
   div.id = `b2ch-${idx}`;
+  const roomTypeOpts = HOTEL_ROOM_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('');
+  const roomViewOpts = HOTEL_VIEWS.map(v=>`<option value="${v}">${v}</option>`).join('');
   div.innerHTML = `
     <div class="guest-block-header">Hotel ${idx}
       ${idx>1?`<button class="remove-guest" onclick="document.getElementById('b2ch-${idx}').remove()">×</button>`:''}
@@ -12972,6 +12974,25 @@ function addB2CHotelRow() {
       <div class="field"><label>City</label><input id="b2ch-city-${idx}" type="text" readonly style="background:var(--cream)"></div>
       <div class="field"><label>Check-in</label><input id="b2ch-in-${idx}" type="date"></div>
       <div class="field"><label>Check-out</label><input id="b2ch-out-${idx}" type="date"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
+      <div class="field"><label>Room Type</label>
+        <select id="b2ch-rtype-${idx}">
+          <option value="">— Select —</option>${roomTypeOpts}
+        </select>
+      </div>
+      <div class="field"><label>Room View</label>
+        <select id="b2ch-rview-${idx}">
+          <option value="">— Select —</option>${roomViewOpts}
+        </select>
+      </div>
+      <div class="field"><label>Meal Type</label>
+        <select id="b2ch-meal-${idx}">
+          <option value="">— None —</option>
+          <option>Breakfast</option><option>Lunch</option><option>Dinner</option>
+          <option>Half Board</option><option>Full Board</option><option>Other</option>
+        </select>
+      </div>
     </div>`;
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
 }
@@ -13026,6 +13047,9 @@ function saveB2CBooking() {
       hotelId, hotelName: h?.name||'', city: h?.city||'',
       checkIn:  document.getElementById(`b2ch-in-${idx}`)?.value  || checkIn || '',
       checkOut: document.getElementById(`b2ch-out-${idx}`)?.value || checkOut || '',
+      roomType: document.getElementById(`b2ch-rtype-${idx}`)?.value || '',
+      roomView: document.getElementById(`b2ch-rview-${idx}`)?.value || '',
+      mealType: document.getElementById(`b2ch-meal-${idx}`)?.value  || '',
     });
   });
 
