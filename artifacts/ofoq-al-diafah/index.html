@@ -16477,7 +16477,7 @@ function renderSettings() {
   });
   if (s.currency) { const el = document.getElementById('set-currency'); if (el) el.value = s.currency; }
   // Render lookup lists
-  ['views','types','cancellations','refunds','ports','cities','areas','transportCompanies','ourCompanies'].forEach(k => renderLookupList(k));
+  ['views','types','mealTypes','cancellations','refunds','ports','cities','areas','transportCompanies','ourCompanies'].forEach(k => renderLookupList(k));
   const checks = {
     'set-notif-voucher':    s.notifVoucher    !== false,
     'set-notif-hotel-res':  s.notifHotelRes   !== false,
