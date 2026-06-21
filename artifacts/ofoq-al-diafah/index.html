@@ -8183,12 +8183,12 @@ function addHotelConfRow(prefill) {
           <button type="button" id="hc-btn-reg-${idx}"
             onclick="toggleHotelMode(${idx},'registered')"
             style="padding:4px 12px;border:none;cursor:pointer;font-family:inherit;font-size:0.7857rem;transition:all 0.15s;background:${isAdHoc?'var(--surface)':'var(--gold)'};color:${isAdHoc?'var(--ink-muted)':'#fff'}">
-            🏨 Registered
+            🏨 فنادق مسجله
           </button>
           <button type="button" id="hc-btn-adhoc-${idx}"
             onclick="toggleHotelMode(${idx},'adhoc')"
             style="padding:4px 12px;border:none;border-inline-start:1px solid var(--border);cursor:pointer;font-family:inherit;font-size:0.7857rem;transition:all 0.15s;background:${isAdHoc?'var(--gold)':'var(--surface)'};color:${isAdHoc?'#fff':'var(--ink-muted)'}">
-            ✏️ Ad Hoc
+            ✏️ فنادق غير مسجله (مدفوعه من الوكيل)
           </button>
         </div>
         ${idx > 1 ? `<button class="remove-guest" onclick="document.getElementById('hc-row-${idx}').remove()">×</button>` : ''}
