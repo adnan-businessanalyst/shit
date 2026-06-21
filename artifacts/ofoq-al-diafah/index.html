@@ -12994,7 +12994,7 @@ function addB2CHotelRow() {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
       <div class="field"><label>Room Type</label>
-        <select id="b2ch-rtype-${idx}">
+        <select id="b2ch-rtype-${idx}" onchange="onB2CRoomTypeSelect(${idx})">
           <option value="">— Select —</option>${roomTypeOpts}
         </select>
       </div>
@@ -13017,10 +13017,31 @@ function addB2CHotelRow() {
   document.getElementById('b2c-hotel-conf-container').appendChild(div);
 }
 
+function getHotelAgreementPrices(hotelId, roomType) {
+  if (!hotelId || !roomType) return null;
+  const h = hotels.find(x => x.id === hotelId);
+  if (!h?.roomTypes?.length) return null;
+  const rt = h.roomTypes.find(r => r.type === roomType);
+  if (!rt?.hasAgreement) return null;
+  return { cost: rt.cost || 0, sellPrice: rt.sellPrice || 0 };
+}
+
 function onB2CHotelSelect(idx) {
-  const h = hotels.find(x=>x.id===document.getElementById(`b2ch-hotel-${idx}`)?.value);
+  const hotelId = document.getElementById(`b2ch-hotel-${idx}`)?.value;
+  const h = hotels.find(x => x.id === hotelId);
   const city = document.getElementById(`b2ch-city-${idx}`);
   if (city) city.value = h ? h.city : '';
+  onB2CRoomTypeSelect(idx);
+}
+
+function onB2CRoomTypeSelect(idx) {
+  const hotelId  = document.getElementById(`b2ch-hotel-${idx}`)?.value;
+  const roomType = document.getElementById(`b2ch-rtype-${idx}`)?.value;
+  const prices   = getHotelAgreementPrices(hotelId, roomType);
+  const costEl   = document.getElementById(`b2ch-cost-${idx}`);
+  const sellEl   = document.getElementById(`b2ch-sell-${idx}`);
+  if (costEl) costEl.value = prices ? prices.cost   : '';
+  if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
 }
 
 
@@ -13183,7 +13204,7 @@ function addDbHotelRow() {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end;margin-top:10px">
       <div class="field"><label>Room Type</label>
-        <select id="db-h-rtype-${idx}">
+        <select id="db-h-rtype-${idx}" onchange="onDbRoomTypeSelect(${idx})">
           <option value="">— Select —</option>${getLookupList('types').map(t=>`<option>${t}</option>`).join('')}
         </select>
       </div>
@@ -13208,9 +13229,20 @@ function addDbHotelRow() {
 
 function onDbHotelSelect(idx) {
   const sel = document.getElementById(`db-h-hotel-${idx}`);
-  const h = hotels.find(x => x.id === sel.value);
+  const h = hotels.find(x => x.id === sel?.value);
   const city = document.getElementById(`db-h-city-${idx}`);
   if (city) city.value = h ? h.city : '';
+  onDbRoomTypeSelect(idx);
+}
+
+function onDbRoomTypeSelect(idx) {
+  const hotelId  = document.getElementById(`db-h-hotel-${idx}`)?.value;
+  const roomType = document.getElementById(`db-h-rtype-${idx}`)?.value;
+  const prices   = getHotelAgreementPrices(hotelId, roomType);
+  const costEl   = document.getElementById(`db-h-cost-${idx}`);
+  const sellEl   = document.getElementById(`db-h-sell-${idx}`);
+  if (costEl) costEl.value = prices ? prices.cost      : '';
+  if (sellEl) sellEl.value = prices ? prices.sellPrice : '';
 }
 
 function collectDbHotelConfs() {
