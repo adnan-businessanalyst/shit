@@ -6756,21 +6756,31 @@ function addHotelRoomTypeRow(prefill) {
 
   const row = document.createElement('div');
   row.className = 'h-rt-row';
-  row.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--cream-light,#faf9f6)';
+  row.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--cream-light,#faf9f6)';
 
-  const typeOpts = HOTEL_ROOM_TYPES.map(t =>
+  const typeOpts = getLookupList('types').map(t =>
     `<option value="${t}" ${prefill?.type===t?'selected':''}>${t}</option>`
   ).join('');
 
-  const viewChecks = HOTEL_VIEWS.map(v => {
+  const viewChecks = getLookupList('views').map(v => {
     const checked = prefill?.views?.includes(v) ? 'checked' : '';
     return `<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:var(--cream);white-space:nowrap">
       <input type="checkbox" class="rt-view-cb" value="${v}" ${checked} style="accent-color:var(--gold)"> ${v}
     </label>`;
   }).join('');
 
+  const mealChecks = getLookupList('mealTypes').map(m => {
+    const checked = prefill?.meals?.includes(m) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;padding:3px 8px;border:1px solid var(--border);border-radius:20px;background:var(--cream);white-space:nowrap">
+      <input type="checkbox" class="rt-meal-cb" value="${m}" ${checked} style="accent-color:var(--gold)"> ${m}
+    </label>`;
+  }).join('');
+
+  const hasAgreement = prefill?.hasAgreement || false;
+  const agreeDisplay = hasAgreement ? 'grid' : 'none';
+
   row.innerHTML = `
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <select class="rt-type-select" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem">
         <option value="">— Room Type —</option>
         ${typeOpts}
@@ -6779,7 +6789,29 @@ function addHotelRoomTypeRow(prefill) {
         style="padding:4px 10px;border:1px solid var(--red,#c0392b);border-radius:6px;color:var(--red,#c0392b);background:transparent;cursor:pointer;font-size:0.85rem;flex-shrink:0">✕</button>
     </div>
     <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:6px;font-weight:500">Available Views</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">${viewChecks}</div>`;
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${viewChecks || '<span style="font-size:0.8rem;color:var(--ink-muted)">No views defined in Settings.</span>'}</div>
+    <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:6px;font-weight:500">Included Meals</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${mealChecks || '<span style="font-size:0.8rem;color:var(--ink-muted)">No meal types defined in Settings.</span>'}</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--cream);margin-bottom:4px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.875rem;font-weight:600;flex:1">
+        <input type="checkbox" class="rt-agreement-cb" ${hasAgreement?'checked':''} style="accent-color:var(--gold);width:16px;height:16px"
+          onchange="const p=this.closest('.h-rt-row').querySelector('.rt-agreement-fields');p.style.display=this.checked?'grid':'none'">
+        Agreement / عقد
+      </label>
+      <span style="font-size:0.78rem;color:var(--ink-muted)">Enable to enter agreed room prices</span>
+    </div>
+    <div class="rt-agreement-fields" style="display:${agreeDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;border-radius:0 0 8px 8px;background:var(--cream)">
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Cost (SAR)</label>
+        <input type="number" class="rt-cost" min="0" step="0.01" placeholder="e.g. 450" value="${prefill?.cost||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+      <div class="field" style="margin:0">
+        <label style="font-size:0.8rem">Selling Price (SAR)</label>
+        <input type="number" class="rt-sell-price" min="0" step="0.01" placeholder="e.g. 600" value="${prefill?.sellPrice||''}"
+          style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;background:var(--surface);color:var(--ink)">
+      </div>
+    </div>`;
 
   list.appendChild(row);
 }
@@ -6847,8 +6879,12 @@ function saveHotel() {
     roomTypes: [...document.querySelectorAll('#h-room-types-list .h-rt-row')].reduce((acc, row) => {
       const type = row.querySelector('.rt-type-select')?.value;
       if (!type) return acc;
-      const views = [...row.querySelectorAll('.rt-view-cb:checked')].map(cb => cb.value);
-      acc.push({ type, views });
+      const views        = [...row.querySelectorAll('.rt-view-cb:checked')].map(cb => cb.value);
+      const meals        = [...row.querySelectorAll('.rt-meal-cb:checked')].map(cb => cb.value);
+      const hasAgreement = row.querySelector('.rt-agreement-cb')?.checked || false;
+      const cost         = hasAgreement ? (Number(row.querySelector('.rt-cost')?.value) || 0) : 0;
+      const sellPrice    = hasAgreement ? (Number(row.querySelector('.rt-sell-price')?.value) || 0) : 0;
+      acc.push({ type, views, meals, hasAgreement, cost, sellPrice });
       return acc;
     }, []),
   };
