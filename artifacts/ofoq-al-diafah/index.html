@@ -2837,7 +2837,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
           <div><label class="form-label">Date</label><input type="date" id="wo-date" class="form-input"></div>
           <div>
-            <label class="form-label">Hotel (Allotment contracts only)</label>
+            <label class="form-label">الفندق (عقود الأوتمان فقط)</label>
             <select id="wo-hotel" onchange="populateWoItems()" class="form-input"><option value="">-- Select Hotel --</option></select>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -4293,7 +4293,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </div>
           <div class="source-card" id="src-owned" onclick="selectSource('owned')" style="border:1px solid var(--border);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer;text-align:center;transition:all 0.15s">
             <div style="font-size:1.8571rem;margin-bottom:8px">🏢</div>
-            <div style="font-weight:600;font-size:0.9286rem">Allotment — المخزون</div>
+            <div style="font-weight:600;font-size:0.9286rem">الأوتمان</div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:4px">Rooms owned or leased by Ofoq Al Diafah</div>
           </div>
         </div>
@@ -5601,7 +5601,7 @@ function renderInventory() {
   );
   document.getElementById('inv-subtitle').textContent = `${rooms.length} rooms total · ${rooms.filter(r=>r.status==='Available').length} available · ${batches.length} batch${batches.length!==1?'es':''}`;
 
-  const sourceLabel = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Allotment'};
+  const sourceLabel = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
   const sourceBadgeStyle = {
     direct:'background:#E8F0F9;color:#1A4A7A',
     agent:'background:#FEF3E2;color:#7A4A00',
@@ -6919,7 +6919,7 @@ function addHotelRoomTypeRow(prefill) {
       <button type="button" class="rt-contract-btn" data-ctype="agreement" onclick="setRtContract(this,'agreement')"
         style="${btnStyle(ct==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
       <button type="button" class="rt-contract-btn" data-ctype="allotment" onclick="setRtContract(this,'allotment')"
-        style="${btnStyle(ct==='allotment')}">Allotment / مخزون</button>
+        style="${btnStyle(ct==='allotment')}">الأوتمان</button>
     </div>
     <div class="rt-contract-shared-fields" style="display:${sharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
@@ -7031,7 +7031,7 @@ function addHotelMealRow(prefill) {
       <button type="button" class="hm-contract-btn" data-ctype="agreement" onclick="setHmContract(this,'agreement')"
         style="${hmBtnStyle(hmCt==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
       <button type="button" class="hm-contract-btn" data-ctype="allotment" onclick="setHmContract(this,'allotment')"
-        style="${hmBtnStyle(hmCt==='allotment')}">Allotment / مخزون</button>
+        style="${hmBtnStyle(hmCt==='allotment')}">الأوتمان</button>
     </div>
     <div class="hm-contract-shared-fields" style="display:${hmSharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
@@ -7545,7 +7545,7 @@ function addMealPlanConfig() {
         </select>
       </div>
       <div class="field">
-        <label class="required">Allotment Method</label>
+        <label class="required">طريقة الأوتمان</label>
         <select id="mp-method-${idx}" onchange="toggleMealPricingMethod(${idx});updateMealPlanPreviews()">
           <option value="count">Meal Count (fixed number per person)</option>
           <option value="percent">% of Batch Cost (derived allotment)</option>
@@ -7708,7 +7708,7 @@ function buildAgreementStep(configs, meals) {
   const source = document.getElementById('b-source').value;
   const from = document.getElementById('b-from').value;
   const to = document.getElementById('b-to').value;
-  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Allotment'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
   const totalRooms = configs.reduce((a,c)=>a+c.quantity,0);
 
   document.getElementById('agreement-summary').innerHTML = `
@@ -7769,7 +7769,7 @@ function buildAgreementStep(configs, meals) {
     mealsSection.innerHTML = `<div class="form-section">
       <div class="form-section-title">Meal Plans to be Added (${meals.length})</div>
       <div class="table-wrap"><table>
-        <thead><tr><th>#</th><th>Meal</th><th>Type</th><th>Allotment</th><th>Cost/Meal</th><th>Sell/Meal</th><th>Margin</th><th>Notes</th></tr></thead>
+        <thead><tr><th>#</th><th>Meal</th><th>Type</th><th>الأوتمان</th><th>Cost/Meal</th><th>Sell/Meal</th><th>Margin</th><th>Notes</th></tr></thead>
         <tbody>${mealRows}</tbody>
       </table></div>
     </div>`;
@@ -7873,7 +7873,7 @@ function commitBatch(confirmedBy) {
   batches.push(batch);
   persistBatches();
   persist();
-  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Allotment'})[source]}, confirmed by ${confirmedBy}`);
+  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'})[source]}, confirmed by ${confirmedBy}`);
   closeModal('modal-room');
   renderInventory();
   updateLogCount('inv');
@@ -13297,7 +13297,7 @@ function addB2CHotelRow() {
           <button type="button" class="b2ch-rt-ct-btn" data-ctype="agreement" onclick="setB2CRoomContract(this,${idx},'agreement')"
             style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Agreement</button>
           <button type="button" class="b2ch-rt-ct-btn" data-ctype="allotment" onclick="setB2CRoomContract(this,${idx},'allotment')"
-            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Allotment</button>
+            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">الأوتمان</button>
         </div>
       </div>
     </div>
@@ -13312,7 +13312,7 @@ function addB2CHotelRow() {
           <button type="button" class="b2ch-meal-ct-btn" data-ctype="agreement" onclick="setB2CMealContract(this,${idx},'agreement')"
             style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Agreement</button>
           <button type="button" class="b2ch-meal-ct-btn" data-ctype="allotment" onclick="setB2CMealContract(this,${idx},'allotment')"
-            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Allotment</button>
+            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">الأوتمان</button>
         </div>
       </div>
     </div>
@@ -13388,9 +13388,9 @@ function updateB2CMealAllotmentInfo(idx) {
   const remColor    = allotRemain === 0 ? '#c0392b' : allotRemain < allotTotal * 0.2 ? '#e67e22' : '#1a6b3c';
   let html = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;border-radius:6px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">`;
   if (hasAllotment) {
-    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">🍽 Meal Allotment <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> available</span>`;
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">🍽 أوتمان الوجبات <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> متاح</span>`;
   } else {
-    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">🍽 No meal allotment</span>`;
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">🍽 لا يوجد أوتمان للوجبات</span>`;
   }
   if (hasAgreement) {
     html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:4px;font-weight:600;color:#7a5f00">✓ Meal agreement available</span>`;
@@ -13405,7 +13405,7 @@ function updateB2CMealAllotmentInfo(idx) {
     const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
     html += `
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 12px;margin-top:-1px;border-radius:0 0 6px 6px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
-        <span style="font-weight:700;color:var(--ink)">Meal Allotment</span>
+        <span style="font-weight:700;color:var(--ink)">أوتمان الوجبات</span>
         <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${allotUsed}</strong></span>
         <span>Remaining: <strong style="color:${allotRemain===0?'#c0392b':'#1a6b3c'}">${allotRemain}</strong></span>
         ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<allotTotal*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
@@ -13493,9 +13493,9 @@ function updateB2CAllotmentInfo(idx) {
   const remColor     = allotRemain === 0 ? '#c0392b' : allotRemain < allotTotal * 0.2 ? '#e67e22' : '#1a6b3c';
   let html = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;border-radius:6px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">`;
   if (hasAllotment) {
-    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">📦 Allotment <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> available</span>`;
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">📦 الأوتمان <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> متاح</span>`;
   } else {
-    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">📦 No allotment</span>`;
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">📦 لا يوجد أوتمان</span>`;
   }
   if (hasAgreement) {
     html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:4px;font-weight:600;color:#7a5f00">✓ Agreement available</span>`;
@@ -13510,7 +13510,7 @@ function updateB2CAllotmentInfo(idx) {
     const barColor  = afterThis < 0 ? '#c0392b' : afterThis === 0 ? '#e67e22' : '#1a6b3c';
     html += `
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 12px;margin-top:-1px;border-radius:0 0 6px 6px;background:rgba(26,107,60,0.05);border:1px solid rgba(26,107,60,0.18);border-top:none;font-size:0.81rem">
-        <span style="font-weight:700;color:var(--ink)">Room Allotment</span>
+        <span style="font-weight:700;color:var(--ink)">أوتمان الغرف</span>
         <span style="color:var(--ink-muted)">Booked: <strong style="color:var(--ink)">${allotUsed}</strong></span>
         <span>Remaining: <strong style="color:${allotRemain===0?'#c0392b':'#1a6b3c'}">${allotRemain}</strong></span>
         ${pending > 0 ? `<span style="color:var(--ink-muted)">After this: <strong style="color:${afterThis<0?'#c0392b':afterThis<allotTotal*0.2?'#e67e22':'#1a6b3c'}">${Math.max(0,afterThis)}</strong>${afterThis<0?` <span style="color:#c0392b;font-weight:700">(over by ${Math.abs(afterThis)})</span>`:''}</span>` : ''}
@@ -16536,7 +16536,7 @@ function renderOpsReports() {
     </div>` : '<div style="font-size:0.9286rem;color:var(--ink-muted);padding:8px 0">No bus reservations yet</div>');
 
   // ── Inventory Source Mix ──────────────────────────────────
-  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'Allotment'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
   const sourceCounts = {direct:0, agent:0, owned:0};
   rooms.forEach(r=>{ if(sourceCounts[r.source]!==undefined) sourceCounts[r.source]++; });
   const maxSrc = Math.max(...Object.values(sourceCounts)) || 1;
@@ -18319,7 +18319,7 @@ function computeJournalEntries(period) {
         if (roomCost > 0 || roomRevenue > 0) entries.push({
           id: 'ras-'+res.id+'-'+i,
           date, type:'allotment_sale', ref,
-          description:`Allotment room sale — ${hc.hotelName} · ${hc.roomType} · ${res.agency||res.name||''}`,
+          description:`بيع أوتمان غرف — ${hc.hotelName} · ${hc.roomType} · ${res.agency||res.name||''}`,
           lines:[
             {code:'5100',account:'Room Cost of Sales',    debit:roomCost,    credit:0},
             {code:'1100',account:'Prepaid Room Inventory',debit:0,           credit:roomCost},
@@ -18331,7 +18331,7 @@ function computeJournalEntries(period) {
         if (mealCost > 0) entries.push({
           id: 'rms-'+res.id+'-'+i,
           date, type:'allotment_sale', ref,
-          description:`Allotment meal sale — ${hc.hotelName} · ${hc.mealType||''} · ${res.agency||''}`,
+          description:`بيع أوتمان وجبات — ${hc.hotelName} · ${hc.mealType||''} · ${res.agency||''}`,
           lines:[
             {code:'5200',account:'Meal Cost of Sales',    debit:mealCost,    credit:0},
             {code:'1200',account:'Prepaid Meal Inventory',debit:0,           credit:mealCost},
