@@ -21,6 +21,7 @@ A self-contained Arabic (RTL) Umrah / hospitality operations dashboard served as
 - `artifacts/ofoq-al-diafah/index.html` — the entire application (~13.9k lines): all 24 pages, styles, scripts, data-URL images. Source of truth for all app behavior.
 - `artifacts/ofoq-al-diafah/vite.config.ts` — Vite config. **Throws if `PORT` or `BASE_PATH` env vars are missing** — always set both for any manual build/run.
 - `artifacts/ofoq-al-diafah/.replit-artifact/artifact.toml` — artifact config (localPort 5000, production serve = static).
+- `VARIABLES.md` — comprehensive reference of every CSS custom property, JS global variable, and data entity field in the app. **Must be kept up to date after every structural change** (new fields, renamed fields, new data objects, new globals, new CSS tokens).
 
 ## Architecture decisions
 
@@ -36,6 +37,7 @@ A hospitality operations platform for managing Umrah/pilgrimage guest services: 
 ## User preferences
 
 - Keep the app as a single served HTML file — do not rebuild it in a frontend framework.
+- After every change that adds, removes, or renames a data field / global variable / CSS token, update `VARIABLES.md` at the project root to reflect the new state.
 
 ## Gotchas
 
