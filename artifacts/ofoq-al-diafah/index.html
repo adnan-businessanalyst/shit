@@ -2871,7 +2871,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
         <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
           <div><label class="form-label">Date</label><input type="date" id="wo-date" class="form-input"></div>
           <div>
-            <label class="form-label">الفندق (عقود الأوتمان فقط)</label>
+            <label class="form-label">الفندق (عقود allotment فقط)</label>
             <select id="wo-hotel" onchange="populateWoItems()" class="form-input"><option value="">-- Select Hotel --</option></select>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -4327,7 +4327,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
           </div>
           <div class="source-card" id="src-owned" onclick="selectSource('owned')" style="border:1px solid var(--border);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer;text-align:center;transition:all 0.15s">
             <div style="font-size:1.8571rem;margin-bottom:8px">🏢</div>
-            <div style="font-weight:600;font-size:0.9286rem">الأوتمان</div>
+            <div style="font-weight:600;font-size:0.9286rem">allotment</div>
             <div style="font-size:0.7857rem;color:var(--ink-muted);margin-top:4px">Rooms owned or leased by Ofoq Al Diafah</div>
           </div>
         </div>
@@ -5636,7 +5636,7 @@ function renderInventory() {
   );
   document.getElementById('inv-subtitle').textContent = `${rooms.length} rooms total · ${rooms.filter(r=>r.status==='Available').length} available · ${batches.length} batch${batches.length!==1?'es':''}`;
 
-  const sourceLabel = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
+  const sourceLabel = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'allotment'};
   const sourceBadgeStyle = {
     direct:'background:#E8F0F9;color:#1A4A7A',
     agent:'background:#FEF3E2;color:#7A4A00',
@@ -6954,7 +6954,7 @@ function addHotelRoomTypeRow(prefill) {
       <button type="button" class="rt-contract-btn" data-ctype="agreement" onclick="setRtContract(this,'agreement')"
         style="${btnStyle(ct==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
       <button type="button" class="rt-contract-btn" data-ctype="allotment" onclick="setRtContract(this,'allotment')"
-        style="${btnStyle(ct==='allotment')}">الأوتمان</button>
+        style="${btnStyle(ct==='allotment')}">allotment</button>
     </div>
     <div class="rt-contract-shared-fields" style="display:${sharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
@@ -7066,7 +7066,7 @@ function addHotelMealRow(prefill) {
       <button type="button" class="hm-contract-btn" data-ctype="agreement" onclick="setHmContract(this,'agreement')"
         style="${hmBtnStyle(hmCt==='agreement')};border-right:1px solid var(--border)">Agreement / عقد</button>
       <button type="button" class="hm-contract-btn" data-ctype="allotment" onclick="setHmContract(this,'allotment')"
-        style="${hmBtnStyle(hmCt==='allotment')}">الأوتمان</button>
+        style="${hmBtnStyle(hmCt==='allotment')}">allotment</button>
     </div>
     <div class="hm-contract-shared-fields" style="display:${hmSharedDisplay};grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border:1px solid var(--gold-light,#e8d9a0);border-top:none;background:rgba(212,175,55,0.05)">
       <div class="field" style="margin:0">
@@ -7580,7 +7580,7 @@ function addMealPlanConfig() {
         </select>
       </div>
       <div class="field">
-        <label class="required">طريقة الأوتمان</label>
+        <label class="required">طريقة allotment</label>
         <select id="mp-method-${idx}" onchange="toggleMealPricingMethod(${idx});updateMealPlanPreviews()">
           <option value="count">Meal Count (fixed number per person)</option>
           <option value="percent">% of Batch Cost (derived allotment)</option>
@@ -7743,7 +7743,7 @@ function buildAgreementStep(configs, meals) {
   const source = document.getElementById('b-source').value;
   const from = document.getElementById('b-from').value;
   const to = document.getElementById('b-to').value;
-  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'allotment'};
   const totalRooms = configs.reduce((a,c)=>a+c.quantity,0);
 
   document.getElementById('agreement-summary').innerHTML = `
@@ -7804,7 +7804,7 @@ function buildAgreementStep(configs, meals) {
     mealsSection.innerHTML = `<div class="form-section">
       <div class="form-section-title">Meal Plans to be Added (${meals.length})</div>
       <div class="table-wrap"><table>
-        <thead><tr><th>#</th><th>Meal</th><th>Type</th><th>الأوتمان</th><th>Cost/Meal</th><th>Sell/Meal</th><th>Margin</th><th>Notes</th></tr></thead>
+        <thead><tr><th>#</th><th>Meal</th><th>Type</th><th>allotment</th><th>Cost/Meal</th><th>Sell/Meal</th><th>Margin</th><th>Notes</th></tr></thead>
         <tbody>${mealRows}</tbody>
       </table></div>
     </div>`;
@@ -7908,7 +7908,7 @@ function commitBatch(confirmedBy) {
   batches.push(batch);
   persistBatches();
   persist();
-  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'})[source]}, confirmed by ${confirmedBy}`);
+  addLog('inv', 'Batch Imported', `${batchRef} — ${batch.name} (${batch.hotel})`, `${addedCount} rooms added via ${({direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'allotment'})[source]}, confirmed by ${confirmedBy}`);
   closeModal('modal-room');
   renderInventory();
   updateLogCount('inv');
@@ -13332,7 +13332,7 @@ function addB2CHotelRow() {
           <button type="button" class="b2ch-rt-ct-btn" data-ctype="agreement" onclick="setB2CRoomContract(this,${idx},'agreement')"
             style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Agreement</button>
           <button type="button" class="b2ch-rt-ct-btn" data-ctype="allotment" onclick="setB2CRoomContract(this,${idx},'allotment')"
-            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">الأوتمان</button>
+            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">allotment</button>
         </div>
       </div>
     </div>
@@ -13347,7 +13347,7 @@ function addB2CHotelRow() {
           <button type="button" class="b2ch-meal-ct-btn" data-ctype="agreement" onclick="setB2CMealContract(this,${idx},'agreement')"
             style="padding:5px 10px;border:none;border-right:1px solid var(--border);font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">Agreement</button>
           <button type="button" class="b2ch-meal-ct-btn" data-ctype="allotment" onclick="setB2CMealContract(this,${idx},'allotment')"
-            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">الأوتمان</button>
+            style="padding:5px 10px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)">allotment</button>
         </div>
       </div>
     </div>
@@ -13528,7 +13528,7 @@ function updateB2CAllotmentInfo(idx) {
   const remColor     = allotRemain === 0 ? '#c0392b' : allotRemain < allotTotal * 0.2 ? '#e67e22' : '#1a6b3c';
   let html = `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;border-radius:6px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);font-size:0.81rem">`;
   if (hasAllotment) {
-    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">📦 الأوتمان <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> متاح</span>`;
+    html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(26,107,60,0.09);border:1px solid rgba(26,107,60,0.22);border-radius:4px;font-weight:600;color:var(--ink)">📦 allotment <span style="color:${remColor}">${allotRemain}<span style="font-weight:400;color:var(--ink-muted)">/${allotTotal}</span></span> متاح</span>`;
   } else {
     html += `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(0,0,0,0.04);border:1px solid var(--border);border-radius:4px;color:var(--ink-muted);font-size:0.78rem">📦 لا يوجد أوتمان</span>`;
   }
@@ -16571,7 +16571,7 @@ function renderOpsReports() {
     </div>` : '<div style="font-size:0.9286rem;color:var(--ink-muted);padding:8px 0">No bus reservations yet</div>');
 
   // ── Inventory Source Mix ──────────────────────────────────
-  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'الأوتمان'};
+  const sourceLabels = {direct:'Direct Hotel Reservation',agent:'Wholesaler',owned:'allotment'};
   const sourceCounts = {direct:0, agent:0, owned:0};
   rooms.forEach(r=>{ if(sourceCounts[r.source]!==undefined) sourceCounts[r.source]++; });
   const maxSrc = Math.max(...Object.values(sourceCounts)) || 1;
@@ -18970,7 +18970,7 @@ function renderAccLedger(entries) {
 
   const typeLabels = {
     allotment_asset:  {label:'أصل مدفوع مسبقاً',  bg:'var(--blue-light)',  fg:'var(--blue)'},
-    allotment_sale:   {label:'بيع من الأوتمان',     bg:'var(--green-light)', fg:'var(--green)'},
+    allotment_sale:   {label:'بيع من allotment',     bg:'var(--green-light)', fg:'var(--green)'},
     direct_sale:      {label:'شراء/بيع مباشر',      bg:'var(--cream-dark)',  fg:'var(--ink-mid)'},
     transport_accrual:{label:'مستحق نقل',            bg:'var(--amber-light)', fg:'var(--amber)'},
     writeoff:         {label:'شطب مخزون',            bg:'var(--red-light)',   fg:'var(--red)'},
@@ -19074,7 +19074,7 @@ function renderAccPrepaid(entries) {
 
   return `<div class="card">
     <div class="card-header" style="margin-bottom:16px">
-      <div><div class="card-title">🏨 أصول المخزون المدفوع مسبقاً</div><div class="card-sub">عقود الأوتمان — قيمة تجلس كأصل حتى تُباع أو تُشطب</div></div>
+      <div><div class="card-title">🏨 أصول المخزون المدفوع مسبقاً</div><div class="card-sub">عقود allotment — قيمة تجلس كأصل حتى تُباع أو تُشطب</div></div>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse">
