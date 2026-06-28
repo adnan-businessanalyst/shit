@@ -195,6 +195,14 @@ body.sidebar-min #sidebar-min-btn svg { transform: scaleX(-1); }
 .btn-whatsapp:hover { background: #0a6b60; }
 .btn-sm { padding: 5px 11px; font-size: 0.8571rem; }
 .btn-xs { padding: 3px 8px; font-size: 0.7857rem; }
+.acc-tab-btn {
+  flex: 1; padding: 8px 10px; border: none; background: transparent;
+  border-radius: var(--r-sm); font-family: 'Alexandria', sans-serif;
+  font-size: 0.83rem; font-weight: 500; color: var(--ink-muted);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.acc-tab-btn:hover { background: var(--cream-dark); color: var(--ink); }
+.acc-tab-btn.active { background: var(--gold); color: #010101; font-weight: 600; }
 
 /* ─── Cards ─────────────────────────────────────────────── */
 .card {
@@ -1252,6 +1260,10 @@ body.dark-mode .action-bar { background: #1A1A1A; }
     <div class="nav-item" data-page="ar" onclick="navigate(this,'ar')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       <span data-i18n="nav.ar">Receivables</span>
+    </div>
+    <div class="nav-item" data-page="accounting" onclick="navigate(this,'accounting')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Accounting Ledger</span>
     </div>
     <div class="nav-item" data-page="activity-log" onclick="navigate(this,'activity-log')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -2774,6 +2786,114 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <div class="card" style="margin-top:14px">
         <div class="card-header"><div class="card-title" style="color:var(--green)" data-i18n="ar.recentlyCollected">✅ Recently Collected</div></div>
         <div class="table-wrap" id="ar-collected-table"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ ACCOUNTING LEDGER -->
+  <div id="page-accounting" class="page">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Accounting Ledger</div>
+        <div class="topbar-sub">Journal entries, prepaid assets, transport accruals &amp; write-offs</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="acc-period" onchange="renderAccounting()" style="padding:7px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-family:'Alexandria',sans-serif;font-size:0.9286rem;background:var(--surface);color:var(--ink)">
+          <option value="all">All Time</option>
+          <option value="month">This Month</option>
+          <option value="quarter">This Quarter</option>
+          <option value="year">This Year</option>
+        </select>
+        <button class="btn btn-gold" onclick="openWriteOffModal()">📉 Write-off</button>
+        <button class="btn btn-gold" onclick="openRefundModal()">↩ Refund</button>
+        <button class="btn btn-sm" onclick="exportAccountingCSV()">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="content" style="max-width:1100px">
+
+      <!-- KPI strip -->
+      <div id="acc-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px"></div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:3px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:4px">
+        <button class="acc-tab-btn active" onclick="switchAccTab('ledger',this)">📒 Journal Ledger</button>
+        <button class="acc-tab-btn" onclick="switchAccTab('prepaid',this)">🏨 Prepaid Assets</button>
+        <button class="acc-tab-btn" onclick="switchAccTab('transport',this)">🚌 Transport Accruals</button>
+        <button class="acc-tab-btn" onclick="switchAccTab('writeoffs',this)">📉 Write-offs</button>
+        <button class="acc-tab-btn" onclick="switchAccTab('refunds',this)">↩ Refunds</button>
+      </div>
+
+      <!-- Tab content -->
+      <div id="acc-tab-content"></div>
+    </div>
+
+    <!-- Write-off Modal -->
+    <div id="writeoff-modal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeWriteOffModal()">
+      <div class="modal" style="max-width:520px">
+        <div class="modal-header">
+          <div class="modal-title">📉 Record Inventory Write-off</div>
+          <button class="modal-close" onclick="closeWriteOffModal()">✕</button>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div><label class="form-label">Date</label><input type="date" id="wo-date" class="form-input"></div>
+          <div>
+            <label class="form-label">Hotel (Allotment contracts only)</label>
+            <select id="wo-hotel" onchange="populateWoItems()" class="form-input"><option value="">-- Select Hotel --</option></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label class="form-label">Asset Type</label>
+              <select id="wo-asset-type" onchange="populateWoItems()" class="form-input"><option value="room">Rooms</option><option value="meal">Meals</option></select>
+            </div>
+            <div>
+              <label class="form-label">Room / Meal Type</label>
+              <select id="wo-item" onchange="calcWoLoss()" class="form-input"><option value="">-- Select --</option></select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div><label class="form-label">Units Unsold</label><input type="number" id="wo-units" class="form-input" min="1" oninput="calcWoLoss()"></div>
+            <div><label class="form-label">Cost / Unit (SAR)</label><input type="number" id="wo-cost" class="form-input" readonly style="background:var(--cream)"></div>
+            <div><label class="form-label">Total Loss (SAR)</label><input type="number" id="wo-total" class="form-input" readonly style="background:var(--red-light);font-weight:700;color:var(--red)"></div>
+          </div>
+          <div><label class="form-label">Notes</label><textarea id="wo-notes" class="form-input" rows="2" style="resize:vertical"></textarea></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border)">
+            <button class="btn" onclick="closeWriteOffModal()">Cancel</button>
+            <button class="btn btn-gold" onclick="saveWriteOff()">Save Write-off</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refund Modal -->
+    <div id="refund-modal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeRefundModal()">
+      <div class="modal" style="max-width:520px">
+        <div class="modal-header">
+          <div class="modal-title">↩ Record Partial Refund</div>
+          <button class="modal-close" onclick="closeRefundModal()">✕</button>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div><label class="form-label">Date</label><input type="date" id="rf-date" class="form-input"></div>
+          <div>
+            <label class="form-label">Reservation</label>
+            <select id="rf-reservation" onchange="onRfResChange()" class="form-input"><option value="">-- Select Reservation --</option></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div><label class="form-label">Original Amount (SAR)</label><input type="number" id="rf-original" class="form-input" readonly style="background:var(--cream)"></div>
+            <div><label class="form-label">Cash Refunded (SAR)</label><input type="number" id="rf-cash" class="form-input" oninput="calcRefundLoss()"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div><label class="form-label">Loss Recognised (SAR)</label><input type="number" id="rf-loss" class="form-input" readonly style="background:var(--red-light);font-weight:700;color:var(--red)"></div>
+            <div>
+              <label class="form-label">Payment Method</label>
+              <select id="rf-method" class="form-input"><option>Cash</option><option>Bank Transfer</option><option>Credit Card</option><option>Cheque</option></select>
+            </div>
+          </div>
+          <div><label class="form-label">Notes</label><textarea id="rf-notes" class="form-input" rows="2" style="resize:vertical"></textarea></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border)">
+            <button class="btn" onclick="closeRefundModal()">Cancel</button>
+            <button class="btn btn-gold" onclick="saveAccRefund()">Save Refund</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4513,6 +4633,7 @@ const DB_KEYS = [
   'hotels','busCompanies','mutamers','hotelReservations','busReservations',
   'notifications','clientCompanies','providers','tours','itTickets',
   'appSettings','authUsers','gc','vc','cc','bc','dashConfig','lookups',
+  'writeOffs','acctRefunds',
 ];
 
 // Async boot: connect to Supabase and load all data into cache
@@ -4735,6 +4856,7 @@ function navigate(el, page) {
   if (page === 'ops-reports') renderOpsReports();
   if (page === 'transport-report') renderTransportReport();
   if (page === 'financial') renderFinancial();
+  if (page === 'accounting') renderAccounting();
   if (page === 'settings') renderSettings();
   if (page === 'visitors') renderVisitors();
 }
@@ -12151,6 +12273,8 @@ function printVisitors() { window.print(); }
 let hotelReservations = DB.load('hotelReservations');
 let busReservations   = DB.load('busReservations');
 let notifications     = DB.load('notifications');
+let writeOffs         = DB.load('writeOffs')   || [];
+let acctRefunds       = DB.load('acctRefunds') || [];
 
 function persistReservations() {
   DB.save('hotelReservations', hotelReservations);
@@ -18100,6 +18224,730 @@ function toggleDarkMode() {
     });
   });
 })();
+
+/* ═══════════════════════════════════════════════════════
+   ACCOUNTING MODULE
+═══════════════════════════════════════════════════════ */
+
+function persistAccounting() {
+  DB.save('writeOffs',   writeOffs);
+  DB.save('acctRefunds', acctRefunds);
+}
+
+function accInPeriod(dateStr, period) {
+  if (!dateStr || period === 'all') return true;
+  const d = new Date(dateStr);
+  const now = new Date();
+  if (period === 'month') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+  if (period === 'year')  return d.getFullYear()===now.getFullYear();
+  if (period === 'quarter') {
+    const q  = Math.floor(now.getMonth()/3);
+    const dq = Math.floor(d.getMonth()/3);
+    return d.getFullYear()===now.getFullYear() && dq===q;
+  }
+  return true;
+}
+
+function accFmt(n) {
+  return (n||0).toLocaleString('en-SA',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+/* ── Compute all journal entries from existing data ── */
+function computeJournalEntries(period) {
+  const entries = [];
+
+  /* 1 ▸ PREPAID ALLOTMENT ASSETS — hotel allotment contracts */
+  (hotels||[]).forEach(h => {
+    (h.roomTypes||[]).forEach(rt => {
+      if (rt.contractType !== 'allotment' || !(rt.allotmentRooms > 0) || !(rt.cost > 0)) return;
+      const contractDays = (rt.startDate && rt.endDate)
+        ? Math.max(1, Math.round((new Date(rt.endDate)-new Date(rt.startDate))/86400000)) : 1;
+      const assetValue = rt.allotmentRooms * rt.cost * contractDays;
+      const date = rt.startDate || h.createdAt || new Date().toISOString().slice(0,10);
+      if (!accInPeriod(date, period)) return;
+      entries.push({
+        id: 'apt-'+h.id+'-'+rt.type,
+        date: date.slice(0,10),
+        type: 'allotment_asset',
+        ref: h.name,
+        description: `Prepaid allotment — ${h.name} · ${rt.type} (${rt.allotmentRooms} rooms × ${contractDays} nights × SAR ${rt.cost})`,
+        lines: [
+          {code:'1100', account:'Prepaid Room Inventory', debit:assetValue, credit:0},
+          {code:'2300', account:'Accounts Payable',        debit:0, credit:assetValue},
+        ],
+        sourceId: h.id,
+      });
+    });
+    (h.meals||[]).forEach(m => {
+      if (m.contractType !== 'allotment' || !(m.allotmentCount > 0) || !(m.cost > 0)) return;
+      const contractDays = (m.startDate && m.endDate)
+        ? Math.max(1, Math.round((new Date(m.endDate)-new Date(m.startDate))/86400000)) : 1;
+      const assetValue = m.allotmentCount * m.cost * contractDays;
+      const date = m.startDate || h.createdAt || new Date().toISOString().slice(0,10);
+      if (!accInPeriod(date, period)) return;
+      entries.push({
+        id: 'apm-'+h.id+'-'+m.type,
+        date: date.slice(0,10),
+        type: 'allotment_asset',
+        ref: h.name,
+        description: `Prepaid allotment — ${h.name} · ${m.type} meals (${m.allotmentCount} slots × ${contractDays} days × SAR ${m.cost})`,
+        lines: [
+          {code:'1200', account:'Prepaid Meal Inventory', debit:assetValue, credit:0},
+          {code:'2300', account:'Accounts Payable',        debit:0, credit:assetValue},
+        ],
+        sourceId: h.id,
+      });
+    });
+  });
+
+  /* 2 ▸ HOTEL RESERVATION ENTRIES — allotment sales & direct buy/sell */
+  (hotelReservations||[]).forEach(res => {
+    const date = (res.checkIn || res.createdAt || new Date().toISOString()).slice(0,10);
+    if (!accInPeriod(date, period)) return;
+    (res.hotelConfs||[]).forEach((hc, i) => {
+      const nights = (hc.checkIn && hc.checkOut)
+        ? Math.max(1, Math.round((new Date(hc.checkOut)-new Date(hc.checkIn))/86400000)) : 1;
+      const rooms       = hc.rooms || 1;
+      const pax         = res.paxTotal || 1;
+      const roomCost    = (hc.cost||0) * rooms * nights;
+      const roomRevenue = (hc.sellPrice||0) * rooms * nights;
+      const mealCost    = (hc.mealPrice||0) * pax * nights;
+      const mealRevenue = mealCost;
+      const ref = res.voucherRef || res.confRef || res.id;
+
+      if (hc.contractType === 'allotment') {
+        if (roomCost > 0 || roomRevenue > 0) entries.push({
+          id: 'ras-'+res.id+'-'+i,
+          date, type:'allotment_sale', ref,
+          description:`Allotment room sale — ${hc.hotelName} · ${hc.roomType} · ${res.agency||res.name||''}`,
+          lines:[
+            {code:'5100',account:'Room Cost of Sales',    debit:roomCost,    credit:0},
+            {code:'1100',account:'Prepaid Room Inventory',debit:0,           credit:roomCost},
+            {code:'1100',account:'Accounts Receivable',   debit:roomRevenue, credit:0},
+            {code:'4100',account:'Room Revenue',          debit:0,           credit:roomRevenue},
+          ],
+          sourceId:res.id,
+        });
+        if (mealCost > 0) entries.push({
+          id: 'rms-'+res.id+'-'+i,
+          date, type:'allotment_sale', ref,
+          description:`Allotment meal sale — ${hc.hotelName} · ${hc.mealType||''} · ${res.agency||''}`,
+          lines:[
+            {code:'5200',account:'Meal Cost of Sales',    debit:mealCost,    credit:0},
+            {code:'1200',account:'Prepaid Meal Inventory',debit:0,           credit:mealCost},
+            {code:'1200',account:'Accounts Receivable',   debit:mealRevenue, credit:0},
+            {code:'4200',account:'Meal Revenue',          debit:0,           credit:mealRevenue},
+          ],
+          sourceId:res.id,
+        });
+      } else {
+        if (roomCost > 0 || roomRevenue > 0) entries.push({
+          id: 'rds-'+res.id+'-'+i,
+          date, type:'direct_sale', ref,
+          description:`Direct room booking — ${hc.hotelName} · ${hc.roomType} · ${res.agency||res.name||''}`,
+          lines:[
+            {code:'5100',account:'Room Cost of Sales',  debit:roomCost,    credit:0},
+            {code:'2300',account:'Accounts Payable',    debit:0,           credit:roomCost},
+            {code:'1300',account:'Accounts Receivable', debit:roomRevenue, credit:0},
+            {code:'4100',account:'Room Revenue',        debit:0,           credit:roomRevenue},
+          ],
+          sourceId:res.id,
+        });
+      }
+    });
+  });
+
+  /* 3 ▸ TRANSPORT ACCRUALS — bus reservations */
+  (busReservations||[]).forEach(br => {
+    const date = (br.date || br.createdAt || new Date().toISOString()).slice(0,10);
+    if (!accInPeriod(date, period)) return;
+    const cost    = br.cost || br.totalCost || 0;
+    const revenue = br.sellPrice || br.totalSell || 0;
+    if (cost <= 0 && revenue <= 0) return;
+    entries.push({
+      id: 'tra-'+br.id,
+      date, type:'transport_accrual',
+      ref: br.ref || br.id,
+      description:`Transport accrual — ${br.busCompanyName||'Bus'} · ${br.leg||''} · ${br.from||''} → ${br.to||''}`,
+      lines:[
+        {code:'5300',account:'Transport Cost',            debit:cost,    credit:0},
+        {code:'2200',account:'Accrued Transport Payable', debit:0,       credit:cost},
+        {code:'1300',account:'Accounts Receivable',       debit:revenue, credit:0},
+        {code:'4300',account:'Transport Revenue',         debit:0,       credit:revenue},
+      ],
+      sourceId: br.id,
+      paymentStatus: br.paymentStatus || 'Pending',
+    });
+  });
+
+  /* 4 ▸ WRITE-OFFS — user created */
+  (writeOffs||[]).forEach(wo => {
+    if (!accInPeriod(wo.date, period)) return;
+    const assetCode = wo.unitType==='meal' ? '1200' : '1100';
+    const assetName = wo.unitType==='meal' ? 'Prepaid Meal Inventory' : 'Prepaid Room Inventory';
+    entries.push({
+      id:'wo-'+wo.id,
+      date:wo.date, type:'writeoff',
+      ref:wo.hotelName,
+      description:`Write-off — ${wo.hotelName} · ${wo.itemLabel} · ${wo.units} ${wo.unitType}(s) unsold`,
+      lines:[
+        {code:'6100',account:'Inventory Write-off Loss',debit:wo.totalLoss,credit:0},
+        {code:assetCode,account:assetName,              debit:0,           credit:wo.totalLoss},
+      ],
+      sourceId:wo.id, _woId:wo.id,
+    });
+  });
+
+  /* 5 ▸ PARTIAL REFUNDS — user created */
+  (acctRefunds||[]).forEach(rf => {
+    if (!accInPeriod(rf.date, period)) return;
+    entries.push({
+      id:'rf-'+rf.id,
+      date:rf.date, type:'refund',
+      ref:rf.resRef,
+      description:`Partial refund — ${rf.resRef} · Cash: SAR ${accFmt(rf.cashRefunded)}, Loss: SAR ${accFmt(rf.lossAmount)}`,
+      lines:[
+        {code:'4100',account:'Revenue (reversal)',  debit:rf.originalAmount, credit:0},
+        {code:'1010',account:'Cash / Bank',         debit:0,                 credit:rf.cashRefunded},
+        {code:'6200',account:'Partial Refund Loss', debit:0,                 credit:rf.lossAmount},
+      ],
+      sourceId:rf.resId, _rfId:rf.id,
+    });
+  });
+
+  return entries.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+}
+
+/* ── Main page render ──────────────────────────────── */
+let _accCurrentTab = 'ledger';
+
+function renderAccounting() {
+  const period  = (document.getElementById('acc-period')||{}).value || 'all';
+  const entries = computeJournalEntries(period);
+
+  let prepaidRooms=0, prepaidMeals=0, transportAccrual=0, totalRev=0, totalCogs=0, totalLoss=0;
+  entries.forEach(e => e.lines.forEach(l => {
+    if (l.code==='1100' && e.type==='allotment_asset') prepaidRooms  += l.debit;
+    if (l.code==='1200' && e.type==='allotment_asset') prepaidMeals  += l.debit;
+    if (l.code==='2200') transportAccrual += l.credit;
+    if (['4100','4200','4300'].includes(l.code)) totalRev  += l.credit;
+    if (['5100','5200','5300'].includes(l.code)) totalCogs += l.debit;
+    if (['6100','6200'].includes(l.code))        totalLoss += l.debit;
+  }));
+  // Subtract what's already sold / written off from prepaid
+  entries.forEach(e => e.lines.forEach(l => {
+    if (l.code==='1100' && e.type!=='allotment_asset') prepaidRooms -= l.credit;
+    if (l.code==='1200' && e.type!=='allotment_asset') prepaidMeals -= l.credit;
+  }));
+
+  const kpis = [
+    {label:'Prepaid Room Assets', value:'SAR '+accFmt(Math.max(0,prepaidRooms)),  color:'var(--blue)',  icon:'🏨'},
+    {label:'Prepaid Meal Assets', value:'SAR '+accFmt(Math.max(0,prepaidMeals)),  color:'var(--blue)',  icon:'🍽'},
+    {label:'Transport Accruals',  value:'SAR '+accFmt(transportAccrual),           color:'var(--amber)', icon:'🚌'},
+    {label:'Total Revenue',       value:'SAR '+accFmt(totalRev),                   color:'var(--green)', icon:'📈'},
+    {label:'Write-off Losses',    value:'SAR '+accFmt(totalLoss),                  color:'var(--red)',   icon:'📉'},
+  ];
+  const kpiEl = document.getElementById('acc-kpis');
+  if (kpiEl) kpiEl.innerHTML = kpis.map(k=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 14px">
+      <div style="font-size:1.4rem;margin-bottom:4px">${k.icon}</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:6px">${k.label}</div>
+      <div style="font-size:1.05rem;font-weight:700;color:${k.color}">${k.value}</div>
+    </div>`).join('');
+
+  switchAccTab(_accCurrentTab, null, entries);
+}
+
+function switchAccTab(tab, btnEl, entries) {
+  _accCurrentTab = tab;
+  document.querySelectorAll('.acc-tab-btn').forEach(b=>b.classList.remove('active'));
+  if (btnEl) {
+    btnEl.classList.add('active');
+  } else {
+    const map = ['ledger','prepaid','transport','writeoffs','refunds'];
+    const idx = map.indexOf(tab);
+    const btns = document.querySelectorAll('.acc-tab-btn');
+    if (btns[idx]) btns[idx].classList.add('active');
+  }
+  if (!entries) {
+    const period = (document.getElementById('acc-period')||{}).value || 'all';
+    entries = computeJournalEntries(period);
+  }
+  const el = document.getElementById('acc-tab-content');
+  if (!el) return;
+  if      (tab==='ledger')    el.innerHTML = renderAccLedger(entries);
+  else if (tab==='prepaid')   el.innerHTML = renderAccPrepaid(entries);
+  else if (tab==='transport') el.innerHTML = renderAccTransport(entries);
+  else if (tab==='writeoffs') el.innerHTML = renderAccWriteoffs();
+  else if (tab==='refunds')   el.innerHTML = renderAccRefunds();
+}
+
+/* ── Tab: Journal Ledger ────────────────────────────── */
+function renderAccLedger(entries) {
+  if (!entries.length) return '<div class="card"><div style="padding:40px;text-align:center;color:var(--ink-muted)">لا توجد قيود لهذه الفترة. أضف فنادق وحجوزات لتوليد القيود تلقائياً.</div></div>';
+
+  const typeLabels = {
+    allotment_asset:  {label:'أصل مدفوع مسبقاً',  bg:'var(--blue-light)',  fg:'var(--blue)'},
+    allotment_sale:   {label:'بيع من الأوتمان',     bg:'var(--green-light)', fg:'var(--green)'},
+    direct_sale:      {label:'شراء/بيع مباشر',      bg:'var(--cream-dark)',  fg:'var(--ink-mid)'},
+    transport_accrual:{label:'مستحق نقل',            bg:'var(--amber-light)', fg:'var(--amber)'},
+    writeoff:         {label:'شطب مخزون',            bg:'var(--red-light)',   fg:'var(--red)'},
+    refund:           {label:'استرداد جزئي',          bg:'var(--red-light)',   fg:'var(--red)'},
+  };
+
+  let totalDebit=0, totalCredit=0;
+  entries.forEach(e => e.lines.forEach(l=>{ totalDebit+=l.debit; totalCredit+=l.credit; }));
+
+  const rows = entries.map(e => {
+    const cfg = typeLabels[e.type]||{label:e.type,bg:'var(--cream)',fg:'var(--ink)'};
+    const eD  = e.lines.reduce((s,l)=>s+l.debit,0);
+    const eC  = e.lines.reduce((s,l)=>s+l.credit,0);
+    const subLines = e.lines.map(l=>`
+      <tr style="background:var(--cream);font-size:0.8rem">
+        <td style="padding:5px 8px 5px 28px;color:var(--ink-muted)" colspan="3">
+          <span style="font-family:monospace;font-size:0.75rem;background:var(--surface);padding:1px 5px;border-radius:3px;margin-inline-end:6px">${l.code}</span>${l.account}
+        </td>
+        <td style="padding:5px 8px;text-align:right;color:${l.debit?'var(--blue)':'var(--ink-muted)'}">${l.debit?'SAR '+accFmt(l.debit):''}</td>
+        <td style="padding:5px 8px;text-align:right;color:${l.credit?'var(--blue)':'var(--ink-muted)'}">${l.credit?'SAR '+accFmt(l.credit):''}</td>
+      </tr>`).join('');
+    const delBtn = e._woId
+      ? `<button onclick="deleteWriteOff('${e._woId}')" style="border:none;background:none;cursor:pointer;color:var(--red);font-size:0.8rem;padding:2px 6px" title="Delete">✕</button>`
+      : e._rfId
+        ? `<button onclick="deleteAccRefund('${e._rfId}')" style="border:none;background:none;cursor:pointer;color:var(--red);font-size:0.8rem;padding:2px 6px" title="Delete">✕</button>`
+        : '';
+    return `
+      <tr class="_acc-row" style="cursor:pointer;border-bottom:1px solid var(--border)" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'table-row-group':'none'">
+        <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);white-space:nowrap">${e.date||''}</td>
+        <td style="padding:10px 8px">
+          <span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.73rem;font-weight:600;background:${cfg.bg};color:${cfg.fg}">${cfg.label}</span>
+        </td>
+        <td style="padding:10px 8px;font-size:0.83rem;color:var(--ink-mid);max-width:300px">${e.description}</td>
+        <td style="padding:10px 8px;text-align:right;font-weight:600">SAR ${accFmt(eD)}</td>
+        <td style="padding:10px 8px;text-align:right;font-weight:600">SAR ${accFmt(eC)}</td>
+        <td style="padding:10px 8px;text-align:center">${delBtn}</td>
+      </tr>
+      <tbody style="display:none">${subLines}</tbody>`;
+  }).join('');
+
+  return `<div class="card">
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);background:var(--cream)">
+            <th style="padding:10px 8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600;white-space:nowrap">التاريخ</th>
+            <th style="padding:10px 8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">النوع</th>
+            <th style="padding:10px 8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">البيان</th>
+            <th style="padding:10px 8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">مدين (DR)</th>
+            <th style="padding:10px 8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">دائن (CR)</th>
+            <th style="padding:10px 8px;width:36px"></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="border-top:2px solid var(--border);background:var(--cream)">
+            <td colspan="3" style="padding:10px 8px;font-weight:700">الإجماليات</td>
+            <td style="padding:10px 8px;text-align:right;font-weight:700;color:var(--blue)">SAR ${accFmt(totalDebit)}</td>
+            <td style="padding:10px 8px;text-align:right;font-weight:700;color:var(--blue)">SAR ${accFmt(totalCredit)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div style="padding:10px 16px;font-size:0.8rem;color:var(--ink-muted)">💡 اضغط على أي صف لعرض تفاصيل القيد. القيود تُولَّد تلقائياً من الحجوزات — الشطب والمردودات يُدخَل يدوياً.</div>
+  </div>`;
+}
+
+/* ── Tab: Prepaid Assets ────────────────────────────── */
+function renderAccPrepaid(entries) {
+  const assetEntries = entries.filter(e=>e.type==='allotment_asset');
+  if (!assetEntries.length) return '<div class="card"><div style="padding:40px;text-align:center;color:var(--ink-muted)">لا توجد عقود أوتمان. أضف فنادق بعقود أوتمان لتظهر هنا كأصول مدفوعة مسبقاً.</div></div>';
+
+  const rows = assetEntries.map(e => {
+    const isRoom      = e.lines.some(l=>l.code==='1100');
+    const totalAsset  = e.lines.find(l=>l.code==='1100'||l.code==='1200')?.debit || 0;
+    const soldCode    = isRoom ? '1100' : '1200';
+    const hotelSold   = entries.filter(s=>s.sourceId===e.sourceId && s.type!=='allotment_asset')
+      .reduce((sum,s)=>sum+s.lines.filter(l=>l.code===soldCode).reduce((ss,l)=>ss+l.credit,0),0);
+    const hotelWo     = entries.filter(s=>s.type==='writeoff'&&s.sourceId===e.sourceId)
+      .reduce((sum,s)=>sum+s.lines.filter(l=>l.code===soldCode).reduce((ss,l)=>ss+l.credit,0),0);
+    const remaining   = Math.max(0, totalAsset - hotelSold - hotelWo);
+    const pctSold     = totalAsset > 0 ? Math.min(100,Math.round((hotelSold/totalAsset)*100)) : 0;
+    const barColor    = pctSold >= 100 ? 'var(--green)' : pctSold > 50 ? 'var(--amber)' : 'var(--blue)';
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 8px;font-size:0.85rem;font-weight:600">${e.ref}</td>
+      <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted)">${isRoom?'غرف':'وجبات'}</td>
+      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted)">${e.date||''}</td>
+      <td style="padding:10px 8px;text-align:right;font-weight:600">SAR ${accFmt(totalAsset)}</td>
+      <td style="padding:10px 8px;text-align:right;color:var(--green);font-weight:600">SAR ${accFmt(hotelSold)}</td>
+      <td style="padding:10px 8px;text-align:right;color:var(--red)">SAR ${accFmt(hotelWo)}</td>
+      <td style="padding:10px 8px;text-align:right;font-weight:700;color:${barColor}">SAR ${accFmt(remaining)}</td>
+      <td style="padding:10px 8px;min-width:90px">
+        <div style="height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pctSold}%;background:${barColor};border-radius:3px;transition:width .4s"></div>
+        </div>
+        <div style="font-size:0.73rem;color:var(--ink-muted);margin-top:3px">${pctSold}% مباع</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="card">
+    <div class="card-header" style="margin-bottom:16px">
+      <div><div class="card-title">🏨 أصول المخزون المدفوع مسبقاً</div><div class="card-sub">عقود الأوتمان — قيمة تجلس كأصل حتى تُباع أو تُشطب</div></div>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);background:var(--cream)">
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الفندق</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">النوع</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">تاريخ العقد</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">إجمالي الأصل</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المباع</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المشطوب</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المتبقي</th>
+            <th style="padding:8px;font-size:0.78rem;color:var(--ink-muted);font-weight:600">نسبة البيع</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Tab: Transport Accruals ────────────────────────── */
+function renderAccTransport(entries) {
+  const transport = entries.filter(e=>e.type==='transport_accrual');
+  if (!transport.length) return '<div class="card"><div style="padding:40px;text-align:center;color:var(--ink-muted)">لا توجد حجوزات نقل.</div></div>';
+
+  let totalAccrual=0, totalSettled=0;
+  transport.forEach(e => {
+    const payable = e.lines.find(l=>l.code==='2200')?.credit||0;
+    totalAccrual += payable;
+    if (e.paymentStatus==='Paid') totalSettled += payable;
+  });
+
+  const rows = transport.map(e => {
+    const payable = e.lines.find(l=>l.code==='2200')?.credit||0;
+    const revenue = e.lines.find(l=>l.code==='4300')?.credit||0;
+    const settled = e.paymentStatus==='Paid';
+    return `<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);white-space:nowrap">${e.date||''}</td>
+      <td style="padding:10px 8px;font-size:0.83rem;font-weight:600">${e.ref||''}</td>
+      <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-mid);max-width:280px">${e.description}</td>
+      <td style="padding:10px 8px;text-align:right;font-weight:600">SAR ${accFmt(payable)}</td>
+      <td style="padding:10px 8px;text-align:right;color:var(--green)">SAR ${accFmt(revenue)}</td>
+      <td style="padding:10px 8px;text-align:center">
+        <span style="padding:3px 10px;border-radius:20px;font-size:0.73rem;font-weight:600;background:${settled?'var(--green-light)':'var(--amber-light)'};color:${settled?'var(--green)':'var(--amber)'}">
+          ${settled?'✅ مسوَّى':'⏳ مستحق'}
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px">
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:4px">إجمالي المستحقات</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--amber)">SAR ${accFmt(totalAccrual)}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px">
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:4px">المسوَّى</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--green)">SAR ${accFmt(totalSettled)}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px">
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:4px">القيد المعلق</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--red)">SAR ${accFmt(Math.max(0,totalAccrual-totalSettled))}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border);background:var(--cream)">
+              <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">التاريخ</th>
+              <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المرجع</th>
+              <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">البيان</th>
+              <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المستحق</th>
+              <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الإيراد</th>
+              <th style="padding:8px;text-align:center;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الحالة</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* ── Tab: Write-offs ────────────────────────────────── */
+function renderAccWriteoffs() {
+  const wos = (writeOffs||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if (!wos.length) return `
+    <div class="card" style="padding:48px;text-align:center">
+      <div style="font-size:2.8rem;margin-bottom:12px">📉</div>
+      <div style="color:var(--ink-mid);font-weight:600;margin-bottom:6px">لا توجد شطبات مسجلة</div>
+      <div style="color:var(--ink-muted);font-size:0.9rem;margin-bottom:18px">سجّل شطباً عندما ينتهي العقد ويبقى مخزون غير مباع.</div>
+      <button class="btn btn-gold" onclick="openWriteOffModal()">📉 تسجيل شطب</button>
+    </div>`;
+
+  const total = wos.reduce((s,w)=>s+w.totalLoss,0);
+  const rows  = wos.map(wo=>`
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted)">${wo.date||''}</td>
+      <td style="padding:10px 8px;font-size:0.85rem;font-weight:600">${wo.hotelName||''}</td>
+      <td style="padding:10px 8px;font-size:0.83rem">${wo.itemLabel||''}</td>
+      <td style="padding:10px 8px;font-size:0.83rem">${wo.units} ${wo.unitType==='meal'?'وجبات':'غرف'}</td>
+      <td style="padding:10px 8px;text-align:right;font-weight:700;color:var(--red)">SAR ${accFmt(wo.totalLoss)}</td>
+      <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted)">${wo.notes||''}</td>
+      <td style="padding:10px 8px;text-align:center">
+        <button onclick="deleteWriteOff('${wo.id}')" class="btn btn-sm" style="color:var(--red);border-color:var(--red)">✕ حذف</button>
+      </td>
+    </tr>`).join('');
+
+  return `<div class="card">
+    <div class="card-header" style="margin-bottom:16px">
+      <div><div class="card-title" style="color:var(--red)">📉 شطب المخزون غير المباع</div></div>
+      <button class="btn btn-gold" onclick="openWriteOffModal()">+ تسجيل شطب</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);background:var(--cream)">
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">التاريخ</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الفندق</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">النوع</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الوحدات</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الخسارة (SAR)</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">ملاحظات</th>
+            <th style="padding:8px"></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="border-top:2px solid var(--border);background:var(--red-light)">
+            <td colspan="4" style="padding:10px 8px;font-weight:700">إجمالي الخسائر المشطوبة</td>
+            <td style="padding:10px 8px;text-align:right;font-weight:700;color:var(--red)">SAR ${accFmt(total)}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Tab: Refunds ───────────────────────────────────── */
+function renderAccRefunds() {
+  const rfs = (acctRefunds||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if (!rfs.length) return `
+    <div class="card" style="padding:48px;text-align:center">
+      <div style="font-size:2.8rem;margin-bottom:12px">↩</div>
+      <div style="color:var(--ink-mid);font-weight:600;margin-bottom:6px">لا توجد مردودات مسجلة</div>
+      <div style="color:var(--ink-muted);font-size:0.9rem;margin-bottom:18px">سجّل مردوداً جزئياً لتوزيعه بين النقد المسترد والخسارة المعترف بها.</div>
+      <button class="btn btn-gold" onclick="openRefundModal()">↩ تسجيل مردود</button>
+    </div>`;
+
+  const rows = rfs.map(rf=>`
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted)">${rf.date||''}</td>
+      <td style="padding:10px 8px;font-size:0.85rem;font-weight:600">${rf.resRef||''}</td>
+      <td style="padding:10px 8px;text-align:right">SAR ${accFmt(rf.originalAmount)}</td>
+      <td style="padding:10px 8px;text-align:right;color:var(--green);font-weight:600">SAR ${accFmt(rf.cashRefunded)}</td>
+      <td style="padding:10px 8px;text-align:right;color:var(--red);font-weight:700">SAR ${accFmt(rf.lossAmount)}</td>
+      <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted)">${rf.paymentMethod||''}</td>
+      <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted);max-width:180px">${rf.notes||''}</td>
+      <td style="padding:10px 8px;text-align:center">
+        <button onclick="deleteAccRefund('${rf.id}')" class="btn btn-sm" style="color:var(--red);border-color:var(--red)">✕</button>
+      </td>
+    </tr>`).join('');
+
+  return `<div class="card">
+    <div class="card-header" style="margin-bottom:16px">
+      <div class="card-title">↩ المردودات الجزئية</div>
+      <button class="btn btn-gold" onclick="openRefundModal()">+ تسجيل مردود</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);background:var(--cream)">
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">التاريخ</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المرجع</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المبلغ الأصلي</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">المبلغ المردود</th>
+            <th style="padding:8px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الخسارة</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">طريقة الدفع</th>
+            <th style="padding:8px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">ملاحظات</th>
+            <th style="padding:8px"></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Write-off Modal ─────────────────────────────────── */
+function openWriteOffModal() {
+  const modal = document.getElementById('writeoff-modal');
+  if (!modal) return;
+  document.getElementById('wo-date').value  = new Date().toISOString().slice(0,10);
+  document.getElementById('wo-units').value = '';
+  document.getElementById('wo-cost').value  = '';
+  document.getElementById('wo-total').value = '';
+  document.getElementById('wo-notes').value = '';
+  const sel = document.getElementById('wo-hotel');
+  sel.innerHTML = '<option value="">-- Select Hotel --</option>';
+  (hotels||[]).filter(h =>
+    (h.roomTypes||[]).some(r=>r.contractType==='allotment') ||
+    (h.meals||[]).some(m=>m.contractType==='allotment')
+  ).forEach(h => {
+    const o = document.createElement('option');
+    o.value = h.id; o.textContent = h.name; sel.appendChild(o);
+  });
+  document.getElementById('wo-item').innerHTML = '<option value="">-- Select --</option>';
+  modal.style.display = 'flex';
+}
+function closeWriteOffModal() {
+  document.getElementById('writeoff-modal').style.display = 'none';
+}
+function populateWoItems() {
+  const hotelId   = document.getElementById('wo-hotel').value;
+  const assetType = document.getElementById('wo-asset-type').value;
+  const h         = (hotels||[]).find(x=>x.id===hotelId);
+  const itemSel   = document.getElementById('wo-item');
+  itemSel.innerHTML = '<option value="">-- Select --</option>';
+  document.getElementById('wo-cost').value  = '';
+  document.getElementById('wo-total').value = '';
+  if (!h) return;
+  const src = assetType==='room'
+    ? (h.roomTypes||[]).filter(rt=>rt.contractType==='allotment')
+    : (h.meals||[]).filter(m=>m.contractType==='allotment');
+  src.forEach(item => {
+    const o = document.createElement('option');
+    const label = item.type;
+    const cost  = item.cost || 0;
+    o.value = JSON.stringify({label, cost});
+    o.textContent = `${label} (SAR ${cost}/${assetType==='room'?'ليلة':'شخص'})`;
+    itemSel.appendChild(o);
+  });
+}
+function calcWoLoss() {
+  const val   = document.getElementById('wo-item').value;
+  const units = parseFloat(document.getElementById('wo-units').value)||0;
+  if (!val) return;
+  let p; try { p = JSON.parse(val); } catch { return; }
+  document.getElementById('wo-cost').value  = p.cost;
+  document.getElementById('wo-total').value = (p.cost * units).toFixed(2);
+}
+function saveWriteOff() {
+  const hotelId   = document.getElementById('wo-hotel').value;
+  const h         = (hotels||[]).find(x=>x.id===hotelId);
+  const assetType = document.getElementById('wo-asset-type').value;
+  const itemVal   = document.getElementById('wo-item').value;
+  const units     = parseFloat(document.getElementById('wo-units').value)||0;
+  const date      = document.getElementById('wo-date').value;
+  if (!hotelId||!itemVal||!units||!date) { toast('يرجى ملء جميع الحقول المطلوبة', false); return; }
+  let p; try { p = JSON.parse(itemVal); } catch { toast('خطأ في الاختيار', false); return; }
+  writeOffs.push({
+    id: uid(), date,
+    hotelId, hotelName: h?.name||hotelId,
+    itemLabel: p.label, unitType: assetType,
+    units, costPerUnit: p.cost, totalLoss: p.cost*units,
+    notes: document.getElementById('wo-notes').value,
+    createdAt: new Date().toISOString(),
+  });
+  persistAccounting();
+  closeWriteOffModal();
+  toast('تم تسجيل الشطب', true);
+  renderAccounting();
+}
+function deleteWriteOff(id) {
+  if (!confirm('هل تريد حذف هذا الشطب؟')) return;
+  writeOffs = writeOffs.filter(w=>w.id!==id);
+  persistAccounting();
+  toast('تم حذف الشطب', true);
+  renderAccounting();
+}
+
+/* ── Refund Modal ───────────────────────────────────── */
+function openRefundModal() {
+  const modal = document.getElementById('refund-modal');
+  if (!modal) return;
+  document.getElementById('rf-date').value  = new Date().toISOString().slice(0,10);
+  document.getElementById('rf-original').value = '';
+  document.getElementById('rf-cash').value  = '';
+  document.getElementById('rf-loss').value  = '';
+  document.getElementById('rf-notes').value = '';
+  const sel = document.getElementById('rf-reservation');
+  sel.innerHTML = '<option value="">-- Select Reservation --</option>';
+  (hotelReservations||[]).forEach(r => {
+    const o   = document.createElement('option');
+    const amt = r.totalWithVat || r.sellPrice || 0;
+    o.value = JSON.stringify({id:r.id, ref:r.voucherRef||r.confRef||r.id, amount:amt});
+    o.textContent = `${r.voucherRef||r.confRef||r.id} — ${r.agency||r.name||''} (SAR ${amt})`;
+    sel.appendChild(o);
+  });
+  modal.style.display = 'flex';
+}
+function closeRefundModal() {
+  document.getElementById('refund-modal').style.display = 'none';
+}
+function onRfResChange() {
+  const val = document.getElementById('rf-reservation').value;
+  if (!val) { document.getElementById('rf-original').value=''; return; }
+  try {
+    const p = JSON.parse(val);
+    document.getElementById('rf-original').value = p.amount||0;
+    calcRefundLoss();
+  } catch {}
+}
+function calcRefundLoss() {
+  const orig = parseFloat(document.getElementById('rf-original').value)||0;
+  const cash = parseFloat(document.getElementById('rf-cash').value)||0;
+  document.getElementById('rf-loss').value = Math.max(0, orig-cash).toFixed(2);
+}
+function saveAccRefund() {
+  const resVal = document.getElementById('rf-reservation').value;
+  const cash   = parseFloat(document.getElementById('rf-cash').value)||0;
+  const date   = document.getElementById('rf-date').value;
+  if (!resVal||!cash||!date) { toast('يرجى ملء جميع الحقول', false); return; }
+  let p; try { p = JSON.parse(resVal); } catch { toast('خطأ', false); return; }
+  const orig = p.amount||0;
+  acctRefunds.push({
+    id: uid(), date,
+    resId: p.id, resRef: p.ref,
+    originalAmount: orig, cashRefunded: cash,
+    lossAmount: Math.max(0, orig-cash),
+    paymentMethod: document.getElementById('rf-method').value,
+    notes: document.getElementById('rf-notes').value,
+    createdAt: new Date().toISOString(),
+  });
+  persistAccounting();
+  closeRefundModal();
+  toast('تم تسجيل المردود', true);
+  renderAccounting();
+}
+function deleteAccRefund(id) {
+  if (!confirm('هل تريد حذف هذا المردود؟')) return;
+  acctRefunds = acctRefunds.filter(r=>r.id!==id);
+  persistAccounting();
+  toast('تم الحذف', true);
+  renderAccounting();
+}
+
+/* ── Export CSV ─────────────────────────────────────── */
+function exportAccountingCSV() {
+  const period  = (document.getElementById('acc-period')||{}).value||'all';
+  const entries = computeJournalEntries(period);
+  const rows    = [['Date','Type','Reference','Description','Account Code','Account','Debit (SAR)','Credit (SAR)']];
+  entries.forEach(e => e.lines.forEach(l => {
+    rows.push([e.date, e.type, e.ref, e.description, l.code, l.account, l.debit||'', l.credit||'']);
+  }));
+  const csv  = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='accounting-ledger.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
 
 window.toggleMobileSidebar = function() {
   var sidebar = document.getElementById('sidebar');

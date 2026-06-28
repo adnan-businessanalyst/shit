@@ -600,6 +600,103 @@ Stored as a single object.
 
 ---
 
+---
+
+### Write-off (`writeOffs[]`) — Accounting Module
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique ID |
+| `date` | string | Write-off date |
+| `hotelId` | string | Linked hotel ID |
+| `hotelName` | string | Hotel name (denormalised) |
+| `itemLabel` | string | Room type or meal type name |
+| `unitType` | string | `room` or `meal` |
+| `units` | number | Number of unsold units |
+| `costPerUnit` | number | Cost per unit (SAR) |
+| `totalLoss` | number | Total loss recognised (SAR) = units × costPerUnit |
+| `notes` | string | Notes |
+| `createdAt` | string | Timestamp |
+
+---
+
+### Accounting Refund (`acctRefunds[]`) — Accounting Module
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique ID |
+| `date` | string | Refund date |
+| `resId` | string | Linked reservation ID |
+| `resRef` | string | Reservation reference (denormalised) |
+| `originalAmount` | number | Original sale amount (SAR) |
+| `cashRefunded` | number | Cash returned to client (SAR) |
+| `lossAmount` | number | Loss recognised = originalAmount − cashRefunded |
+| `paymentMethod` | string | Cash / Bank Transfer / Credit Card / Cheque |
+| `notes` | string | Notes |
+| `createdAt` | string | Timestamp |
+
+---
+
+### Accounting — Chart of Accounts (computed, not stored)
+
+| Code | Account Name | Type |
+|---|---|---|
+| `1010` | Cash / Bank | Asset |
+| `1100` | Prepaid Room Inventory | Asset |
+| `1200` | Prepaid Meal Inventory | Asset |
+| `1300` | Accounts Receivable | Asset |
+| `2200` | Accrued Transport Payable | Liability |
+| `2300` | Accounts Payable | Liability |
+| `4100` | Room Revenue | Revenue |
+| `4200` | Meal Revenue | Revenue |
+| `4300` | Transport Revenue | Revenue |
+| `5100` | Room Cost of Sales | Expense |
+| `5200` | Meal Cost of Sales | Expense |
+| `5300` | Transport Cost | Expense |
+| `6100` | Inventory Write-off Loss | Loss |
+| `6200` | Partial Refund Loss | Loss |
+
+---
+
+### Accounting — New JS Globals
+
+| Variable | Purpose |
+|---|---|
+| `writeOffs` | Persisted array of inventory write-off records |
+| `acctRefunds` | Persisted array of partial refund records |
+| `_accCurrentTab` | Currently active tab on the Accounting Ledger page |
+
+### Accounting — New JS Functions
+
+| Function | Purpose |
+|---|---|
+| `persistAccounting()` | Saves `writeOffs` and `acctRefunds` to DB |
+| `accInPeriod(dateStr, period)` | Returns true if a date falls within the selected period filter |
+| `accFmt(n)` | Formats a number as SAR 2-decimal string |
+| `computeJournalEntries(period)` | Generates all journal entries from hotels, reservations, busReservations, writeOffs, acctRefunds |
+| `renderAccounting()` | Main render for the Accounting Ledger page |
+| `switchAccTab(tab, btnEl, entries)` | Switches between ledger tabs |
+| `renderAccLedger(entries)` | Renders the Journal Ledger tab |
+| `renderAccPrepaid(entries)` | Renders the Prepaid Assets tab |
+| `renderAccTransport(entries)` | Renders the Transport Accruals tab |
+| `renderAccWriteoffs()` | Renders the Write-offs tab |
+| `renderAccRefunds()` | Renders the Refunds tab |
+| `openWriteOffModal()` | Opens the write-off entry modal |
+| `closeWriteOffModal()` | Closes the write-off modal |
+| `populateWoItems()` | Populates allotment item dropdown in write-off modal |
+| `calcWoLoss()` | Calculates total loss in write-off modal |
+| `saveWriteOff()` | Saves a new write-off record |
+| `deleteWriteOff(id)` | Deletes a write-off record |
+| `openRefundModal()` | Opens the refund entry modal |
+| `closeRefundModal()` | Closes the refund modal |
+| `onRfResChange()` | Handles reservation selection change in refund modal |
+| `calcRefundLoss()` | Calculates loss split in refund modal |
+| `saveAccRefund()` | Saves a new partial refund record |
+| `deleteAccRefund(id)` | Deletes a refund record |
+| `exportAccountingCSV()` | Exports full journal ledger as CSV |
+
+---
+
 ## Lookup Lists
 
 User-configurable via Settings → Lookups. Stored under `Prefs.get('lookups')`.
