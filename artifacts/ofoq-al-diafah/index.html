@@ -2817,6 +2817,7 @@ body.dark-mode .action-bar { background: #1A1A1A; }
       <!-- Tabs -->
       <div style="display:flex;gap:3px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:4px">
         <button class="acc-tab-btn active" onclick="switchAccTab('ledger',this)">📒 Journal Ledger</button>
+        <button class="acc-tab-btn" onclick="switchAccTab('balance',this)">📊 الميزانية</button>
         <button class="acc-tab-btn" onclick="switchAccTab('prepaid',this)">🏨 Prepaid Assets</button>
         <button class="acc-tab-btn" onclick="switchAccTab('transport',this)">🚌 Transport Accruals</button>
         <button class="acc-tab-btn" onclick="switchAccTab('writeoffs',this)">📉 Write-offs</button>
@@ -18464,7 +18465,7 @@ function switchAccTab(tab, btnEl, entries) {
   if (btnEl) {
     btnEl.classList.add('active');
   } else {
-    const map = ['ledger','prepaid','transport','writeoffs','refunds'];
+    const map = ['ledger','balance','prepaid','transport','writeoffs','refunds'];
     const idx = map.indexOf(tab);
     const btns = document.querySelectorAll('.acc-tab-btn');
     if (btns[idx]) btns[idx].classList.add('active');
@@ -18476,10 +18477,199 @@ function switchAccTab(tab, btnEl, entries) {
   const el = document.getElementById('acc-tab-content');
   if (!el) return;
   if      (tab==='ledger')    el.innerHTML = renderAccLedger(entries);
+  else if (tab==='balance')   el.innerHTML = renderAccBalance(entries);
   else if (tab==='prepaid')   el.innerHTML = renderAccPrepaid(entries);
   else if (tab==='transport') el.innerHTML = renderAccTransport(entries);
   else if (tab==='writeoffs') el.innerHTML = renderAccWriteoffs();
   else if (tab==='refunds')   el.innerHTML = renderAccRefunds();
+}
+
+/* ── Tab: Balance Sheet (Assets / Receivables / Payables) ── */
+function renderAccBalance(entries) {
+  // Aggregate net balance per account code across all journal entries
+  const bal = {};
+  const addBal = (code, dr, cr) => { bal[code] = (bal[code]||0) + dr - cr; };
+  entries.forEach(e => e.lines.forEach(l => addBal(l.code, l.debit, l.credit)));
+
+  const v = code => Math.max(0, bal[code]||0);
+  const vNet = code => bal[code]||0;
+
+  // — Assets —
+  const prepaidRooms   = v('1100');
+  const prepaidMeals   = v('1200');
+  const arTotal        = v('1300');
+  const cashNet        = Math.abs(vNet('1010'));
+  const totalAssets    = prepaidRooms + prepaidMeals + arTotal;
+
+  // — Liabilities —
+  const apHotels       = Math.abs(vNet('2300'));
+  const accrTransport  = Math.abs(vNet('2200'));
+  const totalLiab      = apHotels + accrTransport;
+
+  // — Revenue & COGS —
+  const revRooms       = Math.abs(vNet('4100'));
+  const revMeals       = Math.abs(vNet('4200'));
+  const revTransport   = Math.abs(vNet('4300'));
+  const totalRev       = revRooms + revMeals + revTransport;
+  const cogsRooms      = v('5100');
+  const cogsMeals      = v('5200');
+  const cogsTransport  = v('5300');
+  const totalCogs      = cogsRooms + cogsMeals + cogsTransport;
+  const grossProfit    = totalRev - totalCogs;
+  const lossWO         = v('6100');
+  const lossRef        = v('6200');
+  const netProfit      = grossProfit - lossWO - lossRef;
+
+  const row = (label, amount, indent=false, bold=false, color='var(--ink)', code='') => `
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:9px 14px ${indent?'9px 30px':'9px 14px'};font-size:${bold?'0.9rem':'0.85rem'};font-weight:${bold?700:400};color:${bold?'var(--ink)':'var(--ink-mid)'}">
+        ${code?`<span style="font-family:monospace;font-size:0.73rem;background:var(--cream-dark);padding:1px 5px;border-radius:3px;margin-inline-end:8px;color:var(--ink-muted)">${code}</span>`:''}${label}
+      </td>
+      <td style="padding:9px 14px;text-align:left;font-size:${bold?'0.9rem':'0.85rem'};font-weight:${bold?700:400};color:${color};white-space:nowrap">
+        ${amount > 0 || bold ? 'SAR '+accFmt(amount) : '<span style="color:var(--ink-muted)">—</span>'}
+      </td>
+    </tr>`;
+
+  const sectionHeader = (label, icon, bgColor='var(--cream)') => `
+    <tr style="background:${bgColor}">
+      <td colspan="2" style="padding:11px 14px;font-weight:700;font-size:0.88rem;color:var(--ink-muted);letter-spacing:0.03em;text-transform:uppercase">${icon} ${label}</td>
+    </tr>`;
+
+  const divider = () => `<tr><td colspan="2" style="padding:0;height:12px;background:var(--bg)"></td></tr>`;
+
+  const profitColor = netProfit >= 0 ? 'var(--green)' : 'var(--red)';
+  const profitIcon  = netProfit >= 0 ? '▲' : '▼';
+
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+    <!-- LEFT COLUMN: Balance Sheet -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px;background:var(--gold);color:#010101;font-weight:700;font-size:0.95rem">
+        📊 الميزانية العمومية
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tbody>
+          ${sectionHeader('الأصول المتداولة','🏦','var(--blue-light)')}
+          ${row('مخزون غرف (أوتمان مدفوع مسبقاً)', prepaidRooms, true, false, 'var(--blue)', '1100')}
+          ${row('مخزون وجبات (أوتمان مدفوع مسبقاً)', prepaidMeals, true, false, 'var(--blue)', '1200')}
+          ${row('ذمم مدينة — العملاء', arTotal, true, false, 'var(--blue)', '1300')}
+          ${row('إجمالي الأصول', totalAssets, false, true, 'var(--blue)')}
+
+          ${divider()}
+
+          ${sectionHeader('الالتزامات المتداولة','🏦','rgba(220,53,69,0.08)')}
+          ${row('ذمم دائنة — الفنادق', apHotels, true, false, 'var(--red)', '2300')}
+          ${row('مستحقات نقل (غير مسددة)', accrTransport, true, false, 'var(--amber)', '2200')}
+          ${row('إجمالي الالتزامات', totalLiab, false, true, 'var(--red)')}
+
+          ${divider()}
+
+          <tr>
+            <td style="padding:11px 14px;font-weight:700;font-size:0.85rem;color:var(--ink-muted)">صافي المركز المالي</td>
+            <td style="padding:11px 14px;text-align:left;font-weight:700;font-size:1rem;color:${totalAssets>=totalLiab?'var(--green)':'var(--red)'}">
+              SAR ${accFmt(Math.abs(totalAssets - totalLiab))}
+              <span style="font-size:0.75rem;margin-inline-start:4px">${totalAssets>=totalLiab?'▲ فائض':'▼ عجز'}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RIGHT COLUMN: P&L -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px;background:var(--gold);color:#010101;font-weight:700;font-size:0.95rem">
+        📈 قائمة الدخل
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tbody>
+          ${sectionHeader('الإيرادات','💰','rgba(26,107,60,0.08)')}
+          ${row('إيراد الغرف', revRooms, true, false, 'var(--green)', '4100')}
+          ${row('إيراد الوجبات', revMeals, true, false, 'var(--green)', '4200')}
+          ${row('إيراد النقل', revTransport, true, false, 'var(--green)', '4300')}
+          ${row('إجمالي الإيرادات', totalRev, false, true, 'var(--green)')}
+
+          ${divider()}
+
+          ${sectionHeader('تكلفة المبيعات (COGS)','📦','rgba(0,0,0,0.04)')}
+          ${row('تكلفة الغرف', cogsRooms, true, false, 'var(--ink-mid)', '5100')}
+          ${row('تكلفة الوجبات', cogsMeals, true, false, 'var(--ink-mid)', '5200')}
+          ${row('تكلفة النقل', cogsTransport, true, false, 'var(--ink-mid)', '5300')}
+          ${row('إجمالي التكلفة', totalCogs, false, true, 'var(--ink)')}
+
+          ${divider()}
+
+          <tr style="background:rgba(26,107,60,0.06)">
+            <td style="padding:9px 14px;font-weight:700;font-size:0.88rem">مجمل الربح</td>
+            <td style="padding:9px 14px;text-align:left;font-weight:700;color:${grossProfit>=0?'var(--green)':'var(--red)'}">SAR ${accFmt(Math.abs(grossProfit))}</td>
+          </tr>
+
+          ${divider()}
+
+          ${sectionHeader('الخسائر','📉','rgba(220,53,69,0.05)')}
+          ${row('خسائر شطب المخزون', lossWO, true, false, 'var(--red)', '6100')}
+          ${row('خسائر استرداد جزئي', lossRef, true, false, 'var(--red)', '6200')}
+
+          ${divider()}
+
+          <tr style="background:${netProfit>=0?'rgba(26,107,60,0.08)':'rgba(220,53,69,0.08)'}">
+            <td style="padding:12px 14px;font-weight:700;font-size:0.95rem">صافي الربح / الخسارة</td>
+            <td style="padding:12px 14px;text-align:left;font-weight:700;font-size:1.1rem;color:${profitColor}">
+              ${profitIcon} SAR ${accFmt(Math.abs(netProfit))}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Bottom: per-account breakdown -->
+  <div class="card" style="margin-top:18px;padding:0;overflow:hidden">
+    <div style="padding:12px 16px;background:var(--cream-dark);font-weight:700;font-size:0.88rem;color:var(--ink-muted)">
+      🔍 رصيد كل حساب على حدة
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--cream);border-bottom:2px solid var(--border)">
+            <th style="padding:9px 14px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">كود</th>
+            <th style="padding:9px 14px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">اسم الحساب</th>
+            <th style="padding:9px 14px;text-align:right;font-size:0.78rem;color:var(--ink-muted);font-weight:600">النوع</th>
+            <th style="padding:9px 14px;text-align:left;font-size:0.78rem;color:var(--ink-muted);font-weight:600">الرصيد</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[
+            {code:'1010',name:'نقدية / بنك',             type:'أصل',     balance:cashNet,       color:'var(--blue)'},
+            {code:'1100',name:'مخزون غرف مدفوع مسبقاً',  type:'أصل',     balance:prepaidRooms,  color:'var(--blue)'},
+            {code:'1200',name:'مخزون وجبات مدفوع مسبقاً',type:'أصل',     balance:prepaidMeals,  color:'var(--blue)'},
+            {code:'1300',name:'ذمم مدينة (العملاء)',      type:'أصل',     balance:arTotal,       color:'var(--blue)'},
+            {code:'2200',name:'مستحقات نقل دائنة',        type:'التزام',  balance:accrTransport, color:'var(--amber)'},
+            {code:'2300',name:'ذمم دائنة (الفنادق)',      type:'التزام',  balance:apHotels,      color:'var(--red)'},
+            {code:'4100',name:'إيراد الغرف',              type:'إيراد',   balance:revRooms,      color:'var(--green)'},
+            {code:'4200',name:'إيراد الوجبات',            type:'إيراد',   balance:revMeals,      color:'var(--green)'},
+            {code:'4300',name:'إيراد النقل',              type:'إيراد',   balance:revTransport,  color:'var(--green)'},
+            {code:'5100',name:'تكلفة مبيعات الغرف',      type:'مصروف',   balance:cogsRooms,     color:'var(--ink-mid)'},
+            {code:'5200',name:'تكلفة مبيعات الوجبات',    type:'مصروف',   balance:cogsMeals,     color:'var(--ink-mid)'},
+            {code:'5300',name:'تكلفة النقل',              type:'مصروف',   balance:cogsTransport, color:'var(--ink-mid)'},
+            {code:'6100',name:'خسارة شطب المخزون',        type:'خسارة',   balance:lossWO,        color:'var(--red)'},
+            {code:'6200',name:'خسارة استرداد جزئي',       type:'خسارة',   balance:lossRef,       color:'var(--red)'},
+          ].map(a=>`
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:8px 14px;font-family:monospace;font-size:0.82rem;color:var(--ink-muted)">${a.code}</td>
+              <td style="padding:8px 14px;font-size:0.85rem;color:var(--ink)">${a.name}</td>
+              <td style="padding:8px 14px">
+                <span style="font-size:0.73rem;padding:2px 8px;border-radius:12px;background:var(--cream-dark);color:var(--ink-muted)">${a.type}</span>
+              </td>
+              <td style="padding:8px 14px;text-align:left;font-weight:600;color:${a.balance>0?a.color:'var(--ink-muted)'}">
+                ${a.balance > 0 ? 'SAR '+accFmt(a.balance) : '—'}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
 }
 
 /* ── Tab: Journal Ledger ────────────────────────────── */
