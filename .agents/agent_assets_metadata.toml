@@ -23,3 +23,9 @@ id = "ZkQORCAaQ04Af2VU2h7mP"
 uri = "file://exports/ofoq-variables-reference.md"
 type = "text"
 title = "Ofoq Variables & Data Fields Reference"
+
+[[outputs]]
+id = "LM7TD-cWAVusHepe5WtYx"
+uri = "file://ACCOUNTING-GUIDE-AR.md"
+type = "text"
+title = "دليل المعاملات المحاسبية — أفق الضيافة"
