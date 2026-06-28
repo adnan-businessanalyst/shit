@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "soAKUMEBVjMvIO7iZNcLR"
@@ -18,3 +17,9 @@ id = "L3G5LdDwx1jsgERaA9op4"
 uri = "file://artifacts/ofoq-al-diafah/public/images/hotel-lobby.png"
 type = "image"
 title = "Luxury Arabic hotel lobby"
+
+[[outputs]]
+id = "ZkQORCAaQ04Af2VU2h7mP"
+uri = "file://exports/ofoq-variables-reference.md"
+type = "text"
+title = "Ofoq Variables & Data Fields Reference"
