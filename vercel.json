@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
   "buildCommand": "pnpm --filter @workspace/ofoq-al-diafah run build",
-  "outputDirectory": "artifacts/ofoq-al-diafah/dist/public",
+  "outputDirectory": "artifacts/ofoq-al-diafah/dist",
   "framework": null,
   "build": {
     "env": {
